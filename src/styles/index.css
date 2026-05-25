@@ -3,8 +3,7 @@
    Precise implementation of the Stitch "Corporate Financial System" design spec
    ───────────────────────────────────────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.cdnfonts.com/css/metropolis');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap');
 
 /* ── Design Tokens ─────────────────────────────────────────────────────────── */
 :root {
@@ -70,8 +69,8 @@
   --sidebar-label-color:        rgba(255,215,0,0.55);
 
   /* ── Typography ── */
-  --font-headline: 'Metropolis', 'Helvetica Neue', system-ui, sans-serif;
-  --font-body:     'Inter', system-ui, -apple-system, sans-serif;
+  --font-headline: 'Hanken Grotesk', 'Helvetica Neue', system-ui, sans-serif;
+  --font-body:     'Hanken Grotesk', system-ui, -apple-system, sans-serif;
 
   /* Type Scale */
   --text-headline-xl:  48px;  --lh-headline-xl:  56px;
