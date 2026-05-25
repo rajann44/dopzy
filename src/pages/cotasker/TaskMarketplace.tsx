@@ -40,7 +40,7 @@ export function TaskMarketplace() {
             {getGreeting()}, {currentUser?.name.split(' ')[0]} 👋
           </h1>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
-            Ihre Online-Plattform für Dienstleistungen — {tasks.length} task{tasks.length !== 1 ? 's' : ''} available.
+            Your Online Platform for Services — {tasks.length} task{tasks.length !== 1 ? 's' : ''} available.
           </p>
         </div>
       </div>
@@ -49,17 +49,17 @@ export function TaskMarketplace() {
         {/* Clipped Promo Banner (Transaction Overview spec) */}
         <div className="promo-banner">
           <div className="promo-banner-left">
-            <img 
-              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600" 
-              alt="Bank architecture" 
+            <img
+              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600"
+              alt="Bank architecture"
             />
           </div>
           <div className="promo-banner-right">
             <span style={{ fontSize: 'var(--text-body-sm)', fontWeight: 500 }}>
-              Sehr geehrter Kunde, für jeden geworbenen Neukunden <strong style={{ color: 'var(--color-primary-container)' }}>schenken wir Ihnen 100 €.</strong>
+              Dear Customer, for every new customer you refer <strong style={{ color: 'var(--color-primary-container)' }}>we are giving you €1.</strong>
             </span>
             <button className="promo-card-btn-gold" style={{ fontSize: '11px', padding: '6px 14px' }}>
-              Jetzt Prämie sichern
+              Claim Your Bonus Now
             </button>
           </div>
         </div>
