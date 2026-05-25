@@ -1,18 +1,15 @@
-import { useState } from 'react';
-import { Star, Clock, DollarSign, CheckCircle, MessageSquare } from 'lucide-react';
-import type { Offer } from '../../types';
+import { useState, useEffect } from 'react';
+import { Star, Clock, CheckCircle } from 'lucide-react';
+import type { Offer, User, CoTaskerProfile } from '../../types';
 import { StatusBadge } from '../ui/Badge';
 import { Avatar } from '../ui/Avatar';
 import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
 import { profileService } from '../../services/profileService';
-import { useEffect } from 'react';
-import type { User, CoTaskerProfile } from '../../types';
 
 interface OfferCardProps {
   offer: Offer;
   onAccept?: (offerId: string) => void;
   onWithdraw?: (offerId: string) => void;
-  onEdit?: (offer: Offer) => void;
   viewerRole: 'client' | 'cotasker' | 'admin';
   showActions?: boolean;
 }
@@ -26,80 +23,97 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
     profileService.getCoTaskerProfile(offer.coTaskerId).then(setProfile);
   }, [offer.coTaskerId]);
 
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
+
   return (
-    <div className="card" style={{ marginBottom: 'var(--space-3)' }}>
-      <div className="card-body" style={{ padding: 'var(--space-4)' }}>
-        <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
-          {/* Avatar */}
-          <Avatar name={user?.name ?? '?'} avatarUrl={user?.avatarUrl} size="lg" />
+    <div className="transaction-row-item" style={{ gridTemplateColumns: '56px 1.5fr 2fr 130px 160px', padding: '16px var(--space-4)' }}>
+      {/* 1. Initials / Avatar Column */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ position: 'relative' }}>
+          <Avatar name={user?.name ?? '?'} avatarUrl={user?.avatarUrl} size="md" />
+          <span style={{
+            position: 'absolute',
+            top: -2,
+            right: -2,
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: 'var(--color-primary-container)',
+            border: '2px solid var(--color-surface-white)'
+          }}></span>
+        </div>
+      </div>
 
-          {/* Content */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-2)' }}>
-              <span style={{ fontWeight: 700, fontSize: 'var(--text-body-md)', color: 'var(--color-on-surface)' }}>
-                {user?.name ?? 'Loading...'}
-              </span>
-              {profile && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary-mid)', fontWeight: 600 }}>
-                  <Star size={13} fill="var(--color-primary-container)" color="var(--color-primary)" />
-                  {profile.rating}
-                </span>
-              )}
-              <div style={{ marginLeft: 'auto' }}>
-                <StatusBadge status={offer.status} />
-              </div>
-            </div>
+      {/* 2. Provider Info & Rating */}
+      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, paddingRight: '12px' }}>
+        <span style={{ fontWeight: 700, color: 'var(--color-secondary)', fontSize: 'var(--text-body-sm)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+          {user?.name ?? 'Loading...'}
+        </span>
+        {profile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '11px', color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+              <Star size={11} fill="var(--color-primary-container)" color="var(--color-primary)" />
+              {profile.rating}
+            </span>
+            <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)' }}>
+              ({profile.completedJobs} jobs done)
+            </span>
+          </div>
+        )}
+      </div>
 
-            {/* Message */}
-            <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-3)', lineHeight: '18px' }}>
-              <MessageSquare size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle', color: 'var(--color-secondary-mid)' }} />
-              {offer.message}
-            </p>
+      {/* 3. Bid Proposal Message */}
+      <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, paddingRight: '12px' }}>
+        <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', margin: 0, fontStyle: 'italic', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+          "{offer.message}"
+        </p>
+      </div>
 
-            {/* Stats row */}
-            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', alignItems: 'center' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)', fontFamily: 'var(--font-headline)' }}>
-                <DollarSign size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                {formatCurrency(offer.price)}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Clock size={13} style={{ color: 'var(--color-secondary-mid)' }} />
-                ~{offer.estimatedHours}h
-              </span>
-              {profile && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <CheckCircle size={13} style={{ color: 'var(--color-status-success)' }} />
-                  {profile.completedJobs} jobs done
-                </span>
-              )}
-              <span style={{ marginLeft: 'auto', color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-label-md)' }}>
-                {formatRelativeTime(offer.createdAt)}
-              </span>
-            </div>
+      {/* 4. Timeline / Effort */}
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary-mid)', fontWeight: 500 }}>
+          <Clock size={13} /> ~{offer.estimatedHours} hours
+        </span>
+        <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', marginTop: '2px', textTransform: 'uppercase' }}>
+          {formatRelativeTime(offer.createdAt)}
+        </span>
+      </div>
+
+      {/* 5. Pricing & Action */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px' }}>
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div className="transaction-amount-green" style={{ fontSize: '16px' }}>
+            {formatCurrency(offer.price)}
+          </div>
+          <div style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '1px' }}>
+            Bid Price
           </div>
         </div>
 
-        {/* Actions */}
-        {showActions && offer.status === 'pending' && (
-          <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-surface-container-highest)', display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
+        {showActions && offer.status === 'pending' ? (
+          <div>
             {viewerRole === 'client' && onAccept && (
               <button
                 className="btn btn-primary btn-sm"
                 onClick={() => onAccept(offer.id)}
-                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                style={{ padding: '6px 12px', fontSize: '10.5px' }}
               >
-                <CheckCircle size={14} />
-                Accept Offer
+                Accept
               </button>
             )}
             {viewerRole === 'cotasker' && onWithdraw && (
               <button
                 className="btn btn-danger btn-sm"
                 onClick={() => onWithdraw(offer.id)}
+                style={{ padding: '6px 12px', fontSize: '10.5px' }}
               >
-                Withdraw Offer
+                Withdraw
               </button>
             )}
+          </div>
+        ) : (
+          <div style={{ flexShrink: 0 }}>
+            <StatusBadge status={offer.status} />
           </div>
         )}
       </div>

@@ -6,6 +6,7 @@ import { useAppContext, createOfferAction, withdrawOfferAction, updateTaskStatus
 import { useToast } from '../../context/ToastContext';
 import { StatusBadge } from '../../components/ui/Badge';
 import { OfferForm } from '../../components/offers/OfferForm';
+import { OfferCard } from '../../components/offers/OfferCard';
 import { ConfirmModal } from '../../components/ui/Modal';
 import { Avatar } from '../../components/ui/Avatar';
 import { profileService } from '../../services/profileService';
@@ -141,12 +142,27 @@ export function CoTaskerTaskDetail() {
 
                 {task.mustHaves && task.mustHaves.length > 0 && (
                   <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '6px' }}>Must-Haves & Requirements</div>
-                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>Must-Haves & Requirements</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       {task.mustHaves.map((m, i) => (
-                        <li key={i} style={{ marginBottom: '4px' }}>{m}</li>
+                        <div key={i} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--space-3)',
+                          padding: '10px var(--space-4)',
+                          background: 'var(--color-surface-container-low)',
+                          border: '1px solid var(--color-outline-variant)',
+                          borderRadius: 'var(--radius)',
+                        }}>
+                          <div className="transaction-initials-badge" style={{ width: '24px', height: '24px', fontSize: '10px', flexShrink: 0, background: 'var(--color-primary-container)', borderColor: 'var(--color-outline-variant)', color: 'var(--color-secondary)' }}>
+                            ✓
+                          </div>
+                          <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)', fontWeight: 500 }}>
+                            {m}
+                          </span>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
 
@@ -186,34 +202,15 @@ export function CoTaskerTaskDetail() {
 
             {/* My Offer / Offer Form */}
             {myOffer ? (
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Your Active Offer</h2>
-                  <StatusBadge status={myOffer.status} />
-                </div>
-                <div className="card-body">
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
-                    <div>
-                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Your Proposed Price</div>
-                      <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary)' }}>
-                        {formatCurrency(myOffer.price)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Estimated Time</div>
-                      <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary)' }}>
-                        {myOffer.estimatedHours} hours
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontStyle: 'italic', marginBottom: 'var(--space-4)', border: '1px solid var(--color-outline-variant)' }}>
-                    "{myOffer.message}"
-                  </div>
-                  {myOffer.status === 'pending' && (
-                    <button className="btn btn-danger btn-sm" onClick={() => setWithdrawConfirm(true)}>
-                      Withdraw Offer
-                    </button>
-                  )}
+              <div style={{ marginBottom: 'var(--space-6)' }}>
+                <div className="section-label" style={{ marginBottom: '12px' }}>Your Active Offer</div>
+                <div className="transaction-rows-container">
+                  <OfferCard
+                    offer={myOffer}
+                    onWithdraw={() => setWithdrawConfirm(true)}
+                    viewerRole="cotasker"
+                    showActions={myOffer.status === 'pending'}
+                  />
                 </div>
               </div>
             ) : canOffer ? (
@@ -268,10 +265,26 @@ export function CoTaskerTaskDetail() {
 
           {/* Right Sidebar Column */}
           <div className="bento-col-4 flex flex-col gap-6">
-            {/* Client Budget */}
-            <div className="card">
-              <div className="card-body" style={{ padding: 'var(--space-5)' }}>
-                <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Client Budget</div>
+            {/* GiroKonto styled Budget Card */}
+            <div className="card" style={{ padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '200px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: 'var(--color-surface-container-low)',
+                  border: '1.5px solid var(--color-outline-variant)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--color-secondary)'
+                }}>
+                  <Wallet size={18} />
+                </div>
+                <span className="text-label" style={{ fontSize: '9px', color: 'var(--color-on-surface-variant)' }}>Contract Spec</span>
+              </div>
+              <div>
+                <div className="section-label" style={{ fontSize: '10px', marginBottom: '4px' }}>Client Budget</div>
                 {task.budgetType === 'fixed' && task.budget ? (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
                     {formatCurrency(task.budget)}
@@ -281,13 +294,13 @@ export function CoTaskerTaskDetail() {
                     {formatCurrency(task.budget)}/hr
                   </div>
                 ) : (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '20px', fontWeight: 600, color: 'var(--color-secondary-mid)' }}>
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary-mid)', lineHeight: 1.1 }}>
                     Open to offers
                   </div>
                 )}
-                <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '8px' }}>
-                  {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
-                </div>
+              </div>
+              <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
+                {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Plus, Briefcase, Star, ArrowRight } from 'lucide-react';
+import { Plus, Briefcase, Star, ArrowRight, Wallet, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAppContext } from '../context/AppContext';
 import { StatusBadge } from '../components/ui/Badge';
@@ -87,8 +87,18 @@ export function MyTasksPage() {
               {/* GiroKonto styled Escrow Card */}
               <div className="bento-col-4 card" style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '260px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div className="diamond-logo-wrap">
-                    <div className="diamond-logo-inner"></div>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'var(--color-surface-container-low)',
+                    border: '1.5px solid var(--color-outline-variant)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--color-secondary)'
+                  }}>
+                    <Wallet size={20} />
                   </div>
                   <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>GiroKonto Style</span>
                 </div>
@@ -140,8 +150,18 @@ export function MyTasksPage() {
               {/* GiroKonto styled Earnings Card */}
               <div className="bento-col-4 card" style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '260px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div className="diamond-logo-wrap">
-                    <div className="diamond-logo-inner"></div>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'var(--color-surface-container-low)',
+                    border: '1.5px solid var(--color-outline-variant)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--color-secondary)'
+                  }}>
+                    <TrendingUp size={20} />
                   </div>
                   <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>GiroKonto Style</span>
                 </div>

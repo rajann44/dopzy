@@ -15,15 +15,18 @@ interface TaskCardProps {
 export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
   const emoji = CATEGORY_ICONS[task.category] ?? '📋';
 
+  // Standardise links: if prefix is empty string, route to /tasks/:id
+  const targetPath = linkPrefix === '' ? `/tasks/${task.id}` : `${linkPrefix}/tasks/${task.id}`;
+
   return (
     <Link
-      to={`${linkPrefix}/tasks/${task.id}`}
+      to={targetPath}
       style={{ textDecoration: 'none' }}
     >
       <article className="card card-hover" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Category Header */}
+        {/* Category Header with Commerzbank Diamond */}
         <div style={{
-          padding: 'var(--space-3) var(--space-4)',
+          padding: '12px var(--space-4)',
           background: 'var(--color-surface-container-low)',
           borderBottom: '1px solid var(--color-outline-variant)',
           display: 'flex',
@@ -31,19 +34,29 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
           justifyContent: 'space-between',
           gap: 'var(--space-2)',
         }}>
-          <span className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', margin: 0, fontSize: '11px' }}>
-            <span>{emoji}</span>
-            {task.category}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-secondary)' }}>
+              <span style={{ fontSize: '14px' }}>{emoji}</span>
+              {task.category}
+            </span>
+          </div>
           <StatusBadge status={task.status} />
         </div>
 
         {/* Card Body */}
         <div className="card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
-          <h3 className="text-headline-sm" style={{ color: 'var(--color-on-surface)', fontSize: '16px', fontWeight: 700, lineHeight: '22px' }}>
+          <h3 style={{ 
+            fontFamily: 'var(--font-headline)',
+            fontSize: '16.5px', 
+            fontWeight: 700, 
+            lineHeight: '22px',
+            color: 'var(--color-secondary)',
+            letterSpacing: '-0.01em',
+            margin: 0
+          }}>
             {truncate(task.title, 70)}
           </h3>
-          <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', flex: 1, lineHeight: '18px' }}>
+          <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', flex: 1, lineHeight: '18px', margin: 0 }}>
             {truncate(task.description, 110)}
           </p>
 
@@ -60,7 +73,7 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer with Pill Budget */}
         <div style={{
           padding: 'var(--space-3) var(--space-4)',
           borderTop: '1px solid var(--color-surface-container-highest)',
@@ -69,14 +82,22 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
           justifyContent: 'space-between',
           background: 'var(--color-surface-container-lowest)',
         }}>
-          <span style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>
-            {task.budgetType === 'fixed' && task.budget
-              ? formatCurrency(task.budget)
-              : task.budgetType === 'hourly' && task.budget
-                ? `${formatCurrency(task.budget)}/hr`
-                : <span style={{ color: 'var(--color-secondary-mid)', fontSize: 'var(--text-label-md)', fontWeight: 600, textTransform: 'uppercase' }}>Open Offer</span>}
-          </span>
-
+          <div style={{
+            padding: '4px 12px',
+            background: 'var(--color-surface-container-low)',
+            border: '1.5px solid var(--color-outline-variant)',
+            borderRadius: 'var(--radius-full)',
+            display: 'inline-flex',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '14.5px', color: 'var(--color-secondary)' }}>
+              {task.budgetType === 'fixed' && task.budget
+                ? formatCurrency(task.budget)
+                : task.budgetType === 'hourly' && task.budget
+                  ? `${formatCurrency(task.budget)}/hr`
+                  : 'Open Offer'}
+            </span>
+          </div>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-label-md)', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase' }}>
             <Users size={14} />
             {task.offersCount} offer{task.offersCount !== 1 ? 's' : ''}

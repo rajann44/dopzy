@@ -136,6 +136,11 @@ body {
   min-height: 100vh;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  color: var(--color-secondary);
+}
+
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; font-family: inherit; border: none; background: none; }
@@ -731,23 +736,6 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
 }
 
 /* ── Commerzbank Brand Elements (Stitch SPEC) ── */
-.diamond-logo-wrap {
-  width: 48px;
-  height: 48px;
-  background: var(--color-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(45deg);
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-}
-.diamond-logo-inner {
-  width: 20px;
-  height: 20px;
-  background: var(--color-surface-white);
-  transform: rotate(-45deg);
-}
 
 /* Bento promo cards */
 .promo-card-dark {

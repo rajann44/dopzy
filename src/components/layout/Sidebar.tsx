@@ -195,7 +195,7 @@ export function Sidebar() {
             e.currentTarget.style.background = 'none';
           }}
         >
-          <LogOut size={15} />
+          <LogOut size={17} />
           Sign Out
         </button>
       </div>
