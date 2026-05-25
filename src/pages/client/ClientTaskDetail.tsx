@@ -137,6 +137,11 @@ export function ClientTaskDetail() {
                 <span>{emoji}</span> {task.category}
               </span>
               <StatusBadge status={task.status} />
+              {task.taskType === 'remote' ? (
+                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+              ) : (
+                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+              )}
             </div>
             <h1 className="text-headline-md truncate" style={{ margin: 0, fontWeight: 700 }}>{task.title}</h1>
           </div>
@@ -170,6 +175,30 @@ export function ClientTaskDetail() {
                   {task.description}
                 </p>
 
+                {task.mustHaves && task.mustHaves.length > 0 && (
+                  <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '6px' }}>Must-Haves & Requirements</div>
+                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>
+                      {task.mustHaves.map((m, i) => (
+                        <li key={i} style={{ marginBottom: '4px' }}>{m}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {task.images && task.images.length > 0 && (
+                  <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Reference Images</div>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      {task.images.map((img, i) => (
+                        <div key={i} style={{ borderRadius: 'var(--radius)', overflow: 'hidden', width: '180px', height: '120px', border: '1px solid var(--color-outline-variant)' }}>
+                          <img src={img} alt={`Reference ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
                   <div>
                     <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
@@ -190,7 +219,7 @@ export function ClientTaskDetail() {
                 </div>
               </div>
             </div>
-
+ 
             {/* Offers Section */}
             {task.status !== 'cancelled' && (
               <div>
@@ -223,7 +252,7 @@ export function ClientTaskDetail() {
                 )}
               </div>
             )}
-
+ 
             {/* Review Section */}
             {task.status === 'completed' && task.assignedCoTaskerId && (
               <div className="card">
@@ -256,7 +285,7 @@ export function ClientTaskDetail() {
               </div>
             )}
           </div>
-
+ 
           {/* Right Sidebar Column */}
           <div className="bento-col-4 flex flex-col gap-6">
             {/* Budget Bento Card */}
@@ -267,16 +296,21 @@ export function ClientTaskDetail() {
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
                     {formatCurrency(task.budget)}
                   </div>
+                ) : task.budgetType === 'hourly' && task.budget ? (
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
+                    {formatCurrency(task.budget)}/hr
+                  </div>
                 ) : (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '20px', fontWeight: 600, color: 'var(--color-secondary-mid)' }}>
                     Open to offers
                   </div>
                 )}
                 <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '8px' }}>
-                  {task.budgetType === 'fixed' ? 'Fixed price contract' : 'Time and materials contract'}
+                  {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
                 </div>
               </div>
             </div>
+
 
             {/* Payment Info */}
             {acceptedOffer && (

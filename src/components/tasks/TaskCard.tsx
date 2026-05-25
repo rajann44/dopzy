@@ -72,8 +72,11 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
           <span style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>
             {task.budgetType === 'fixed' && task.budget
               ? formatCurrency(task.budget)
-              : <span style={{ color: 'var(--color-secondary-mid)', fontSize: 'var(--text-label-md)', fontWeight: 600, textTransform: 'uppercase' }}>Open Offer</span>}
+              : task.budgetType === 'hourly' && task.budget
+                ? `${formatCurrency(task.budget)}/hr`
+                : <span style={{ color: 'var(--color-secondary-mid)', fontSize: 'var(--text-label-md)', fontWeight: 600, textTransform: 'uppercase' }}>Open Offer</span>}
           </span>
+
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-label-md)', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase' }}>
             <Users size={14} />
             {task.offersCount} offer{task.offersCount !== 1 ? 's' : ''}

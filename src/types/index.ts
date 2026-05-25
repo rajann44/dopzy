@@ -65,7 +65,7 @@ export type TaskStatus =
   | 'completed'
   | 'cancelled';
 
-export type BudgetType = 'fixed' | 'open_to_offers';
+export type BudgetType = 'fixed' | 'hourly' | 'open_to_offers';
 
 export interface Task {
   id: string;
@@ -84,7 +84,10 @@ export interface Task {
   status: TaskStatus;
   createdAt: string;
   offersCount: number;
+  taskType?: 'in_person' | 'remote';
+  mustHaves?: string[];
 }
+
 
 export interface TaskStatusHistory {
   taskId: string;
