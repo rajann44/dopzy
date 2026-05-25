@@ -40,6 +40,10 @@ export interface CoTaskerProfile {
   totalEarnings: number;
   availability: string;
   hourlyRate?: number;
+  qualifications?: string[];
+  languages?: string[];
+  transport?: string;
+  portfolio?: { title: string; imageUrl: string; description?: string }[];
 }
 
 // ─── Tasks ──────────────────────────────────────────────────────────────────

@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-export function ProtectedRoute({ allowedRoles, redirectTo = '/login' }: ProtectedRouteProps) {
+export function ProtectedRoute({ redirectTo = '/login' }: ProtectedRouteProps) {
   const { currentUser, isLoading } = useAuth();
 
   if (isLoading) {
@@ -20,15 +20,6 @@ export function ProtectedRoute({ allowedRoles, redirectTo = '/login' }: Protecte
 
   if (!currentUser) {
     return <Navigate to={redirectTo} replace />;
-  }
-
-  // Admin has access to client routes
-  if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
-    if (currentUser.role === 'admin') {
-      return <Outlet />;
-    }
-    const fallback = currentUser.role === 'cotasker' ? '/cotasker/dashboard' : '/client/dashboard';
-    return <Navigate to={fallback} replace />;
   }
 
   return <Outlet />;

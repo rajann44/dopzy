@@ -41,7 +41,7 @@ export function CoTaskerTaskDetail() {
       <div className="empty-state">
         <div className="empty-state-icon">🔍</div>
         <h3>Task not found</h3>
-        <Link to="/cotasker/tasks"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Back to Browse</button></Link>
+        <Link to="/browse"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Back to Browse</button></Link>
       </div>
     );
   }
@@ -72,7 +72,7 @@ export function CoTaskerTaskDetail() {
       message: `${currentUser!.name} sent an offer of ${formatCurrency(data.price)} for your task "${task.title}".`,
       isRead: false,
       createdAt: new Date().toISOString(),
-      linkTo: `/client/tasks/${task.id}`,
+      linkTo: `/tasks/${task.id}`,
     }));
     showToast('Offer sent successfully!', 'success');
     setShowOfferForm(false);

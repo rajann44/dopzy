@@ -1,7 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, ListTodo, PlusCircle, Bell, MessageSquare,
-  User, LogOut, Briefcase, Search, ClipboardList, Settings, ChevronRight,
+  ListTodo, Bell, MessageSquare, User, LogOut, Search, Settings
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
@@ -13,23 +12,10 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-const clientNav: NavItem[] = [
-  { to: '/client/dashboard',  label: 'Dashboard',  icon: <LayoutDashboard size={17} /> },
-  { to: '/client/tasks',      label: 'My Tasks',   icon: <ListTodo size={17} /> },
-  { to: '/client/tasks/new',  label: 'Post a Task',icon: <PlusCircle size={17} /> },
-  { to: '/client/offers',     label: 'My Offers',  icon: <ClipboardList size={17} /> },
-];
-
-const cotaskerNav: NavItem[] = [
-  { to: '/cotasker/dashboard', label: 'Dashboard',    icon: <LayoutDashboard size={17} /> },
-  { to: '/cotasker/tasks',     label: 'Browse Tasks', icon: <Search size={17} /> },
-  { to: '/cotasker/my-offers', label: 'My Offers',    icon: <ClipboardList size={17} /> },
-  { to: '/cotasker/jobs',      label: 'My Jobs',      icon: <Briefcase size={17} /> },
-];
-
-const sharedNav: NavItem[] = [
-  { to: '/notifications', label: 'Notifications', icon: <Bell size={17} /> },
-  { to: '/messages',      label: 'Messages',      icon: <MessageSquare size={17} /> },
+const mainNav: NavItem[] = [
+  { to: '/browse',    label: 'Browse Tasks', icon: <Search size={17} /> },
+  { to: '/my-tasks',  label: 'My Tasks',     icon: <ListTodo size={17} /> },
+  { to: '/messages',  label: 'Messages',     icon: <MessageSquare size={17} /> },
 ];
 
 export function Sidebar() {
@@ -39,9 +25,6 @@ export function Sidebar() {
 
   if (!currentUser) return null;
 
-  const mainNav = currentUser.role === 'client' || currentUser.role === 'admin'
-    ? clientNav : cotaskerNav;
-
   const unreadCount = state.notifications.filter(
     (n) => n.userId === currentUser.id && !n.isRead
   ).length;
@@ -50,9 +33,6 @@ export function Sidebar() {
     await logout();
     navigate('/login');
   };
-
-  const roleLabel = currentUser.role === 'cotasker' ? 'Provider' : currentUser.role === 'admin' ? 'Admin' : 'Client';
-  const sectionLabel = currentUser.role === 'cotasker' ? 'Provider' : 'Client';
 
   return (
     <aside style={{
@@ -141,7 +121,7 @@ export function Sidebar() {
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             textTransform: 'uppercase', letterSpacing: '0.05em',
           }}>
-            {roleLabel}
+            Workspace Member
           </div>
         </div>
       </div>
@@ -149,14 +129,14 @@ export function Sidebar() {
       {/* ── Navigation ── */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 12px' }}>
 
-        {/* Main nav section */}
+        {/* Workspace section */}
         <div style={{
           fontSize: '10px', fontWeight: 600,
           color: 'var(--sidebar-label-color)',
           textTransform: 'uppercase', letterSpacing: '0.10em',
           padding: '8px 10px 6px',
         }}>
-          {sectionLabel}
+          Workspace
         </div>
         {mainNav.map((item) => (
           <SidebarLink key={item.to} {...item} />
@@ -164,22 +144,21 @@ export function Sidebar() {
 
         <div style={{ height: '1px', background: 'var(--sidebar-border)', margin: '10px 4px' }} />
 
-        {/* General section */}
+        {/* Account section */}
         <div style={{
           fontSize: '10px', fontWeight: 600,
           color: 'var(--sidebar-label-color)',
           textTransform: 'uppercase', letterSpacing: '0.10em',
           padding: '8px 10px 6px',
         }}>
-          General
+          Account
         </div>
-        {sharedNav.map((item) => (
-          <SidebarLink
-            key={item.to}
-            {...item}
-            badge={item.to === '/notifications' && unreadCount > 0 ? unreadCount : undefined}
-          />
-        ))}
+        <SidebarLink
+          to="/notifications"
+          label="Notifications"
+          icon={<Bell size={17} />}
+          badge={unreadCount > 0 ? unreadCount : undefined}
+        />
         <SidebarLink
           to={`/profile/${currentUser.id}`}
           label="My Profile"
@@ -245,7 +224,6 @@ function SidebarLink({ to, label, icon, badge }: NavItem & { badge?: number }) {
         marginBottom: '2px',
         position: 'relative',
       })}
-      end={to.endsWith('dashboard')}
       onMouseEnter={(e) => {
         if (!(e.currentTarget as HTMLElement).getAttribute('aria-current')) {
           (e.currentTarget as HTMLElement).style.background = 'var(--sidebar-bg-hover)';

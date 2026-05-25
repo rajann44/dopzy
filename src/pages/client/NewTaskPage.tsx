@@ -77,7 +77,7 @@ export function NewTaskPage() {
     dispatch(createTaskAction(newTask));
     showToast('Task posted successfully! You\'ll receive offers soon.', 'success');
     setIsLoading(false);
-    navigate(`/client/tasks/${newTask.id}`);
+    navigate(`/tasks/${newTask.id}`);
   };
 
   return (

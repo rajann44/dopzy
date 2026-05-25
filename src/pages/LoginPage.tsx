@@ -5,8 +5,8 @@ import { useToast } from '../context/ToastContext';
 import { Eye, EyeOff, ChevronRight } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
-  { label: 'Client Account', email: 'client@demo.com', password: '123456', color: 'var(--color-secondary)' },
-  { label: 'Co-Tasker Account', email: 'cotasker@demo.com', password: '123456', color: 'var(--color-primary)' },
+  { label: 'Sarah Mitchell (Client Focus)', email: 'client@demo.com', password: '123456', color: 'var(--color-secondary)' },
+  { label: 'Marcus Weber (Tasker Focus)', email: 'cotasker@demo.com', password: '123456', color: 'var(--color-primary-container)' },
   { label: 'Admin Account', email: 'admin@demo.com', password: '123456', color: 'var(--color-tertiary)' },
 ];
 
@@ -22,8 +22,7 @@ export function LoginPage() {
   const [error, setError] = useState('');
 
   if (currentUser) {
-    const dest = currentUser.role === 'cotasker' ? '/cotasker/dashboard' : '/client/dashboard';
-    return <Navigate to={dest} replace />;
+    return <Navigate to="/browse" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

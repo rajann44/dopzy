@@ -48,7 +48,7 @@ export function ClientTaskDetail() {
       <div className="empty-state">
         <div className="empty-state-icon">🔍</div>
         <h3>Task not found</h3>
-        <Link to="/client/tasks"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Back to Tasks</button></Link>
+        <Link to="/my-tasks"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Back to Tasks</button></Link>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export function ClientTaskDetail() {
       message: `Your offer for "${task.title}" has been accepted. Check your jobs to get started.`,
       isRead: false,
       createdAt: new Date().toISOString(),
-      linkTo: '/cotasker/jobs',
+      linkTo: '/my-tasks?tab=tasker',
     }));
     showToast('Offer accepted! The task has been assigned.', 'success');
     setAcceptConfirm(null);
@@ -84,7 +84,7 @@ export function ClientTaskDetail() {
     showToast('Task has been cancelled.', 'info');
     setCancelConfirm(false);
     setIsActionLoading(false);
-    navigate('/client/tasks');
+    navigate('/my-tasks');
   };
 
   const handleMarkComplete = async () => {

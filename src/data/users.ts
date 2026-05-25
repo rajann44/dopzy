@@ -75,7 +75,7 @@ export const MOCK_COTASKER_PROFILES: CoTaskerProfile[] = [
   {
     userId: 'user-3',
     bio: 'Professional handyman with 8+ years experience. I specialize in furniture assembly, repairs, and moving. Punctual, careful, and detail-oriented.',
-    skills: ['Furniture Assembly', 'Moving', 'Repairs', 'Painting'],
+    skills: ['Furniture Assembly', 'Moving', 'Repairs', 'Painting', 'Mounting', 'Smart Home Setup'],
     categories: ['Furniture Assembly', 'Moving', 'Repairs', 'Painting'],
     location: 'Berlin',
     rating: 4.9,
@@ -89,11 +89,35 @@ export const MOCK_COTASKER_PROFILES: CoTaskerProfile[] = [
     totalEarnings: 12840,
     availability: 'Mon–Sat, 8am–7pm',
     hourlyRate: 35,
+    qualifications: [
+      'Certified Handyman (IHK Germany)',
+      'IKEA Assembly Partner Certificate',
+      'Electrical Installation & Safety Training (DGUV V3)'
+    ],
+    languages: ['German (Native)', 'English (Fluent)', 'Spanish (Basic)'],
+    transport: 'Mercedes Sprinter Van (Large payload, equipped with cargo straps, blankets & trolley)',
+    portfolio: [
+      {
+        title: 'IKEA PAX Wardrobe Custom Build',
+        imageUrl: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=600',
+        description: 'Complete assembly and wall-anchoring of a 3-meter wide PAX wardrobe with sliding mirror doors and custom interior organizers.'
+      },
+      {
+        title: 'Drywall Repair & Apartment Repaint',
+        imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600',
+        description: 'Patched multiple holes in drywall, primed, and repainted the entire living area using premium low-VOC white paint.'
+      },
+      {
+        title: 'Living Room Pendant Light Installation',
+        imageUrl: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600',
+        description: 'Safely mounted three heavy designer pendant lamps, routed wires cleanly, and set up a smart dimmer switch.'
+      }
+    ]
   },
   {
     userId: 'user-4',
     bio: 'Experienced cleaner and personal assistant. I take pride in leaving every space spotless. Background-checked and fully insured.',
-    skills: ['Cleaning', 'Personal Assistance', 'Delivery'],
+    skills: ['Cleaning', 'Deep Cleaning', 'Organization', 'Personal Assistance', 'Delivery', 'Grocery Shopping'],
     categories: ['Cleaning', 'Personal Assistance', 'Delivery'],
     location: 'Berlin',
     rating: 4.7,
@@ -107,5 +131,24 @@ export const MOCK_COTASKER_PROFILES: CoTaskerProfile[] = [
     totalEarnings: 7600,
     availability: 'Mon–Sun, 9am–6pm',
     hourlyRate: 28,
+    qualifications: [
+      'Professional Domestic Cleaning Certificate',
+      'Hygiene & Sanitation Training Certified',
+      'First Aid & Emergency Response Certificate'
+    ],
+    languages: ['English (Fluent)', 'Hindi (Native)', 'German (Conversational)'],
+    transport: 'Compact SUV (Fully stocked with eco-friendly cleaning supplies and vacuum)',
+    portfolio: [
+      {
+        title: 'End of Lease Deep Kitchen Cleaning',
+        imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600',
+        description: 'Deep oven degreasing, refrigerator sanitation, and polishing of all stainless steel surfaces.'
+      },
+      {
+        title: 'Office Closet & Storage Space Organization',
+        imageUrl: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=600',
+        description: 'Sorted, categorized, and labeled entire office stock inventory room, maximizing usable storage by 40%.'
+      }
+    ]
   },
 ];
