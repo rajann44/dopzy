@@ -1,7 +1,7 @@
 import { useAppContext, markNotificationReadAction, markAllNotificationsReadAction } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationItem } from '../../components/notifications/NotificationItem';
-import { Bell, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 export function NotificationsPage() {
   const { currentUser } = useAuth();
@@ -37,7 +37,7 @@ export function NotificationsPage() {
         )}
       </div>
 
-      <div className="page-inner" style={{ maxWidth: '680px', margin: '0 auto' }}>
+      <div className="page-inner">
         <div className="card" style={{ overflow: 'hidden' }}>
           {myNotifications.length > 0 ? (
             myNotifications.map((notif) => (
@@ -49,7 +49,7 @@ export function NotificationsPage() {
             ))
           ) : (
             <div className="empty-state">
-              <div className="empty-state-icon"><Bell size={40} /></div>
+              <div className="empty-state-icon">🔔</div>
               <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No notifications yet</h3>
               <p>You'll see updates about your offers, tasks, and reviews here.</p>
             </div>

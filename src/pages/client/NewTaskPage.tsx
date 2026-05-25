@@ -97,7 +97,7 @@ export function NewTaskPage() {
         </div>
       </div>
 
-      <div className="page-inner" style={{ maxWidth: '720px', margin: '0 auto' }}>
+      <div className="page-inner">
         <form onSubmit={handleSubmit}>
           {/* Task Details */}
           <div className="card" style={{ marginBottom: 'var(--space-4)' }}>
