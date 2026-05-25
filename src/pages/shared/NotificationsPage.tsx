@@ -22,12 +22,12 @@ export function NotificationsPage() {
   };
 
   return (
-    <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-6)' }}>
+    <div>
+      <div className="page-topbar">
         <div>
-          <h1 className="text-headline-lg">Notifications</h1>
-          <p style={{ color: 'var(--color-on-surface-variant)', marginTop: 'var(--space-1)' }}>
-            {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up!'}
+          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>Notifications</h1>
+          <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
+            {unreadCount > 0 ? `You have ${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}` : 'All caught up!'}
           </p>
         </div>
         {unreadCount > 0 && (
@@ -37,22 +37,24 @@ export function NotificationsPage() {
         )}
       </div>
 
-      <div className="card" style={{ overflow: 'hidden' }}>
-        {myNotifications.length > 0 ? (
-          myNotifications.map((notif) => (
-            <NotificationItem
-              key={notif.id}
-              notification={notif}
-              onMarkRead={handleMarkRead}
-            />
-          ))
-        ) : (
-          <div className="empty-state">
-            <div className="empty-state-icon"><Bell size={48} /></div>
-            <h3 className="text-headline-sm">No notifications yet</h3>
-            <p>You'll be notified about offers, tasks, and messages here.</p>
-          </div>
-        )}
+      <div className="page-inner" style={{ maxWidth: '680px', margin: '0 auto' }}>
+        <div className="card" style={{ overflow: 'hidden' }}>
+          {myNotifications.length > 0 ? (
+            myNotifications.map((notif) => (
+              <NotificationItem
+                key={notif.id}
+                notification={notif}
+                onMarkRead={handleMarkRead}
+              />
+            ))
+          ) : (
+            <div className="empty-state">
+              <div className="empty-state-icon"><Bell size={40} /></div>
+              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No notifications yet</h3>
+              <p>You'll see updates about your offers, tasks, and reviews here.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

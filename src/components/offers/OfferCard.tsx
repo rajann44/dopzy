@@ -28,7 +28,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
 
   return (
     <div className="card" style={{ marginBottom: 'var(--space-3)' }}>
-      <div className="card-body">
+      <div className="card-body" style={{ padding: 'var(--space-4)' }}>
         <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
           {/* Avatar */}
           <Avatar name={user?.name ?? '?'} avatarUrl={user?.avatarUrl} size="lg" />
@@ -40,28 +40,30 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
                 {user?.name ?? 'Loading...'}
               </span>
               {profile && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-body-sm)', color: 'var(--color-primary)' }}>
-                  <Star size={13} fill="currentColor" />
-                  {profile.rating} ({profile.reviewCount} reviews)
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary-mid)', fontWeight: 600 }}>
+                  <Star size={13} fill="var(--color-primary-container)" color="var(--color-primary)" />
+                  {profile.rating}
                 </span>
               )}
-              <StatusBadge status={offer.status} />
+              <div style={{ marginLeft: 'auto' }}>
+                <StatusBadge status={offer.status} />
+              </div>
             </div>
 
             {/* Message */}
-            <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-3)', lineHeight: 'var(--lh-body-md)' }}>
-              <MessageSquare size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+            <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-3)', lineHeight: '18px' }}>
+              <MessageSquare size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle', color: 'var(--color-secondary-mid)' }} />
               {offer.message}
             </p>
 
             {/* Stats row */}
-            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontSize: '18px', color: 'var(--color-on-surface)', fontFamily: 'var(--font-headline)' }}>
-                <DollarSign size={16} style={{ color: 'var(--color-primary)' }} />
+            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', alignItems: 'center' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)', fontFamily: 'var(--font-headline)' }}>
+                <DollarSign size={16} style={{ color: 'var(--color-secondary-mid)' }} />
                 {formatCurrency(offer.price)}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Clock size={13} />
+                <Clock size={13} style={{ color: 'var(--color-secondary-mid)' }} />
                 ~{offer.estimatedHours}h
               </span>
               {profile && (
@@ -70,7 +72,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
                   {profile.completedJobs} jobs done
                 </span>
               )}
-              <span style={{ marginLeft: 'auto', color: 'var(--color-on-surface-variant)' }}>
+              <span style={{ marginLeft: 'auto', color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-label-md)' }}>
                 {formatRelativeTime(offer.createdAt)}
               </span>
             </div>
@@ -79,11 +81,12 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
 
         {/* Actions */}
         {showActions && offer.status === 'pending' && (
-          <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-surface-container)', display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
+          <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-surface-container-highest)', display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
             {viewerRole === 'client' && onAccept && (
               <button
                 className="btn btn-primary btn-sm"
                 onClick={() => onAccept(offer.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
               >
                 <CheckCircle size={14} />
                 Accept Offer

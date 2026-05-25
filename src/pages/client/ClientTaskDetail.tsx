@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, Clock, Users, CheckCircle, X, Star } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Clock, Users, CheckCircle, X, Star, Wallet, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext, acceptOfferAction, updateTaskStatusAction, addReviewAction, addNotificationAction } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
@@ -124,22 +124,21 @@ export function ClientTaskDetail() {
   const emoji = CATEGORY_ICONS[task.category] ?? '📋';
 
   return (
-    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+    <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-        <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon" style={{ marginTop: 4 }}>
-          <ArrowLeft size={20} />
-        </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-            <span>{emoji}</span>
-            <StatusBadge status={task.status} showDot />
-          </div>
-          <h1 className="text-headline-lg" style={{ marginBottom: 'var(--space-1)' }}>{task.title}</h1>
-          <div style={{ display: 'flex', gap: 'var(--space-4)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', flexWrap: 'wrap' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={13} />{task.location} · {task.address}</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={13} />{formatDate(task.date)}</span>
-            {task.time && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={13} />{task.time}</span>}
+      <div className="page-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', minWidth: 0 }}>
+          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon" style={{ flexShrink: 0 }}>
+            <ArrowLeft size={20} />
+          </button>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
+              <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>{emoji}</span> {task.category}
+              </span>
+              <StatusBadge status={task.status} />
+            </div>
+            <h1 className="text-headline-md truncate" style={{ margin: 0, fontWeight: 700 }}>{task.title}</h1>
           </div>
         </div>
         {/* Actions */}
@@ -157,156 +156,206 @@ export function ClientTaskDetail() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 'var(--space-5)' }} className="task-detail-grid">
-        {/* Main column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {/* Description */}
-          <div className="card">
-            <div className="card-header"><h2 className="text-headline-sm">Description</h2></div>
-            <div className="card-body">
-              <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)' }}>{task.description}</p>
-            </div>
-          </div>
-
-          {/* Offers Section */}
-          {task.status !== 'cancelled' && (
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                <h2 className="text-headline-sm">Offers</h2>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
-                  <Users size={14} /> {offers.filter(o => o.status !== 'withdrawn').length} received
-                </span>
+      <div className="page-inner">
+        <div className="bento-grid">
+          {/* Main Column */}
+          <div className="bento-col-8 flex flex-col gap-6">
+            {/* Description */}
+            <div className="card">
+              <div className="card-header">
+                <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Task Details</h2>
               </div>
-              {offers.length > 0 ? (
-                offers.map((offer) => (
-                  <OfferCard
-                    key={offer.id}
-                    offer={offer}
-                    onAccept={task.status === 'receiving_offers' ? (id) => {
-                      const o = offers.find(x => x.id === id);
-                      if (o) setAcceptConfirm(o);
-                    } : undefined}
-                    viewerRole="client"
-                    showActions={task.status === 'receiving_offers'}
-                  />
-                ))
-              ) : (
-                <div className="card">
-                  <div className="empty-state" style={{ padding: 'var(--space-8)' }}>
-                    <div className="empty-state-icon"><Users size={40} /></div>
-                    <h3 className="text-headline-sm">No offers yet</h3>
-                    <p>Providers will start submitting offers soon.</p>
+              <div className="card-body">
+                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)', margin: 0 }}>
+                  {task.description}
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
+                  <div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
+                      <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                      <span>{task.location} · {task.address}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Schedule</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
+                      <Calendar size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                      <span>
+                        {formatDate(task.date)} {task.time && `at ${task.time}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          )}
 
-          {/* Review section */}
-          {task.status === 'completed' && task.assignedCoTaskerId && (
-            <div className="card">
-              <div className="card-header"><h2 className="text-headline-sm">Your Review</h2></div>
-              <div className="card-body">
-                {existingReview ? (
-                  <div>
-                    <div style={{ display: 'flex', gap: 'var(--space-1)', marginBottom: 'var(--space-3)' }}>
-                      {[1,2,3,4,5].map(s => (
-                        <span key={s} style={{ fontSize: '20px' }}>{s <= existingReview.rating ? '⭐' : '☆'}</span>
-                      ))}
-                    </div>
-                    <p style={{ color: 'var(--color-on-surface-variant)' }}>{existingReview.comment}</p>
+            {/* Offers Section */}
+            {task.status !== 'cancelled' && (
+              <div>
+                <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <span>Offers Received ({offers.filter(o => o.status !== 'withdrawn').length})</span>
+                </div>
+                {offers.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {offers.map((offer) => (
+                      <OfferCard
+                        key={offer.id}
+                        offer={offer}
+                        onAccept={task.status === 'receiving_offers' ? (id) => {
+                          const o = offers.find(x => x.id === id);
+                          if (o) setAcceptConfirm(o);
+                        } : undefined}
+                        viewerRole="client"
+                        showActions={task.status === 'receiving_offers'}
+                      />
+                    ))}
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    <p style={{ color: 'var(--color-on-surface-variant)' }}>How did this task go?</p>
-                    <button className="btn btn-primary btn-sm" onClick={() => setShowReviewModal(true)} style={{ width: 'fit-content' }}>
-                      <Star size={14} /> Leave a Review
-                    </button>
+                  <div className="card">
+                    <div className="empty-state">
+                      <div className="empty-state-icon">👥</div>
+                      <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No offers yet</h3>
+                      <p>Providers will start submitting offers soon. We'll notify you as they arrive.</p>
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
-          )}
-        </div>
+            )}
 
-        {/* Sidebar column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {/* Budget Card */}
-          <div className="card">
-            <div className="card-body">
-              <div className="stat-label" style={{ marginBottom: 'var(--space-2)' }}>Budget</div>
-              {task.budgetType === 'fixed' && task.budget ? (
-                <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-on-surface)' }}>
-                  {formatCurrency(task.budget)}
+            {/* Review Section */}
+            {task.status === 'completed' && task.assignedCoTaskerId && (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Your Review</h2>
                 </div>
-              ) : (
-                <div style={{ fontFamily: 'var(--font-headline)', fontSize: '20px', fontWeight: 600, color: 'var(--color-tertiary)' }}>
-                  Open to offers
+                <div className="card-body">
+                  {existingReview ? (
+                    <div>
+                      <div style={{ display: 'flex', gap: '2px', marginBottom: 'var(--space-3)' }}>
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <span key={s} className={`star ${s <= existingReview.rating ? '' : 'star-empty'}`}>★</span>
+                        ))}
+                      </div>
+                      <p style={{ color: 'var(--color-on-surface-variant)', fontStyle: 'italic', margin: 0 }}>
+                        "{existingReview.comment}"
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                      <p style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
+                        How was your experience with the service provider? Let others know!
+                      </p>
+                      <button className="btn btn-primary" onClick={() => setShowReviewModal(true)} style={{ width: 'fit-content', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                        <Star size={16} /> Leave a Review
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-              <div className="stat-label" style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)' }}>Category</div>
-              <div style={{ fontWeight: 600, fontSize: 'var(--text-body-md)' }}>{emoji} {task.category}</div>
-            </div>
+              </div>
+            )}
           </div>
 
-          {/* Payment status */}
-          {acceptedOffer && (
+          {/* Right Sidebar Column */}
+          <div className="bento-col-4 flex flex-col gap-6">
+            {/* Budget Bento Card */}
             <div className="card">
-              <div className="card-header"><h2 className="text-headline-sm">Payment</h2></div>
-              <div className="card-body">
-                {state.walletTransactions.filter(w => w.taskId === task.id).map(tx => (
-                  <div key={tx.id}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>Amount</span>
-                      <span style={{ fontWeight: 700 }}>{formatCurrency(tx.amount)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-2)' }}>
-                      <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>Status</span>
-                      <span className={`badge badge-${tx.status}`}>{tx.status}</span>
-                    </div>
+              <div className="card-body" style={{ padding: 'var(--space-5)' }}>
+                <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Task Budget</div>
+                {task.budgetType === 'fixed' && task.budget ? (
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
+                    {formatCurrency(task.budget)}
                   </div>
-                ))}
-                {state.walletTransactions.filter(w => w.taskId === task.id).length === 0 && (
-                  <div style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)' }}>Payment will be reserved when you accept an offer</div>
+                ) : (
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '20px', fontWeight: 600, color: 'var(--color-secondary-mid)' }}>
+                    Open to offers
+                  </div>
                 )}
-              </div>
-            </div>
-          )}
-
-          {/* Assigned Provider */}
-          {assignedUser && (
-            <div className="card">
-              <div className="card-header"><h2 className="text-headline-sm">Assigned Provider</h2></div>
-              <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <Avatar name={assignedUser.name} avatarUrl={assignedUser.avatarUrl} size="lg" />
-                  <div>
-                    <div style={{ fontWeight: 700 }}>{assignedUser.name}</div>
-                    <Link to={`/profile/${assignedUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-primary)', fontWeight: 600 }}>
-                      View Profile →
-                    </Link>
-                  </div>
+                <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '8px' }}>
+                  {task.budgetType === 'fixed' ? 'Fixed price contract' : 'Time and materials contract'}
                 </div>
-                {acceptedOffer && (
-                  <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', fontSize: 'var(--text-body-sm)' }}>
-                    <strong>Agreed price:</strong> {formatCurrency(acceptedOffer.price)}
-                    <br />
-                    <strong>Est. time:</strong> ~{acceptedOffer.estimatedHours}h
-                  </div>
-                )}
               </div>
             </div>
-          )}
+
+            {/* Payment Info */}
+            {acceptedOffer && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Wallet size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                    Payment Details
+                  </h3>
+                </div>
+                <div className="card-body" style={{ padding: 'var(--space-4)' }}>
+                  {state.walletTransactions.filter(w => w.taskId === task.id).map(tx => (
+                    <div key={tx.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--text-body-sm)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Funded Amount</span>
+                        <span style={{ fontWeight: 700 }}>{formatCurrency(tx.amount)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Contract Status</span>
+                        <span className={`badge badge-${tx.status}`}>
+                          {tx.status === 'reserved' ? 'In Escrow' : tx.status === 'released' ? 'Released' : 'Refunded'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  {state.walletTransactions.filter(w => w.taskId === task.id).length === 0 && (
+                    <div style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', textAlign: 'center' }}>
+                      No transactions recorded.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Assigned Provider Profile */}
+            {assignedUser && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                    Assigned Provider
+                  </h3>
+                </div>
+                <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-4)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                    <Avatar name={assignedUser.name} avatarUrl={assignedUser.avatarUrl} size="lg" />
+                    <div>
+                      <div style={{ fontWeight: 700, color: 'var(--color-on-surface)' }}>{assignedUser.name}</div>
+                      <Link to={`/profile/${assignedUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600, display: 'inline-block', marginTop: '2px' }}>
+                        View Profile →
+                      </Link>
+                    </div>
+                  </div>
+                  {acceptedOffer && (
+                    <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', fontSize: 'var(--text-body-sm)', border: '1px solid var(--color-outline-variant)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Agreed budget:</span>
+                        <strong>{formatCurrency(acceptedOffer.price)}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Estimated effort:</span>
+                        <strong>~{acceptedOffer.estimatedHours} hours</strong>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Confirm Modals */}
       <ConfirmModal
         isOpen={!!acceptConfirm}
         onClose={() => setAcceptConfirm(null)}
         onConfirm={handleAcceptOffer}
         title="Accept this offer?"
-        message={`You're about to accept ${acceptConfirm?.price ? formatCurrency(acceptConfirm.price) : ''} offer. All other offers will be rejected and the task will be assigned. This action cannot be undone.`}
+        message={`You are about to accept the offer of ${acceptConfirm?.price ? formatCurrency(acceptConfirm.price) : ''}. All other offers will be auto-declined and the project funds will be placed in secure escrow.`}
         confirmLabel="Accept Offer"
         isLoading={isActionLoading}
       />
@@ -314,9 +363,9 @@ export function ClientTaskDetail() {
         isOpen={cancelConfirm}
         onClose={() => setCancelConfirm(false)}
         onConfirm={handleCancelTask}
-        title="Cancel this task?"
-        message="This will permanently cancel the task and reject all pending offers. This cannot be undone."
-        confirmLabel="Cancel Task"
+        title="Cancel task listing?"
+        message="This will cancel your task posting, delete the listing from the marketplace, and close all pending offers. This action cannot be undone."
+        confirmLabel="Cancel Listing"
         confirmVariant="danger"
         isLoading={isActionLoading}
       />
@@ -324,9 +373,9 @@ export function ClientTaskDetail() {
         isOpen={completeConfirm}
         onClose={() => setCompleteConfirm(false)}
         onConfirm={handleMarkComplete}
-        title="Mark task as complete?"
-        message="Confirming completion will release the payment to the provider. Please only confirm once the work has been done to your satisfaction."
-        confirmLabel="Mark Complete"
+        title="Mark task as completed?"
+        message="Please verify that the work has been completed to your satisfaction. Confirming completion will release the escrow funds directly to the provider."
+        confirmLabel="Confirm Completion"
         isLoading={isActionLoading}
       />
 
@@ -334,7 +383,7 @@ export function ClientTaskDetail() {
       <Modal
         isOpen={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        title="Leave a Review"
+        title="Review Service Provider"
         footer={
           <>
             <button className="btn btn-ghost" onClick={() => setShowReviewModal(false)}>Skip</button>
@@ -347,39 +396,32 @@ export function ClientTaskDetail() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div>
-            <div style={{ fontSize: 'var(--text-body-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>Rating</div>
-            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            <div style={{ fontSize: 'var(--text-body-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>How was your experience?</div>
+            <div style={{ display: 'flex', gap: 'var(--space-1)' }}>
               {[1, 2, 3, 4, 5].map((s) => (
                 <button
                   key={s}
                   onClick={() => setReviewRating(s)}
-                  style={{ fontSize: '28px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px', transition: 'transform 0.1s' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.2)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  style={{ fontSize: '32px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: 'var(--color-primary-container)' }}
                 >
-                  {s <= reviewRating ? '⭐' : '☆'}
+                  {s <= reviewRating ? '★' : '☆'}
                 </button>
               ))}
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Your comment</label>
+            <label className="form-label required">Written Feedback</label>
             <textarea
               className="form-textarea"
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
-              placeholder="How did the task go? Was the provider professional and thorough?"
+              placeholder="Tell others what it was like working with this provider. Minimum 10 characters."
               rows={4}
+              required
             />
           </div>
         </div>
       </Modal>
-
-      <style>{`
-        @media (max-width: 767px) {
-          .task-detail-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

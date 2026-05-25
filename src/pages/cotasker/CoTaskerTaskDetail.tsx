@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, Clock, DollarSign, User } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Clock, DollarSign, User, Wallet, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext, createOfferAction, withdrawOfferAction, updateTaskStatusAction, addNotificationAction } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
@@ -100,145 +100,201 @@ export function CoTaskerTaskDetail() {
   };
 
   return (
-    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+    <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-        <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon" style={{ marginTop: 4 }}>
-          <ArrowLeft size={20} />
-        </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-            <span>{emoji}</span>
-            <StatusBadge status={task.status} showDot />
-            {isAssignedToMe && <span className="badge badge-assigned">Your Job</span>}
-          </div>
-          <h1 className="text-headline-lg">{task.title}</h1>
-          <div style={{ display: 'flex', gap: 'var(--space-4)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={13} />{task.location} · {task.address}</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={13} />{formatDate(task.date)}</span>
-            {task.time && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={13} />{task.time}</span>}
+      <div className="page-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', minWidth: 0 }}>
+          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon" style={{ flexShrink: 0 }}>
+            <ArrowLeft size={20} />
+          </button>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
+              <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>{emoji}</span> {task.category}
+              </span>
+              <StatusBadge status={task.status} />
+              {isAssignedToMe && <span className="badge badge-gold">Your Job</span>}
+            </div>
+            <h1 className="text-headline-md truncate" style={{ margin: 0, fontWeight: 700 }}>{task.title}</h1>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 'var(--space-5)' }} className="ct-task-grid">
-        {/* Main column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {/* Description */}
-          <div className="card">
-            <div className="card-header"><h2 className="text-headline-sm">Task Description</h2></div>
-            <div className="card-body">
-              <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)' }}>{task.description}</p>
-            </div>
-          </div>
-
-          {/* My Offer / Offer Form */}
-          {myOffer ? (
+      <div className="page-inner">
+        <div className="bento-grid">
+          {/* Main Column */}
+          <div className="bento-col-8 flex flex-col gap-6">
+            {/* Description */}
             <div className="card">
               <div className="card-header">
-                <h2 className="text-headline-sm">Your Offer</h2>
-                <StatusBadge status={myOffer.status} />
+                <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Task Details</h2>
               </div>
               <div className="card-body">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)', margin: 0 }}>
+                  {task.description}
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
                   <div>
-                    <div className="stat-label">Your Price</div>
-                    <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700 }}>{formatCurrency(myOffer.price)}</div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
+                      <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                      <span>{task.location} · {task.address}</span>
+                    </div>
                   </div>
                   <div>
-                    <div className="stat-label">Est. Time</div>
-                    <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700 }}>{myOffer.estimatedHours}h</div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Schedule</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
+                      <Calendar size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                      <span>
+                        {formatDate(task.date)} {task.time && `at ${task.time}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontStyle: 'italic', marginBottom: 'var(--space-4)' }}>
-                  "{myOffer.message}"
-                </div>
-                {myOffer.status === 'pending' && (
-                  <button className="btn btn-danger btn-sm" onClick={() => setWithdrawConfirm(true)}>
-                    Withdraw Offer
-                  </button>
-                )}
               </div>
             </div>
-          ) : canOffer ? (
-            <div className="card">
-              <div className="card-header"><h2 className="text-headline-sm">Send an Offer</h2></div>
-              <div className="card-body">
-                {showOfferForm ? (
-                  <OfferForm
-                    taskId={task.id}
-                    coTaskerId={currentUser!.id}
-                    onSubmit={handleSubmitOffer}
-                    onCancel={() => setShowOfferForm(false)}
-                    isLoading={isLoading}
-                  />
-                ) : (
-                  <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
-                    <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
-                      Interested in this task? Send your offer with your price and availability.
-                    </p>
-                    <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
-                      <DollarSign size={16} /> Make an Offer
+
+            {/* My Offer / Offer Form */}
+            {myOffer ? (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Your Active Offer</h2>
+                  <StatusBadge status={myOffer.status} />
+                </div>
+                <div className="card-body">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+                    <div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Your Proposed Price</div>
+                      <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary)' }}>
+                        {formatCurrency(myOffer.price)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Estimated Time</div>
+                      <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary)' }}>
+                        {myOffer.estimatedHours} hours
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontStyle: 'italic', marginBottom: 'var(--space-4)', border: '1px solid var(--color-outline-variant)' }}>
+                    "{myOffer.message}"
+                  </div>
+                  {myOffer.status === 'pending' && (
+                    <button className="btn btn-danger btn-sm" onClick={() => setWithdrawConfirm(true)}>
+                      Withdraw Offer
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          ) : null}
-
-          {/* Status update for assigned tasks */}
-          {isAssignedToMe && (task.status === 'assigned' || task.status === 'in_progress') && (
-            <div className="card">
-              <div className="card-header"><h2 className="text-headline-sm">Update Job Status</h2></div>
-              <div className="card-body" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-                {task.status === 'assigned' && (
-                  <button className="btn btn-secondary" onClick={() => setUpdateStatusConfirm('in_progress')}>
-                    Mark as In Progress
-                  </button>
-                )}
-                {task.status === 'in_progress' && (
-                  <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)' }}>
-                    Waiting for the client to mark this task as complete.
-                  </p>
-                )}
+            ) : canOffer ? (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Make an Offer</h2>
+                </div>
+                <div className="card-body">
+                  {showOfferForm ? (
+                    <OfferForm
+                      taskId={task.id}
+                      coTaskerId={currentUser!.id}
+                      onSubmit={handleSubmitOffer}
+                      onCancel={() => setShowOfferForm(false)}
+                      isLoading={isLoading}
+                    />
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
+                      <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
+                        Interested in providing this service? Send your offer details to the client.
+                      </p>
+                      <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
+                        <DollarSign size={16} /> Submit Offer
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            ) : null}
 
-        {/* Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {/* Budget */}
-          <div className="card">
-            <div className="card-body">
-              <div className="stat-label" style={{ marginBottom: 'var(--space-2)' }}>Budget</div>
-              {task.budgetType === 'fixed' && task.budget ? (
-                <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700 }}>{formatCurrency(task.budget)}</div>
-              ) : (
-                <div style={{ fontFamily: 'var(--font-headline)', fontSize: '20px', fontWeight: 600, color: 'var(--color-tertiary)' }}>Open to offers</div>
-              )}
-              <div className="stat-label" style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-1)' }}>Category</div>
-              <div style={{ fontWeight: 600 }}>{emoji} {task.category}</div>
-              <div className="stat-label" style={{ marginTop: 'var(--space-3)', marginBottom: 'var(--space-1)' }}>Offers received</div>
-              <div style={{ fontWeight: 600 }}>{allOffers.filter(o => o.status !== 'withdrawn').length}</div>
-            </div>
+            {/* Status update for assigned tasks */}
+            {isAssignedToMe && (task.status === 'assigned' || task.status === 'in_progress') && (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Update Job Status</h2>
+                </div>
+                <div className="card-body" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                  {task.status === 'assigned' && (
+                    <button className="btn btn-secondary" onClick={() => setUpdateStatusConfirm('in_progress')}>
+                      Mark as In Progress
+                    </button>
+                  )}
+                  {task.status === 'in_progress' && (
+                    <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0 }}>
+                      Waiting for the client to confirm completion and release payment from escrow.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Client info */}
-          {clientUser && (
+          {/* Right Sidebar Column */}
+          <div className="bento-col-4 flex flex-col gap-6">
+            {/* Client Budget */}
             <div className="card">
-              <div className="card-header"><h2 className="text-headline-sm">Posted by</h2></div>
-              <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                <Avatar name={clientUser.name} avatarUrl={clientUser.avatarUrl} size="md" />
-                <div>
-                  <div style={{ fontWeight: 600 }}>{clientUser.name}</div>
-                  <Link to={`/profile/${clientUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-primary)', fontWeight: 600 }}>
-                    View Profile →
-                  </Link>
+              <div className="card-body" style={{ padding: 'var(--space-5)' }}>
+                <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Client Budget</div>
+                {task.budgetType === 'fixed' && task.budget ? (
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
+                    {formatCurrency(task.budget)}
+                  </div>
+                ) : (
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '20px', fontWeight: 600, color: 'var(--color-secondary-mid)' }}>
+                    Open to offers
+                  </div>
+                )}
+                <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '8px' }}>
+                  {task.budgetType === 'fixed' ? 'Fixed price contract' : 'Time and materials contract'}
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Task stats */}
+            <div className="card">
+              <div className="card-header">
+                <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Users size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                  Competition
+                </h3>
+              </div>
+              <div className="card-body" style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--text-body-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: 'var(--color-on-surface-variant)' }}>Offers submitted</span>
+                  <span style={{ fontWeight: 700 }}>{allOffers.filter(o => o.status !== 'withdrawn').length}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Client Info */}
+            {clientUser && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                    Posted by
+                  </h3>
+                </div>
+                <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
+                  <Avatar name={clientUser.name} avatarUrl={clientUser.avatarUrl} size="md" />
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--color-on-surface)' }}>{clientUser.name}</div>
+                    <Link to={`/profile/${clientUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600, display: 'inline-block', marginTop: '2px' }}>
+                      View Profile →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -248,8 +304,8 @@ export function CoTaskerTaskDetail() {
         onClose={() => setWithdrawConfirm(false)}
         onConfirm={handleWithdraw}
         title="Withdraw your offer?"
-        message="This will remove your offer from this task. You can submit a new offer if the task is still open."
-        confirmLabel="Withdraw"
+        message="This will retract your offer from this task listing. The client will no longer see your offer, but you can submit a new one if you change your mind."
+        confirmLabel="Withdraw Offer"
         confirmVariant="danger"
         isLoading={isLoading}
       />
@@ -257,17 +313,11 @@ export function CoTaskerTaskDetail() {
         isOpen={!!updateStatusConfirm}
         onClose={() => setUpdateStatusConfirm(null)}
         onConfirm={handleUpdateStatus}
-        title="Update job status?"
-        message={`This will mark the job as "${updateStatusConfirm}". The client will be notified.`}
-        confirmLabel="Update Status"
+        title="Update job progress?"
+        message={`This will transition the job status to "${updateStatusConfirm}". The client will be updated on your progress.`}
+        confirmLabel="Confirm Update"
         isLoading={isLoading}
       />
-
-      <style>{`
-        @media (max-width: 767px) {
-          .ct-task-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

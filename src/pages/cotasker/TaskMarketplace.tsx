@@ -26,36 +26,40 @@ export function TaskMarketplace() {
 
   return (
     <div>
-      <div style={{ marginBottom: 'var(--space-6)' }}>
-        <h1 className="text-headline-lg">Browse Tasks</h1>
-        <p style={{ color: 'var(--color-on-surface-variant)', marginTop: 'var(--space-1)' }}>
-          {tasks.length} task{tasks.length !== 1 ? 's' : ''} available — find the right job for you
-        </p>
+      <div className="page-topbar">
+        <div>
+          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>Browse Tasks</h1>
+          <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
+            {tasks.length} task{tasks.length !== 1 ? 's' : ''} available — find work near you
+          </p>
+        </div>
       </div>
 
-      <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-        <TaskFiltersBar filters={filters} onChange={setFilters} showStatus={false} />
-      </div>
+      <div className="page-inner">
+        <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+          <TaskFiltersBar filters={filters} onChange={setFilters} showStatus={false} />
+        </div>
 
-      {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
-          <div className="spinner" style={{ width: 40, height: 40 }} />
-        </div>
-      ) : tasks.length > 0 ? (
-        <div className="grid-tasks">
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} linkPrefix="/cotasker" />
-          ))}
-        </div>
-      ) : (
-        <div className="card">
-          <div className="empty-state">
-            <div className="empty-state-icon">🔍</div>
-            <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No tasks found</h3>
-            <p>Try adjusting your filters, or check back soon for new tasks.</p>
+        {isLoading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
+            <div className="spinner" style={{ width: 40, height: 40 }} />
           </div>
-        </div>
-      )}
+        ) : tasks.length > 0 ? (
+          <div className="grid-tasks">
+            {tasks.map((task) => (
+              <TaskCard key={task.id} task={task} linkPrefix="/cotasker" />
+            ))}
+          </div>
+        ) : (
+          <div className="card">
+            <div className="empty-state">
+              <div className="empty-state-icon">🔍</div>
+              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No tasks found</h3>
+              <p>Try adjusting your filters, or check back soon for new tasks.</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -28,50 +28,52 @@ export function ClientTasks() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-6)' }}>
+      <div className="page-topbar">
         <div>
-          <h1 className="text-headline-lg">My Tasks</h1>
-          <p style={{ color: 'var(--color-on-surface-variant)', marginTop: 'var(--space-1)' }}>
-            {tasks.length} task{tasks.length !== 1 ? 's' : ''}
+          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>My Tasks</h1>
+          <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
+            Manage and track the status of your posted tasks
           </p>
         </div>
         <Link to="/client/tasks/new">
-          <button className="btn btn-primary">
-            <Plus size={16} /> Post Task
+          <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <Plus size={16} /> Post a Task
           </button>
         </Link>
       </div>
 
-      <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-        <TaskFiltersBar filters={filters} onChange={setFilters} showStatus />
-      </div>
+      <div className="page-inner">
+        <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+          <TaskFiltersBar filters={filters} onChange={setFilters} showStatus />
+        </div>
 
-      {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
-          <div className="spinner" style={{ width: 40, height: 40 }} />
-        </div>
-      ) : tasks.length > 0 ? (
-        <div className="grid-tasks">
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} linkPrefix="/client" />
-          ))}
-        </div>
-      ) : (
-        <div className="card">
-          <div className="empty-state">
-            <div className="empty-state-icon">🔍</div>
-            <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No tasks found</h3>
-            <p style={{ marginBottom: 'var(--space-4)' }}>
-              {Object.keys(filters).length > 0
-                ? 'Try adjusting your filters'
-                : "You haven't posted any tasks yet."}
-            </p>
-            <Link to="/client/tasks/new">
-              <button className="btn btn-primary"><Plus size={16} /> Post First Task</button>
-            </Link>
+        {isLoading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
+            <div className="spinner" style={{ width: 40, height: 40 }} />
           </div>
-        </div>
-      )}
+        ) : tasks.length > 0 ? (
+          <div className="grid-tasks">
+            {tasks.map((task) => (
+              <TaskCard key={task.id} task={task} linkPrefix="/client" />
+            ))}
+          </div>
+        ) : (
+          <div className="card">
+            <div className="empty-state">
+              <div className="empty-state-icon">🔍</div>
+              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No tasks found</h3>
+              <p style={{ marginBottom: 'var(--space-4)' }}>
+                {Object.keys(filters).length > 0
+                  ? 'Try adjusting your filters'
+                  : "You haven't posted any tasks yet."}
+              </p>
+              <Link to="/client/tasks/new">
+                <button className="btn btn-primary"><Plus size={16} /> Post First Task</button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

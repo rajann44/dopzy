@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, ListTodo, PlusCircle, Bell, MessageSquare,
-  User, LogOut, Briefcase, Search, ClipboardList, Settings,
+  User, LogOut, Briefcase, Search, ClipboardList, Settings, ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
@@ -14,22 +14,22 @@ interface NavItem {
 }
 
 const clientNav: NavItem[] = [
-  { to: '/client/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
-  { to: '/client/tasks', label: 'My Tasks', icon: <ListTodo size={18} /> },
-  { to: '/client/tasks/new', label: 'Post a Task', icon: <PlusCircle size={18} /> },
-  { to: '/client/offers', label: 'My Offers', icon: <ClipboardList size={18} /> },
+  { to: '/client/dashboard',  label: 'Dashboard',  icon: <LayoutDashboard size={17} /> },
+  { to: '/client/tasks',      label: 'My Tasks',   icon: <ListTodo size={17} /> },
+  { to: '/client/tasks/new',  label: 'Post a Task',icon: <PlusCircle size={17} /> },
+  { to: '/client/offers',     label: 'My Offers',  icon: <ClipboardList size={17} /> },
 ];
 
 const cotaskerNav: NavItem[] = [
-  { to: '/cotasker/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
-  { to: '/cotasker/tasks', label: 'Browse Tasks', icon: <Search size={18} /> },
-  { to: '/cotasker/my-offers', label: 'My Offers', icon: <ClipboardList size={18} /> },
-  { to: '/cotasker/jobs', label: 'My Jobs', icon: <Briefcase size={18} /> },
+  { to: '/cotasker/dashboard', label: 'Dashboard',    icon: <LayoutDashboard size={17} /> },
+  { to: '/cotasker/tasks',     label: 'Browse Tasks', icon: <Search size={17} /> },
+  { to: '/cotasker/my-offers', label: 'My Offers',    icon: <ClipboardList size={17} /> },
+  { to: '/cotasker/jobs',      label: 'My Jobs',      icon: <Briefcase size={17} /> },
 ];
 
 const sharedNav: NavItem[] = [
-  { to: '/notifications', label: 'Notifications', icon: <Bell size={18} /> },
-  { to: '/messages', label: 'Messages', icon: <MessageSquare size={18} /> },
+  { to: '/notifications', label: 'Notifications', icon: <Bell size={17} /> },
+  { to: '/messages',      label: 'Messages',      icon: <MessageSquare size={17} /> },
 ];
 
 export function Sidebar() {
@@ -51,84 +51,126 @@ export function Sidebar() {
     navigate('/login');
   };
 
+  const roleLabel = currentUser.role === 'cotasker' ? 'Provider' : currentUser.role === 'admin' ? 'Admin' : 'Client';
+  const sectionLabel = currentUser.role === 'cotasker' ? 'Provider' : 'Client';
+
   return (
-    <aside
-      style={{
-        width: 'var(--sidebar-width)',
-        background: 'var(--color-surface-white)',
-        borderRight: '1px solid var(--color-outline-variant)',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        zIndex: 100,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Logo */}
+    <aside style={{
+      width: 'var(--sidebar-width)',
+      background: 'var(--sidebar-bg)',
+      borderRight: '1px solid var(--sidebar-border)',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      position: 'fixed',
+      left: 0, top: 0,
+      zIndex: 100,
+      overflow: 'hidden',
+    }}>
+
+      {/* ── Logo ── */}
       <div style={{
-        padding: '20px var(--space-5)',
-        borderBottom: '1px solid var(--color-surface-container-highest)',
+        padding: '20px 20px 18px',
+        borderBottom: '1px solid var(--sidebar-border)',
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--space-3)',
+        gap: '12px',
+        flexShrink: 0,
       }}>
         <div style={{
-          width: 36, height: 36,
+          width: 38, height: 38,
           background: 'var(--color-primary-container)',
           borderRadius: 'var(--radius)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontWeight: 800,
           fontFamily: 'var(--font-headline)',
-          fontSize: '18px',
+          fontWeight: 800, fontSize: '17px',
           color: 'var(--color-on-primary-container)',
           flexShrink: 0,
+          letterSpacing: '-0.02em',
         }}>
           TB
         </div>
         <div>
-          <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '16px', color: 'var(--color-on-surface)', lineHeight: 1 }}>
+          <div style={{
+            fontFamily: 'var(--font-headline)',
+            fontWeight: 700, fontSize: '16px',
+            color: '#ffffff',
+            lineHeight: 1.1,
+            letterSpacing: '-0.01em',
+          }}>
             TaskBuddy
           </div>
-          <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {currentUser.role === 'cotasker' ? 'Provider' : currentUser.role === 'admin' ? 'Admin' : 'Client'}
+          <div style={{
+            fontSize: 'var(--text-label-md)',
+            color: 'var(--sidebar-text-muted)',
+            marginTop: 2,
+            textTransform: 'uppercase',
+            letterSpacing: '0.07em',
+          }}>
+            Service Marketplace
           </div>
         </div>
       </div>
 
-      {/* User info */}
+      {/* ── User info ── */}
       <div style={{
-        padding: 'var(--space-4) var(--space-5)',
-        borderBottom: '1px solid var(--color-surface-container)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-3)',
+        padding: '14px 20px',
+        borderBottom: '1px solid var(--sidebar-border)',
+        display: 'flex', alignItems: 'center', gap: '12px',
+        flexShrink: 0,
       }}>
-        <Avatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size="md" />
+        <div style={{
+          border: '2px solid rgba(255,215,0,0.35)',
+          borderRadius: '50%',
+          padding: 2,
+          flexShrink: 0,
+        }}>
+          <Avatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size="sm" />
+        </div>
         <div style={{ minWidth: 0 }}>
-          <div className="truncate" style={{ fontWeight: 600, fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>
+          <div style={{
+            fontWeight: 600, fontSize: '13px',
+            color: '#ffffff',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {currentUser.name}
           </div>
-          <div className="truncate" style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>
-            {currentUser.email}
+          <div style={{
+            fontSize: 'var(--text-label-md)',
+            color: 'var(--sidebar-text-muted)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            textTransform: 'uppercase', letterSpacing: '0.05em',
+          }}>
+            {roleLabel}
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-3) var(--space-3)' }}>
-        <div style={{ fontSize: 'var(--text-label-md)', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: 'var(--space-2) var(--space-2)', marginBottom: 'var(--space-1)' }}>
-          {currentUser.role === 'cotasker' ? 'Provider Menu' : 'Client Menu'}
+      {/* ── Navigation ── */}
+      <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 12px' }}>
+
+        {/* Main nav section */}
+        <div style={{
+          fontSize: '10px', fontWeight: 600,
+          color: 'var(--sidebar-label-color)',
+          textTransform: 'uppercase', letterSpacing: '0.10em',
+          padding: '8px 10px 6px',
+        }}>
+          {sectionLabel}
         </div>
         {mainNav.map((item) => (
           <SidebarLink key={item.to} {...item} />
         ))}
 
-        <div style={{ height: '1px', background: 'var(--color-surface-container)', margin: 'var(--space-3) 0' }} />
+        <div style={{ height: '1px', background: 'var(--sidebar-border)', margin: '10px 4px' }} />
 
-        <div style={{ fontSize: 'var(--text-label-md)', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: 'var(--space-2) var(--space-2)', marginBottom: 'var(--space-1)' }}>
+        {/* General section */}
+        <div style={{
+          fontSize: '10px', fontWeight: 600,
+          color: 'var(--sidebar-label-color)',
+          textTransform: 'uppercase', letterSpacing: '0.10em',
+          padding: '8px 10px 6px',
+        }}>
           General
         </div>
         {sharedNav.map((item) => (
@@ -141,41 +183,44 @@ export function Sidebar() {
         <SidebarLink
           to={`/profile/${currentUser.id}`}
           label="My Profile"
-          icon={<User size={18} />}
+          icon={<User size={17} />}
         />
-        <SidebarLink
-          to="/settings"
-          label="Settings"
-          icon={<Settings size={18} />}
-        />
+        <SidebarLink to="/settings" label="Settings" icon={<Settings size={17} />} />
       </nav>
 
-      {/* Logout */}
-      <div style={{ padding: 'var(--space-3)', borderTop: '1px solid var(--color-surface-container-highest)' }}>
+      {/* ── Sign out ── */}
+      <div style={{
+        padding: '10px 12px 12px',
+        borderTop: '1px solid var(--sidebar-border)',
+        flexShrink: 0,
+      }}>
         <button
           onClick={handleLogout}
           style={{
             width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-3)',
-            padding: 'var(--space-2) var(--space-3)',
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '8px 10px',
             borderRadius: 'var(--radius)',
-            color: 'var(--color-status-error)',
+            color: 'rgba(255,255,255,0.55)',
             fontSize: 'var(--text-body-sm)',
             fontWeight: 500,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'background var(--transition-fast)',
+            background: 'none', border: 'none', cursor: 'pointer',
+            transition: 'all var(--transition-fast)',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-error-container)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#ff6b6b';
+            e.currentTarget.style.background = 'rgba(255,107,107,0.10)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
+            e.currentTarget.style.background = 'none';
+          }}
         >
-          <LogOut size={16} />
+          <LogOut size={15} />
           Sign Out
         </button>
       </div>
+
     </aside>
   );
 }
@@ -187,32 +232,42 @@ function SidebarLink({ to, label, icon, badge }: NavItem & { badge?: number }) {
       style={({ isActive }) => ({
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--space-3)',
-        padding: 'var(--space-2) var(--space-3)',
+        gap: '10px',
+        padding: '8px 10px',
         borderRadius: 'var(--radius)',
-        fontSize: 'var(--text-body-sm)',
-        fontWeight: isActive ? 600 : 500,
-        color: isActive ? 'var(--color-on-primary-container)' : 'var(--color-on-surface-variant)',
-        background: isActive ? 'var(--color-primary-container)' : 'transparent',
+        fontSize: '13.5px',
+        fontWeight: isActive ? 600 : 400,
+        color: isActive ? 'var(--sidebar-active-text)' : 'var(--sidebar-text)',
+        background: isActive ? 'var(--sidebar-active-bg)' : 'transparent',
+        borderLeft: isActive ? '3px solid var(--sidebar-active-border)' : '3px solid transparent',
         textDecoration: 'none',
         transition: 'all var(--transition-fast)',
         marginBottom: '2px',
         position: 'relative',
       })}
       end={to.endsWith('dashboard')}
+      onMouseEnter={(e) => {
+        if (!(e.currentTarget as HTMLElement).getAttribute('aria-current')) {
+          (e.currentTarget as HTMLElement).style.background = 'var(--sidebar-bg-hover)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        const isActive = (e.currentTarget as HTMLElement).getAttribute('aria-current') === 'page';
+        if (!isActive) {
+          (e.currentTarget as HTMLElement).style.background = 'transparent';
+        }
+      }}
     >
-      {icon}
+      <span style={{ opacity: 0.85, flexShrink: 0 }}>{icon}</span>
       <span style={{ flex: 1 }}>{label}</span>
       {badge !== undefined && (
         <span style={{
-          background: 'var(--color-status-error)',
-          color: '#fff',
+          background: 'var(--color-primary-container)',
+          color: 'var(--color-on-primary-container)',
           borderRadius: 'var(--radius-full)',
-          fontSize: '11px',
-          fontWeight: 700,
-          padding: '1px 6px',
-          minWidth: '20px',
-          textAlign: 'center',
+          fontSize: '10px', fontWeight: 700,
+          padding: '1px 7px',
+          minWidth: '20px', textAlign: 'center',
         }}>
           {badge}
         </span>

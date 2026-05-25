@@ -25,7 +25,6 @@ export function AppLayout() {
           className="page-content"
           style={{
             flex: 1,
-            padding: 'var(--space-6) var(--space-4)',
             maxWidth: '100%',
           }}
         >
@@ -54,7 +53,7 @@ export function AppLayout() {
             display: none;
           }
           #main-content > div {
-            padding: var(--space-8) var(--space-8) !important;
+            padding: 0 !important;
           }
         }
       `}</style>
