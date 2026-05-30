@@ -5,6 +5,7 @@ export function TaskPlaceholderImage({ className }: { className?: string }) {
       width="100%" 
       height="100%" 
       xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid slice"
       className={className}
       style={{ display: 'block' }}
     >
