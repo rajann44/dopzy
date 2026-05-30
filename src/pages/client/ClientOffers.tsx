@@ -20,10 +20,12 @@ export function ClientOffers() {
   const { currentUser } = useAuth();
   const { state } = useAppContext();
 
-  // Get all offers on client's tasks
-  const clientTaskIds = state.tasks
-    .filter((t) => t.clientId === currentUser?.id)
-    .map((t) => t.id);
+  // Get all offers on client's active tasks (exclude completed/cancelled)
+  const ACTIVE_TASK_STATUSES = ['open', 'receiving_offers', 'assigned', 'in_progress'];
+  const clientTasks = state.tasks.filter(
+    (t) => t.clientId === currentUser?.id && ACTIVE_TASK_STATUSES.includes(t.status)
+  );
+  const clientTaskIds = clientTasks.map((t) => t.id);
 
   const offers = state.offers.filter((o) => clientTaskIds.includes(o.taskId));
 
