@@ -234,11 +234,17 @@ export function CoTaskerProfileDrawer({ userId, onClose }: CoTaskerProfileDrawer
               <div>
                 <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-mid)', margin: '0 0 10px 0' }}>Skills</h3>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {profile.skills.map((skill, index) => (
-                    <span key={index} className="badge badge-secondary" style={{ fontSize: '11px', padding: '4px 10px' }}>
-                      {skill}
+                  {profile.skills.length > 0 ? (
+                    profile.skills.map((skill, index) => (
+                      <span key={index} className="badge badge-secondary" style={{ fontSize: '11px', padding: '4px 10px' }}>
+                        {skill}
+                      </span>
+                    ))
+                  ) : (
+                    <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
+                      No skills specified.
                     </span>
-                  ))}
+                  )}
                 </div>
               </div>
 
