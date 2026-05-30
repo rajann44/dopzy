@@ -15,11 +15,13 @@ import { Avatar } from '../../components/ui/Avatar';
 import { formatCurrency, generateId } from '../../utils/formatters';
 import { MOCK_USERS } from '../../data/users';
 import { CoTaskerProfileDrawer } from '../../components/profile/CoTaskerProfileDrawer';
+import { useTranslation } from '../../context/LanguageContext';
 
 export function MessagesPage() {
   const { currentUser } = useAuth();
   const { state, dispatch } = useAppContext();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const [activeTab, setActiveTab] = useState<'chats' | 'requests'>('chats');
@@ -51,7 +53,7 @@ export function MessagesPage() {
   if (!currentUser) {
     return (
       <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>
-        <p>Please log in to view messages.</p>
+        <p>{t('messages.login_required')}</p>
       </div>
     );
   }
@@ -144,12 +146,12 @@ export function MessagesPage() {
       id: generateId('msg'),
       conversationId: convId,
       senderId: activeRequest.senderId,
-      text: `Inquiry Request: "${activeRequest.question}"`,
+      text: `${t('messages.inquiry_req_prefix')}"${activeRequest.question}"`,
       createdAt: activeRequest.createdAt
     };
 
     dispatch(respondChatRequestAction(activeRequest.id, 'accepted', conversation, systemMessage));
-    showToast('Inquiry request accepted. Chat opened!', 'success');
+    showToast(t('messages.toast_accepted'), 'success');
     
     // Switch tabs and select the new chat room
     setSearchParams({ conv: convId });
@@ -158,7 +160,7 @@ export function MessagesPage() {
   const handleDeclineRequest = () => {
     if (!activeRequest) return;
     dispatch(respondChatRequestAction(activeRequest.id, 'declined'));
-    showToast('Inquiry request declined.', 'info');
+    showToast(t('messages.toast_declined'), 'info');
     setSelectedId(null);
     setSearchParams({});
   };
@@ -166,13 +168,13 @@ export function MessagesPage() {
   const handleAcceptOffer = () => {
     if (!activeOffer || !activeTask) return;
     dispatch(acceptOfferAction(activeOffer.id, activeTask.id, activeOffer.coTaskerId));
-    showToast('Offer accepted! Funds locked in escrow.', 'success');
+    showToast(t('messages.toast_offer_accepted'), 'success');
   };
 
   // Helper to find username by ID
   const getUserName = (id: string) => {
-    if (id === currentUser.id) return 'You';
-    return MOCK_USERS.find((u) => u.id === id)?.name || 'User';
+    if (id === currentUser.id) return t('messages.you');
+    return MOCK_USERS.find((u) => u.id === id)?.name || t('messages.user');
   };
 
   return (
@@ -188,9 +190,9 @@ export function MessagesPage() {
         flexShrink: 0
       }}>
         <div style={{ padding: 'var(--space-5) var(--space-6)', borderBottom: '1px solid var(--color-outline-variant)' }}>
-          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>Messages</h1>
+          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>{t('messages.title')}</h1>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '11px', margin: '4px 0 0 0' }}>
-            Context-locked conversations & inquiries
+            {t('messages.subtitle')}
           </p>
         </div>
 
@@ -215,7 +217,7 @@ export function MessagesPage() {
               gap: '6px'
             }}
           >
-            Chats
+            {t('messages.tab_chats')}
             {activeConversations.length > 0 && (
               <span style={{ fontSize: '10px', background: 'var(--color-surface-container-high)', padding: '2px 6px', borderRadius: '10px' }}>
                 {activeConversations.length}
@@ -242,7 +244,7 @@ export function MessagesPage() {
               gap: '6px'
             }}
           >
-            Pending Inquiries
+            {t('messages.tab_inquiries')}
             {pendingRequests.length > 0 && (
               <span style={{ fontSize: '10px', background: 'var(--color-primary)', color: 'var(--color-secondary)', fontWeight: 800, padding: '2px 6px', borderRadius: '10px' }}>
                 {pendingRequests.length}
@@ -309,8 +311,8 @@ export function MessagesPage() {
             ) : (
               <div style={{ textAlign: 'center', padding: 'var(--space-8) var(--space-4)', color: 'var(--color-on-surface-variant)' }}>
                 <MessageSquare size={36} style={{ opacity: 0.4, marginBottom: '8px' }} />
-                <div style={{ fontSize: '13px', fontWeight: 700 }}>No conversations yet</div>
-                <p style={{ fontSize: '11px', margin: '4px 0 0 0' }}>Bids or accepted inquiries will open chat threads here.</p>
+                <div style={{ fontSize: '13px', fontWeight: 700 }}>{t('messages.no_conversations')}</div>
+                <p style={{ fontSize: '11px', margin: '4px 0 0 0' }}>{t('messages.no_conversations_desc')}</p>
               </div>
             )
           ) : (
@@ -369,8 +371,8 @@ export function MessagesPage() {
             ) : (
               <div style={{ textAlign: 'center', padding: 'var(--space-8) var(--space-4)', color: 'var(--color-on-surface-variant)' }}>
                 <AlertCircle size={36} style={{ opacity: 0.4, marginBottom: '8px' }} />
-                <div style={{ fontSize: '13px', fontWeight: 700 }}>No pending inquiries</div>
-                <p style={{ fontSize: '11px', margin: '4px 0 0 0' }}>When taskers ask questions about your listings, they will show up here.</p>
+                <div style={{ fontSize: '13px', fontWeight: 700 }}>{t('messages.no_inquiries')}</div>
+                <p style={{ fontSize: '11px', margin: '4px 0 0 0' }}>{t('messages.no_inquiries_desc')}</p>
               </div>
             )
           )}
@@ -422,7 +424,7 @@ export function MessagesPage() {
                         onClick={(e) => e.stopPropagation()} // prevent opening profile drawer
                         style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
                       >
-                        <strong>Regarding:</strong> {activeTask.title} <ChevronRight size={12} />
+                        <strong>{t('messages.regarding')}</strong> {activeTask.title} <ChevronRight size={12} />
                       </Link>
                     )}
                   </div>
@@ -442,20 +444,20 @@ export function MessagesPage() {
               }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-secondary)' }}>
-                    🏷️ Active Bid: <strong style={{ fontSize: '15px', color: 'var(--color-secondary)' }}>{formatCurrency(activeOffer.price)}</strong>
+                    🏷️ {t('messages.active_bid')} <strong style={{ fontSize: '15px', color: 'var(--color-secondary)' }}>{formatCurrency(activeOffer.price)}</strong>
                   </span>
                   <span className="chip" style={{ fontSize: '10px' }}>
-                    {activeOffer.status === 'accepted' ? '✓ Hired' : 'Pending Review'}
+                    {activeOffer.status === 'accepted' ? t('messages.status_hired') : t('messages.status_pending')}
                   </span>
                 </div>
                 {activeTask.clientId === currentUser.id && activeOffer.status === 'pending' && (
                   <button className="btn btn-primary btn-sm" onClick={handleAcceptOffer}>
-                    Accept Offer & Hire
+                    {t('messages.accept_and_hire')}
                   </button>
                 )}
                 {activeOffer.coTaskerId === currentUser.id && (
                   <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
-                    Waiting for client decision
+                    {t('messages.waiting_decision')}
                   </span>
                 )}
               </div>
@@ -486,7 +488,7 @@ export function MessagesPage() {
                         borderRadius: '12px',
                         borderTopRightRadius: isCurrentUser ? '2px' : '12px',
                         borderTopLeftRadius: !isCurrentUser ? '2px' : '12px',
-                        background: isCurrentUser ? 'var(--color-secondary)' : 'var(--color-surface-white)',
+                        background: isCurrentUser ? 'var(--color-secondary)' : 'var(--color-on-surface)',
                         color: isCurrentUser ? '#ffffff' : 'var(--color-on-surface)',
                         border: isCurrentUser ? 'none' : '1px solid var(--color-outline-variant)',
                         fontSize: 'var(--text-body-sm)',
@@ -518,7 +520,7 @@ export function MessagesPage() {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Type a message..."
+                  placeholder={t('chat.type_message')}
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                   style={{ flex: 1, borderRadius: 'var(--radius-full)', padding: '10px 16px', fontSize: 'var(--text-body-sm)' }}
@@ -541,7 +543,7 @@ export function MessagesPage() {
                 gap: '6px'
               }}>
                 <AlertTriangle size={14} style={{ color: 'var(--color-status-warning)' }} />
-                This task has been assigned to another provider. Chat is now read-only.
+                {t('messages.read_only_msg')}
               </div>
             )}
           </>
@@ -569,7 +571,7 @@ export function MessagesPage() {
                 <Avatar name={activeRequestSender?.name || 'User'} avatarUrl={activeRequestSender?.avatarUrl} size="lg" />
                 <div>
                   <span className="chip" style={{ fontSize: '10px', background: 'var(--color-primary-container)', color: 'var(--color-secondary)', fontWeight: 700, marginBottom: '4px', display: 'inline-block' }}>
-                    Clarification Request
+                    {t('messages.clarification_request')}
                   </span>
                   <h2 className="text-headline-sm hover-underline" style={{ 
                     margin: 0, 
@@ -577,20 +579,20 @@ export function MessagesPage() {
                     fontSize: '16px',
                     textDecoration: activeRequestSender?.role === 'cotasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
                   }}>
-                    Inquiry from {activeRequestSender?.name}
+                    {t('messages.inquiry_from')} {activeRequestSender?.name}
                   </h2>
                 </div>
               </div>
 
               {activeTask && (
                 <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-outline-variant)', padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', marginBottom: '20px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginBottom: '4px' }}>Task Details</div>
+                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginBottom: '4px' }}>{t('messages.task_details')}</div>
                   <h3 style={{ margin: '0 0 6px 0', fontSize: '14px', fontWeight: 700, color: 'var(--color-secondary)' }}>
                     {activeTask.title}
                   </h3>
                   <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
                     <span>📍 {activeTask.location}</span>
-                    <span>💶 {activeTask.budgetType === 'open_to_offers' ? 'Open Bids' : `${formatCurrency(activeTask.budget || 0)}`}</span>
+                    <span>💶 {activeTask.budgetType === 'open_to_offers' ? t('messages.open_bids') : `${formatCurrency(activeTask.budget || 0)}`}</span>
                   </div>
                 </div>
               )}
@@ -603,10 +605,10 @@ export function MessagesPage() {
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                 <button className="btn btn-ghost" onClick={handleDeclineRequest}>
-                  Decline Request
+                  {t('messages.decline_request')}
                 </button>
                 <button className="btn btn-primary" onClick={handleAcceptRequest}>
-                  Accept & Open Chat
+                  {t('messages.accept_and_chat')}
                 </button>
               </div>
             </div>
@@ -630,10 +632,10 @@ export function MessagesPage() {
               <MessageSquare size={28} />
             </div>
             <h3 className="text-headline-sm" style={{ fontWeight: 700, margin: '0 0 6px 0', fontSize: '15px' }}>
-              Select a conversation
+              {t('messages.select_conversation')}
             </h3>
             <p style={{ fontSize: 'var(--text-body-sm)', margin: 0, opacity: 0.8 }}>
-              Choose a thread from the sidebar to view message history or pending inquiries.
+              {t('messages.select_conversation_desc')}
             </p>
           </div>
         )}

@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button';
 import { TASK_CATEGORIES, AUSTRALIAN_CITIES, CATEGORY_LUCIDE_ICONS } from '../../utils/constants';
 import { Modal } from '../../components/ui/Modal';
 import { generateId, formatCurrency, formatDate } from '../../utils/formatters';
+import { useTranslation } from '../../context/LanguageContext';
 import type { Task, TaskCategory } from '../../types';
 
 const PRESET_IMAGES = [
@@ -35,6 +36,7 @@ export function NewTaskPage() {
   const { dispatch } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Wizard state: Step 1 (Details), Step 2 (Schedule), Step 3 (Budget), Step 4 (Confirm)
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -103,32 +105,32 @@ export function NewTaskPage() {
     const newErrors: Record<string, string> = {};
 
     if (currentStep === 1) {
-      if (!form.title.trim()) newErrors.title = 'Title is required';
+      if (!form.title.trim()) newErrors.title = t('new_task.title_error');
       if (!form.description.trim() || form.description.length < 30) {
-        newErrors.description = 'Description must be at least 30 characters';
+        newErrors.description = t('new_task.desc_error');
       }
-      if (!form.category) newErrors.category = 'Category is required';
+      if (!form.category) newErrors.category = t('new_task.cat_error');
       if (form.taskType === 'in_person') {
-        if (!form.location) newErrors.location = 'City is required';
-        if (!form.address.trim()) newErrors.address = 'Address or general area is required';
+        if (!form.location) newErrors.location = t('new_task.city_error');
+        if (!form.address.trim()) newErrors.address = t('new_task.addr_error');
       }
     } else if (currentStep === 2) {
       if (form.scheduleType === 'specific') {
         if (!form.date) {
-          newErrors.date = 'Date is required for scheduled tasks';
+          newErrors.date = t('new_task.date_error');
         } else {
           const selected = new Date(form.date);
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           if (selected < today) {
-            newErrors.date = 'Date cannot be in the past';
+            newErrors.date = t('new_task.date_past_error');
           }
         }
       }
     } else if (currentStep === 3) {
       if (form.budgetType !== 'open_to_offers') {
         if (!form.budget || Number(form.budget) <= 0) {
-          newErrors.budget = 'Please enter a valid budget amount greater than €0';
+          newErrors.budget = t('new_task.budget_error');
         }
       }
     }
@@ -178,10 +180,11 @@ export function NewTaskPage() {
       status: 'open',
       createdAt: new Date().toISOString(),
       offersCount: 0,
+      moderationStatus: 'pending',
     };
 
     dispatch(createTaskAction(newTask));
-    showToast('Task posted successfully! Providers will be notified.', 'success');
+    showToast(t('new_task.post_success') || 'Task posted successfully! It will be visible in the marketplace once approved by moderation.', 'success');
     setIsLoading(false);
     navigate(`/tasks/${newTask.id}`);
   };
@@ -201,9 +204,9 @@ export function NewTaskPage() {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>Post a New Task</h1>
+            <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>{t('new_task.title')}</h1>
             <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
-              Describe what you need done and get quotes in 3 easy steps
+              {t('new_task.subtitle')}
             </p>
           </div>
         </div>
@@ -223,10 +226,10 @@ export function NewTaskPage() {
           borderRadius: 'var(--radius)',
         }}>
           {[
-            { stepNum: 1, label: 'Task Details', icon: <FileText size={16} /> },
-            { stepNum: 2, label: 'Date & Time', icon: <Calendar size={16} /> },
-            { stepNum: 3, label: 'Budget', icon: <DollarSign size={16} /> },
-            { stepNum: 4, label: 'Confirm', icon: <Check size={16} /> }
+            { stepNum: 1, label: t('new_task.step_details'), icon: <FileText size={16} /> },
+            { stepNum: 2, label: t('new_task.step_schedule'), icon: <Calendar size={16} /> },
+            { stepNum: 3, label: t('new_task.step_budget'), icon: <DollarSign size={16} /> },
+            { stepNum: 4, label: t('new_task.step_confirm'), icon: <Check size={16} /> }
           ].map((item, idx, arr) => {
             const status = getStepStatus(item.stepNum);
             const isCompleted = status === 'completed';
@@ -260,7 +263,7 @@ export function NewTaskPage() {
                     }}>
                       {item.label}
                     </span>
-                    <span style={{ fontSize: '9px', color: 'var(--color-on-surface-variant)', opacity: 0.8 }}>Step {item.stepNum}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--color-on-surface-variant)', opacity: 0.8 }}>{t('new_task.step_num_prefix')}{item.stepNum}</span>
                   </div>
                 </div>
                 {idx < arr.length - 1 && (
@@ -286,59 +289,59 @@ export function NewTaskPage() {
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FileText size={18} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Step 1: Core Details
+                    {t('new_task.step1_title')}
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
                   <Input
-                    label="Task Title"
+                    label={t('new_task.task_title')}
                     value={form.title}
                     onChange={update('title')}
                     error={errors.title}
                     required
-                    placeholder="e.g. Assemble IKEA PAX Wardrobe in bedroom"
-                    hint="Summarize the core service you need"
+                    placeholder={t('new_task.title_placeholder')}
+                    hint={t('new_task.title_hint')}
                   />
 
                   <Textarea
-                    label="Description"
+                    label={t('new_task.description')}
                     value={form.description}
                     onChange={update('description')}
                     error={errors.description}
                     required
                     rows={5}
-                    placeholder="Detail what needs to be done. E.g. tools needed, dimensions of items, apartment level, elevator availability, etc."
-                    hint={`${form.description.length}/30 characters minimum`}
+                    placeholder={t('new_task.desc_placeholder')}
+                    hint={`${form.description.length}/30${t('new_task.desc_hint_suffix')}`}
                   />
 
                   <div className="form-group">
-                    <label className="form-label">Type of Task</label>
+                    <label className="form-label">{t('new_task.type_of_task')}</label>
                     <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                       {[
-                        { value: 'in_person', label: '📍 In Person', desc: 'Requires physical presence' },
-                        { value: 'remote', label: '💻 Remote / Online', desc: 'Can be done from anywhere' },
-                      ].map((t) => (
+                        { value: 'in_person', label: t('new_task.in_person'), desc: t('new_task.in_person_desc') },
+                        { value: 'remote', label: t('new_task.remote'), desc: t('new_task.remote_desc') },
+                      ].map((tVal) => (
                         <label
-                          key={t.value}
+                          key={tVal.value}
                           style={{
                             flex: 1,
                             padding: 'var(--space-4)',
-                            border: `1.5px solid ${form.taskType === t.value ? 'var(--color-secondary)' : 'var(--color-outline-variant)'}`,
+                            border: `1.5px solid ${form.taskType === tVal.value ? 'var(--color-secondary)' : 'var(--color-outline-variant)'}`,
                             borderRadius: 'var(--radius-lg)',
                             cursor: 'pointer',
-                            background: form.taskType === t.value ? 'var(--color-surface-container-low)' : 'transparent',
+                            background: form.taskType === tVal.value ? 'var(--color-surface-container-low)' : 'transparent',
                             transition: 'all var(--transition-fast)',
                           }}
                         >
                           <input
                             type="radio"
                             name="taskType"
-                            checked={form.taskType === t.value}
-                            onChange={() => setFormVal('taskType', t.value)}
+                            checked={form.taskType === tVal.value}
+                            onChange={() => setFormVal('taskType', tVal.value)}
                             style={{ display: 'none' }}
                           />
-                          <div style={{ fontWeight: 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', marginBottom: '2px' }}>{t.label}</div>
-                          <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{t.desc}</div>
+                          <div style={{ fontWeight: 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', marginBottom: '2px' }}>{tVal.label}</div>
+                          <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{tVal.desc}</div>
                         </label>
                       ))}
                     </div>
@@ -348,7 +351,7 @@ export function NewTaskPage() {
                   {form.taskType === 'in_person' && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 'var(--space-3)', background: 'var(--color-surface-container-lowest)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--color-outline-variant)' }}>
                       <Select
-                        label="City"
+                        label={t('new_task.city')}
                         value={form.location}
                         onChange={update('location')}
                         error={errors.location}
@@ -356,18 +359,18 @@ export function NewTaskPage() {
                         options={AUSTRALIAN_CITIES.map((c) => ({ value: c, label: c }))}
                       />
                       <Input
-                        label="Address / Area details"
+                        label={t('new_task.address')}
                         value={form.address}
                         onChange={update('address')}
                         error={errors.address}
                         required
-                        placeholder="e.g. Friedrichstraße 100, Berlin-Mitte"
+                        placeholder={t('new_task.address_placeholder')}
                       />
                     </div>
                   )}
 
                   <div className="form-group">
-                    <label className="form-label required">Task Category</label>
+                    <label className="form-label required">{t('new_task.category_required')}</label>
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
@@ -415,7 +418,7 @@ export function NewTaskPage() {
                                 <MoreHorizontal size={24} strokeWidth={1.8} />
                               </div>
                               <span className="category-label">
-                                More...
+                                {t('new_task.more_categories')}
                               </span>
                             </button>
                           </>
@@ -436,18 +439,18 @@ export function NewTaskPage() {
                   <div className="card-header">
                     <h2 className="text-headline-sm" style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Sparkles size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                      Requirements & Must-Haves
+                      {t('new_task.requirements_title')}
                     </h2>
                   </div>
                   <div className="card-body flex flex-col gap-4" style={{ padding: 'var(--space-5)' }}>
                     <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', margin: 0 }}>
-                      Specify any must-haves, e.g. "must bring own drill" or "must have a van".
+                      {t('new_task.requirements_desc')}
                     </p>
                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                       <input
                         type="text"
-                        className="form-control"
-                        placeholder="e.g. Must bring own drill"
+                        className="form-input"
+                        placeholder={t('new_task.requirements_placeholder')}
                         value={newMustHave}
                         onChange={(e) => setNewMustHave(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMustHave())}
@@ -463,7 +466,7 @@ export function NewTaskPage() {
                           borderRadius: 'var(--radius-full)'
                         }}
                       >
-                        <Plus size={14} /> Add
+                        <Plus size={14} /> {t('new_task.add_btn')}
                       </button>
                     </div>
 
@@ -544,7 +547,7 @@ export function NewTaskPage() {
                   <div className="card-header">
                     <h2 className="text-headline-sm" style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <ImageIcon size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                      Reference Photo
+                      {t('new_task.ref_photo')}
                     </h2>
                   </div>
                   <div className="card-body flex flex-col gap-4" style={{ padding: 'var(--space-5)' }}>
@@ -555,7 +558,7 @@ export function NewTaskPage() {
                         onClick={() => setCustomImageMode(false)}
                         style={{ padding: '4px 10px', fontSize: '11px' }}
                       >
-                        Preset
+                        {t('new_task.preset')}
                       </button>
                       <button 
                         type="button" 
@@ -563,7 +566,7 @@ export function NewTaskPage() {
                         onClick={() => setCustomImageMode(true)}
                         style={{ padding: '4px 10px', fontSize: '11px' }}
                       >
-                        Paste URL
+                        {t('new_task.paste_url')}
                       </button>
                     </div>
 
@@ -601,7 +604,7 @@ export function NewTaskPage() {
                         value={form.imageUrl}
                         onChange={update('imageUrl')}
                         placeholder="https://images.unsplash.com/photo-..."
-                        hint="Paste any public image address url"
+                        hint={t('new_task.paste_hint')}
                         style={{ fontSize: '12px' }}
                       />
                     )}
@@ -614,7 +617,7 @@ export function NewTaskPage() {
             <Modal
               isOpen={isCategoryModalOpen}
               onClose={() => setIsCategoryModalOpen(false)}
-              title="Select Task Category"
+              title={t('new_task.modal_title')}
               size="lg"
             >
               {/* Search Bar */}
@@ -622,17 +625,17 @@ export function NewTaskPage() {
                 <input
                   type="text"
                   className="category-search-input"
-                  placeholder="Search categories (e.g. painting, cleaning...)"
+                  placeholder={t('new_task.search_categories')}
                   value={categorySearchQuery}
                   onChange={(e) => setCategorySearchQuery(e.target.value)}
                   autoFocus
                 />
                 {categorySearchQuery ? (
                   <div 
-                    className="category-search-icon" 
-                    onClick={() => setCategorySearchQuery('')}
-                    role="button"
-                    aria-label="Clear search"
+                     className="category-search-icon" 
+                     onClick={() => setCategorySearchQuery('')}
+                     role="button"
+                     aria-label="Clear search"
                   >
                     <X size={16} />
                   </div>
@@ -667,7 +670,7 @@ export function NewTaskPage() {
                         fontSize: 'var(--text-body-sm)'
                       }}>
                         <HelpCircle size={32} style={{ color: 'var(--color-outline)', marginBottom: '8px', opacity: 0.7 }} />
-                        <div>No categories matching "{categorySearchQuery}"</div>
+                        <div>{t('new_task.no_matching_categories')} "{categorySearchQuery}"</div>
                       </div>
                     );
                   }
@@ -709,10 +712,10 @@ export function NewTaskPage() {
               marginTop: 'var(--space-2)'
             }}>
               <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
-                Cancel
+                {t('new_task.cancel')}
               </Button>
               <Button type="button" variant="primary" onClick={handleNext}>
-                Next Step
+                {t('new_task.next_step')}
               </Button>
             </div>
           </div>
@@ -727,14 +730,14 @@ export function NewTaskPage() {
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Calendar size={18} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Step 2: When should this task be completed?
+                    {t('new_task.step2_title')}
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                     {[
-                      { value: 'asap', label: '⚡ As soon as possible (ASAP)', desc: 'Flexible schedule, looking to complete immediately' },
-                      { value: 'specific', label: '📅 Specific Date & Time', desc: 'Choose a planned execution date' },
+                      { value: 'asap', label: t('new_task.schedule_asap'), desc: t('new_task.schedule_asap_desc') },
+                      { value: 'specific', label: t('new_task.schedule_specific'), desc: t('new_task.schedule_specific_desc') },
                     ].map((s) => (
                       <label
                         key={s.value}
@@ -764,7 +767,7 @@ export function NewTaskPage() {
                   {form.scheduleType === 'specific' && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', background: 'var(--color-surface-container-lowest)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--color-outline-variant)' }}>
                       <Input
-                        label="Preferred Date"
+                        label={t('new_task.pref_date')}
                         type="date"
                         value={form.date}
                         onChange={update('date')}
@@ -773,7 +776,7 @@ export function NewTaskPage() {
                         min={new Date().toISOString().split('T')[0]}
                       />
                       <Input
-                        label="Preferred Time (optional)"
+                        label={t('new_task.pref_time')}
                         type="time"
                         value={form.time}
                         onChange={update('time')}
@@ -788,20 +791,20 @@ export function NewTaskPage() {
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Clock size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Scheduling Guide
+                    {t('new_task.guide_title')}
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-4" style={{ padding: 'var(--space-5)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', lineHeight: '1.6' }}>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                     <div style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>⚡</div>
                     <div>
-                      <strong>ASAP Tasks:</strong> Ideal for urgent needs. Taskers looking for immediate work will receive notifications instantly.
+                      <strong>{t('new_task.asap_tasks')}</strong> {t('new_task.asap_tasks_desc')}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                     <div style={{ color: 'var(--color-secondary-mid)', fontWeight: 'bold' }}>📅</div>
                     <div>
-                      <strong>Planned Tasks:</strong> Schedule up to 30 days in advance. Allows you to coordinate details with taskers for a specific date.
+                      <strong>{t('new_task.planned_tasks')}</strong> {t('new_task.planned_tasks_desc')}
                     </div>
                   </div>
                 </div>
@@ -819,10 +822,10 @@ export function NewTaskPage() {
               marginTop: 'var(--space-2)'
             }}>
               <Button type="button" variant="outlined" onClick={handleBack}>
-                Back
+                {t('new_task.back')}
               </Button>
               <Button type="button" variant="primary" onClick={handleNext}>
-                Next Step
+                {t('new_task.next_step')}
               </Button>
             </div>
           </div>
@@ -837,15 +840,15 @@ export function NewTaskPage() {
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <DollarSign size={18} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Step 3: Set your budget
+                    {t('new_task.step3_title')}
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                     {[
-                      { value: 'fixed', label: '💶 Whole Price (Fixed)', desc: 'You pay a solid fixed amount for the entire job' },
-                      { value: 'hourly', label: '⏱️ Price per hour', desc: 'Pay based on active working hours spent' },
-                      { value: 'open_to_offers', label: '🤝 Open for offers', desc: 'No budget declared, taskers propose prices' },
+                      { value: 'fixed', label: t('new_task.budget_fixed'), desc: t('new_task.budget_fixed_desc') },
+                      { value: 'hourly', label: t('new_task.budget_hourly'), desc: t('new_task.budget_hourly_desc') },
+                      { value: 'open_to_offers', label: t('new_task.budget_offers'), desc: t('new_task.budget_offers_desc') },
                     ].map((b) => (
                       <label
                         key={b.value}
@@ -884,7 +887,7 @@ export function NewTaskPage() {
                   {form.budgetType !== 'open_to_offers' && (
                     <div style={{ background: 'var(--color-surface-container-lowest)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--color-outline-variant)', marginTop: '4px' }}>
                       <Input
-                        label={form.budgetType === 'fixed' ? 'Budget Amount (€)' : 'Hourly Rate (€/hour)'}
+                        label={form.budgetType === 'fixed' ? t('new_task.budget_amt') : t('new_task.budget_rate')}
                         type="number"
                         min="5"
                         step="5"
@@ -892,8 +895,8 @@ export function NewTaskPage() {
                         onChange={update('budget')}
                         error={errors.budget}
                         required
-                        placeholder={form.budgetType === 'fixed' ? 'e.g. 150' : 'e.g. 35'}
-                        hint={form.budgetType === 'fixed' ? 'This is the total price for the service' : 'Estimated hourly rate you are willing to pay'}
+                        placeholder={form.budgetType === 'fixed' ? t('new_task.budget_amt_placeholder') : t('new_task.budget_rate_placeholder')}
+                        hint={form.budgetType === 'fixed' ? t('new_task.budget_amt_hint') : t('new_task.budget_rate_hint')}
                       />
                     </div>
                   )}
@@ -905,20 +908,20 @@ export function NewTaskPage() {
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Wallet size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Secure Payments
+                    {t('new_task.sec_payments')}
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-4" style={{ padding: 'var(--space-5)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', lineHeight: '1.6' }}>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                     <div style={{ color: 'var(--color-status-success)', fontWeight: 'bold' }}>✓</div>
                     <div>
-                      <strong>Escrow Trust:</strong> Your money is held securely by TaskBuddy until the job is done. It is only released when you approve.
+                      <strong>{t('new_task.escrow_trust')}</strong> {t('new_task.escrow_trust_desc')}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                     <div style={{ color: 'var(--color-status-success)', fontWeight: 'bold' }}>✓</div>
                     <div>
-                      <strong>Fair Bids:</strong> Choose "Open for offers" to let taskers pitch competitive quotes based on their qualifications.
+                      <strong>{t('new_task.fair_bids')}</strong> {t('new_task.fair_bids_desc')}
                     </div>
                   </div>
                 </div>
@@ -936,10 +939,10 @@ export function NewTaskPage() {
               marginTop: 'var(--space-2)'
             }}>
               <Button type="button" variant="outlined" onClick={handleBack}>
-                Back
+                {t('new_task.back')}
               </Button>
               <Button type="button" variant="primary" onClick={handleNext}>
-                Review Details
+                {t('new_task.review_details')}
               </Button>
             </div>
           </div>
@@ -952,12 +955,12 @@ export function NewTaskPage() {
               <div className="card-header">
                 <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Check size={18} style={{ color: 'var(--color-status-success)' }} />
-                  Confirm and Post Your Task
+                  {t('new_task.step4_title')}
                 </h2>
               </div>
               <div className="card-body" style={{ padding: 'var(--space-6)' }}>
                 <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-5)' }}>
-                  Please review your details carefully before posting. Trusted service providers will see this description to formulate their offers.
+                  {t('new_task.step4_desc')}
                 </p>
 
                 <div className="bento-grid" style={{ gap: 'var(--space-4)' }}>
@@ -967,7 +970,7 @@ export function NewTaskPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                         <span className="chip chip-active" style={{ fontSize: '10px' }}>{form.category}</span>
                         <span className="chip" style={{ fontSize: '10px', textTransform: 'uppercase' }}>
-                          {form.taskType === 'in_person' ? '📍 In Person' : '💻 Remote'}
+                          {form.taskType === 'in_person' ? t('new_task.in_person') : t('new_task.remote')}
                         </span>
                       </div>
                       
@@ -982,7 +985,7 @@ export function NewTaskPage() {
                       {form.mustHaves.length > 0 && (
                         <div style={{ marginBottom: '12px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-secondary-mid)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                            Must-Haves & Requirements
+                            {t('new_task.confirm_must_haves')}
                           </span>
                           <ul style={{ margin: 0, paddingLeft: '18px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>
                             {form.mustHaves.map((m, i) => (
@@ -996,7 +999,7 @@ export function NewTaskPage() {
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
                           <MapPin size={16} style={{ color: 'var(--color-secondary-mid)', flexShrink: 0, marginTop: 2 }} />
                           <div>
-                            <strong>Location:</strong> {form.address}, {form.location}
+                            <strong>{t('new_task.confirm_location')}:</strong> {form.address}, {form.location}
                           </div>
                         </div>
                       )}
@@ -1016,11 +1019,11 @@ export function NewTaskPage() {
                     <div style={{ background: 'var(--color-surface-container-low)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--color-outline-variant)', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                       <div>
                         <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-                          Schedule
+                          {t('new_task.confirm_schedule')}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)', fontWeight: 600, color: 'var(--color-secondary)' }}>
                           <Calendar size={15} />
-                          {form.scheduleType === 'asap' ? 'As soon as possible (ASAP)' : formatDate(form.date)}
+                          {form.scheduleType === 'asap' ? t('new_task.schedule_asap') : formatDate(form.date)}
                         </div>
                         {form.scheduleType === 'specific' && form.time && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
@@ -1032,11 +1035,11 @@ export function NewTaskPage() {
 
                       <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px' }}>
                         <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-                          Offered Budget
+                          {t('new_task.confirm_budget')}
                         </span>
                         <div style={{ fontSize: '20px', fontFamily: 'var(--font-headline)', fontWeight: 700, color: 'var(--color-secondary)' }}>
                           {form.budgetType === 'open_to_offers' 
-                            ? 'Open for Offers' 
+                            ? t('new_task.open_for_offers') 
                             : form.budgetType === 'fixed' 
                               ? formatCurrency(Number(form.budget)) 
                               : `${formatCurrency(Number(form.budget))}/hr`
@@ -1044,10 +1047,10 @@ export function NewTaskPage() {
                         </div>
                         <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
                           {form.budgetType === 'fixed' 
-                            ? 'Fixed Total Contract' 
+                            ? t('new_task.contract_fixed') 
                             : form.budgetType === 'hourly' 
-                              ? 'Hourly Rates Contract' 
-                              : 'Open Bidding'
+                              ? t('new_task.contract_hourly') 
+                              : t('new_task.contract_open')
                           }
                         </span>
                       </div>
@@ -1058,10 +1061,10 @@ export function NewTaskPage() {
               </div>
               <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-4) var(--space-6)' }}>
                 <Button type="button" variant="outlined" onClick={handleBack} disabled={isLoading}>
-                  Back
+                  {t('new_task.back')}
                 </Button>
                 <Button type="submit" variant="primary" size="lg" isLoading={isLoading} style={{ minWidth: '150px' }}>
-                  Post Task Now
+                  {t('new_task.post_now')}
                 </Button>
               </div>
             </div>

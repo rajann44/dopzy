@@ -9,15 +9,8 @@ export const MOCK_USERS: User[] = [
     name: 'Sarah Mitchell',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarah&backgroundColor=b6e3f4',
     createdAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: 'user-2',
-    email: 'client2@demo.com',
-    password: '123456',
-    role: 'client',
-    name: 'James Holloway',
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=james&backgroundColor=c0aede',
-    createdAt: '2024-02-20T10:00:00Z',
+    coTaskerStatus: 'pending',
+    isDisabled: false,
   },
   {
     id: 'user-3',
@@ -27,15 +20,8 @@ export const MOCK_USERS: User[] = [
     name: 'Marcus Weber',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=marcus&backgroundColor=ffd5dc',
     createdAt: '2023-11-05T10:00:00Z',
-  },
-  {
-    id: 'user-4',
-    email: 'cotasker2@demo.com',
-    password: '123456',
-    role: 'cotasker',
-    name: 'Priya Sharma',
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=priya&backgroundColor=d1f4cc',
-    createdAt: '2023-09-12T10:00:00Z',
+    coTaskerStatus: 'approved',
+    isDisabled: false,
   },
   {
     id: 'user-5',
@@ -45,6 +31,8 @@ export const MOCK_USERS: User[] = [
     name: 'Admin User',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin&backgroundColor=ffdfbf',
     createdAt: '2023-01-01T10:00:00Z',
+    coTaskerStatus: 'none',
+    isDisabled: false,
   },
 ];
 
@@ -58,16 +46,6 @@ export const MOCK_CLIENT_PROFILES: ClientProfile[] = [
     memberSince: 'January 2024',
     isVerified: true,
     createdAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    userId: 'user-2',
-    bio: 'Busy professional who needs help with moving and home maintenance.',
-    location: 'Hamburg',
-    tasksPosted: 3,
-    completedTasks: 2,
-    memberSince: 'February 2024',
-    isVerified: false,
-    createdAt: '2024-02-20T10:00:00Z',
   },
 ];
 
@@ -111,43 +89,6 @@ export const MOCK_COTASKER_PROFILES: CoTaskerProfile[] = [
         title: 'Living Room Pendant Light Installation',
         imageUrl: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600',
         description: 'Safely mounted three heavy designer pendant lamps, routed wires cleanly, and set up a smart dimmer switch.'
-      }
-    ]
-  },
-  {
-    userId: 'user-4',
-    bio: 'Experienced cleaner and personal assistant. I take pride in leaving every space spotless. Background-checked and fully insured.',
-    skills: ['Cleaning', 'Deep Cleaning', 'Organization', 'Personal Assistance', 'Delivery', 'Grocery Shopping'],
-    categories: ['Cleaning', 'Personal Assistance', 'Delivery'],
-    location: 'Berlin',
-    rating: 4.7,
-    reviewCount: 31,
-    completedJobs: 35,
-    responseTime: '< 1 hour',
-    memberSince: 'September 2023',
-    isVerified: true,
-    isTopRated: false,
-    isFastResponder: true,
-    totalEarnings: 7600,
-    availability: 'Mon–Sun, 9am–6pm',
-    hourlyRate: 28,
-    qualifications: [
-      'Professional Domestic Cleaning Certificate',
-      'Hygiene & Sanitation Training Certified',
-      'First Aid & Emergency Response Certificate'
-    ],
-    languages: ['English (Fluent)', 'Hindi (Native)', 'German (Conversational)'],
-    transport: 'Compact SUV (Fully stocked with eco-friendly cleaning supplies and vacuum)',
-    portfolio: [
-      {
-        title: 'End of Lease Deep Kitchen Cleaning',
-        imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600',
-        description: 'Deep oven degreasing, refrigerator sanitation, and polishing of all stainless steel surfaces.'
-      },
-      {
-        title: 'Office Closet & Storage Space Organization',
-        imageUrl: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=600',
-        description: 'Sorted, categorized, and labeled entire office stock inventory room, maximizing usable storage by 40%.'
       }
     ]
   },

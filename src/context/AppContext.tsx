@@ -3,6 +3,7 @@ import type { AppState, AppAction, Task, Offer, Review, Notification, ChatReques
 import { MOCK_TASKS } from '../data/tasks';
 import { MOCK_OFFERS } from '../data/offers';
 import { MOCK_REVIEWS } from '../data/reviews';
+import { MOCK_USERS } from '../data/users';
 import {
   MOCK_NOTIFICATIONS,
   MOCK_WALLET_TRANSACTIONS,
@@ -13,6 +14,7 @@ import {
 import { generateId } from '../utils/formatters';
 
 const initialState: AppState = {
+  users: MOCK_USERS,
   tasks: MOCK_TASKS,
   offers: MOCK_OFFERS,
   reviews: MOCK_REVIEWS,
@@ -223,6 +225,84 @@ function appReducer(state: AppState, action: AppAction): AppState {
         conversations: [action.payload, ...state.conversations],
       };
 
+    case 'APPLY_COTASKER':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.userId ? { ...u, coTaskerStatus: 'pending' } : u
+        ),
+      };
+
+    case 'APPROVE_COTASKER':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.userId
+            ? { ...u, coTaskerStatus: 'approved', role: 'cotasker' }
+            : u
+        ),
+      };
+
+    case 'REJECT_COTASKER':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.userId ? { ...u, coTaskerStatus: 'rejected' } : u
+        ),
+      };
+
+    case 'APPROVE_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.map((t) =>
+          t.id === action.payload.taskId ? { ...t, moderationStatus: 'approved' } : t
+        ),
+      };
+
+    case 'REJECT_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.map((t) =>
+          t.id === action.payload.taskId ? { ...t, moderationStatus: 'rejected' } : t
+        ),
+      };
+
+    case 'DISABLE_USER':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.userId ? { ...u, isDisabled: true } : u
+        ),
+      };
+
+    case 'ENABLE_USER':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.userId ? { ...u, isDisabled: false } : u
+        ),
+      };
+
+    case 'TOGGLE_USER_COTASKER':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.userId
+            ? {
+                ...u,
+                role: action.payload.shouldBeCoTasker ? 'cotasker' : 'client',
+                coTaskerStatus: action.payload.shouldBeCoTasker ? 'approved' : 'none',
+              }
+            : u
+        ),
+      };
+
+    case 'DELETE_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.filter((t) => t.id !== action.payload.taskId),
+      };
+
     default:
       return state;
   }
@@ -310,4 +390,41 @@ export function sendChatMessageAction(message: ChatMessage): AppAction {
 export function createConversationAction(conversation: Conversation): AppAction {
   return { type: 'CREATE_CONVERSATION', payload: conversation };
 }
+
+export function applyCoTaskerAction(userId: string): AppAction {
+  return { type: 'APPLY_COTASKER', payload: { userId } };
+}
+
+export function approveCoTaskerAction(userId: string): AppAction {
+  return { type: 'APPROVE_COTASKER', payload: { userId } };
+}
+
+export function rejectCoTaskerAction(userId: string): AppAction {
+  return { type: 'REJECT_COTASKER', payload: { userId } };
+}
+
+export function approveTaskAction(taskId: string): AppAction {
+  return { type: 'APPROVE_TASK', payload: { taskId } };
+}
+
+export function rejectTaskAction(taskId: string): AppAction {
+  return { type: 'REJECT_TASK', payload: { taskId } };
+}
+
+export function disableUserAction(userId: string): AppAction {
+  return { type: 'DISABLE_USER', payload: { userId } };
+}
+
+export function enableUserAction(userId: string): AppAction {
+  return { type: 'ENABLE_USER', payload: { userId } };
+}
+
+export function toggleUserCoTaskerAction(userId: string, shouldBeCoTasker: boolean): AppAction {
+  return { type: 'TOGGLE_USER_COTASKER', payload: { userId, shouldBeCoTasker } };
+}
+
+export function deleteTaskAction(taskId: string): AppAction {
+  return { type: 'DELETE_TASK', payload: { taskId } };
+}
+
 

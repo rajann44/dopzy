@@ -10,9 +10,12 @@ const DEMO_ACCOUNTS = [
   { label: 'Admin Account', email: 'admin@demo.com', password: '123456', color: 'var(--color-tertiary)' },
 ];
 
+import { useTranslation } from '../context/LanguageContext';
+
 export function LoginPage() {
   const { currentUser, login } = useAuth();
   const { showToast } = useToast();
+  const { t, language } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -134,10 +137,10 @@ export function LoginPage() {
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: 'var(--space-8)' }}>
             <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: 'var(--text-headline-lg)', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: 'var(--space-2)' }}>
-              Sign In
+              {t('login.login_btn')}
             </h2>
             <p style={{ fontSize: 'var(--text-body-md)', color: 'var(--color-on-surface-variant)' }}>
-              Access your TaskBuddy account
+              {t('login.select_profile')}
             </p>
           </div>
 
@@ -187,7 +190,7 @@ export function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <div className="form-group">
-              <label htmlFor="email" className="form-label">Email Address</label>
+              <label htmlFor="email" className="form-label">{t('login.email')}</label>
               <input
                 id="email"
                 type="email"
@@ -201,7 +204,7 @@ export function LoginPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password" className="form-label">Password</label>
+              <label htmlFor="password" className="form-label">{t('login.password')}</label>
               <div style={{ position: 'relative' }}>
                 <input
                   id="password"
@@ -253,9 +256,9 @@ export function LoginPage() {
               {isLoading ? (
                 <>
                   <span className="spinner" style={{ width: '18px', height: '18px', borderColor: 'rgba(255,255,255,0.5)', borderTopColor: '#fff' }} />
-                  Signing in...
+                  {language === 'de' ? 'Anmeldung...' : 'Signing in...'}
                 </>
-              ) : 'Sign In'}
+              ) : t('login.login_btn')}
             </button>
           </form>
 

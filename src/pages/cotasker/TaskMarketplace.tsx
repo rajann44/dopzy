@@ -4,11 +4,13 @@ import { useAppContext } from '../../context/AppContext';
 import { TaskCard } from '../../components/tasks/TaskCard';
 import { TaskFiltersBar } from '../../components/tasks/TaskFilters';
 import { taskService } from '../../services/taskService';
+import { useTranslation } from '../../context/LanguageContext';
 import type { Task, TaskFilters } from '../../types';
 
 export function TaskMarketplace() {
   const { currentUser } = useAuth();
   const { state } = useAppContext();
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filters, setFilters] = useState<TaskFilters>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +18,9 @@ export function TaskMarketplace() {
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
-      const open = await taskService.getOpenTasks(state.tasks);
+      const open = (await taskService.getOpenTasks(state.tasks)).filter(
+        (t) => t.moderationStatus !== 'pending' && t.moderationStatus !== 'rejected'
+      );
       const filtered = await taskService.getTasks(open, filters);
       setTasks(filtered);
       setIsLoading(false);
@@ -26,9 +30,9 @@ export function TaskMarketplace() {
 
   const getGreeting = () => {
     const hr = new Date().getHours();
-    if (hr < 12) return 'Guten Morgen';
-    if (hr < 17) return 'Guten Tag';
-    return 'Guten Abend';
+    if (hr < 12) return t('marketplace.greeting_morning');
+    if (hr < 17) return t('marketplace.greeting_afternoon');
+    return t('marketplace.greeting_evening');
   };
 
   return (
@@ -40,7 +44,7 @@ export function TaskMarketplace() {
             {getGreeting()}, {currentUser?.name.split(' ')[0]} 👋
           </h1>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
-            Your Online Platform for Services — {tasks.length} task{tasks.length !== 1 ? 's' : ''} available.
+            {t('marketplace.subtitle_prefix')}{tasks.length} {tasks.length === 1 ? t('marketplace.task_singular') : t('marketplace.task_plural')}{t('marketplace.subtitle_suffix')}
           </p>
         </div>
       </div>
@@ -56,10 +60,10 @@ export function TaskMarketplace() {
           </div>
           <div className="promo-banner-right">
             <span style={{ fontSize: 'var(--text-body-sm)', fontWeight: 500 }}>
-              Dear Customer, for every new customer you refer <strong style={{ color: 'var(--color-primary-container)' }}>we are giving you €1.</strong>
+              {t('marketplace.promo_referral')}<strong style={{ color: 'var(--color-primary-container)' }}>{t('marketplace.promo_referral_bold')}</strong>
             </span>
             <button className="promo-card-btn-gold" style={{ fontSize: '11px', padding: '6px 14px' }}>
-              Claim Your Bonus Now
+              {t('marketplace.promo_btn')}
             </button>
           </div>
         </div>
@@ -82,8 +86,8 @@ export function TaskMarketplace() {
           <div className="card">
             <div className="empty-state">
               <div className="empty-state-icon">🔍</div>
-              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No tasks found</h3>
-              <p>Try adjusting your filters, or check back soon for new tasks.</p>
+              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>{t('marketplace.no_tasks')}</h3>
+              <p>{t('marketplace.adjust_filters')}</p>
             </div>
           </div>
         )}
@@ -91,3 +95,4 @@ export function TaskMarketplace() {
     </div>
   );
 }
+

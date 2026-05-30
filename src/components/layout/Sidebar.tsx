@@ -1,10 +1,11 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import {
-  ListTodo, Bell, MessageSquare, User, LogOut, Search, Settings
+  ListTodo, Bell, MessageSquare, LogOut, Search, Settings, Shield
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
 import { Avatar } from '../ui/Avatar';
+import { useTranslation } from '../../context/LanguageContext';
 
 interface NavItem {
   to: string;
@@ -22,6 +23,7 @@ export function Sidebar() {
   const { currentUser, logout } = useAuth();
   const { state } = useAppContext();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (!currentUser) return null;
 
@@ -107,7 +109,7 @@ export function Sidebar() {
         }}>
           <Avatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size="sm" />
         </div>
-        <div style={{ minWidth: 0 }}>
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div style={{
             fontWeight: 600, fontSize: '13px',
             color: '#ffffff',
@@ -120,9 +122,23 @@ export function Sidebar() {
             color: 'var(--sidebar-text-muted)',
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             textTransform: 'uppercase', letterSpacing: '0.05em',
+            fontWeight: 500,
           }}>
-            Workspace Member
+            {currentUser.role === 'admin' ? 'Admin' : 'Member'}
           </div>
+          <Link
+            to={`/profile/${currentUser.id}`}
+            style={{
+              fontSize: '11px',
+              color: 'var(--color-primary)',
+              textDecoration: 'none',
+              fontWeight: 600,
+              display: 'inline-block',
+              marginTop: '1px'
+            }}
+          >
+            {t('nav.profile_view') || 'View Profile'}
+          </Link>
         </div>
       </div>
 
@@ -138,9 +154,33 @@ export function Sidebar() {
         }}>
           Workspace
         </div>
-        {mainNav.map((item) => (
-          <SidebarLink key={item.to} {...item} />
-        ))}
+        {mainNav.map((item) => {
+          let labelKey = 'browse_tasks';
+          if (item.to === '/my-tasks') labelKey = 'my_tasks';
+          if (item.to === '/messages') labelKey = 'messages';
+          return (
+            <SidebarLink key={item.to} to={item.to} label={t(`nav.${labelKey}`)} icon={item.icon} />
+          );
+        })}
+
+        {currentUser.role === 'admin' && (
+          <>
+            <div style={{ height: '1px', background: 'var(--sidebar-border)', margin: '10px 4px' }} />
+            <div style={{
+              fontSize: '10px', fontWeight: 600,
+              color: 'var(--sidebar-label-color)',
+              textTransform: 'uppercase', letterSpacing: '0.10em',
+              padding: '8px 10px 6px',
+            }}>
+              Administration
+            </div>
+            <SidebarLink
+              to="/admin/moderation"
+              label={t('nav.moderation') || 'Moderation Panel'}
+              icon={<Shield size={17} />}
+            />
+          </>
+        )}
 
         <div style={{ height: '1px', background: 'var(--sidebar-border)', margin: '10px 4px' }} />
 
@@ -155,16 +195,11 @@ export function Sidebar() {
         </div>
         <SidebarLink
           to="/notifications"
-          label="Notifications"
+          label={t('nav.notifications')}
           icon={<Bell size={17} />}
           badge={unreadCount > 0 ? unreadCount : undefined}
         />
-        <SidebarLink
-          to={`/profile/${currentUser.id}`}
-          label="My Profile"
-          icon={<User size={17} />}
-        />
-        <SidebarLink to="/settings" label="Settings" icon={<Settings size={17} />} />
+        <SidebarLink to="/settings" label={t('nav.settings')} icon={<Settings size={17} />} />
       </nav>
 
       {/* ── Sign out ── */}
@@ -196,7 +231,7 @@ export function Sidebar() {
           }}
         >
           <LogOut size={17} />
-          Sign Out
+          {t('nav.logout')}
         </button>
       </div>
 

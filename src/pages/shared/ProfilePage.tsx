@@ -264,7 +264,7 @@ export function ProfilePage() {
                     <label className="form-label">Full Name</label>
                     <input 
                       type="text" 
-                      className="form-control" 
+                      className="form-input" 
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                     />
@@ -274,7 +274,7 @@ export function ProfilePage() {
                     <label className="form-label">Location / City</label>
                     <input 
                       type="text" 
-                      className="form-control" 
+                      className="form-input" 
                       value={editLocation}
                       onChange={(e) => setEditLocation(e.target.value)}
                     />
@@ -283,7 +283,7 @@ export function ProfilePage() {
                   <div className="form-group">
                     <label className="form-label">About / Bio</label>
                     <textarea 
-                      className="form-control" 
+                      className="form-textarea" 
                       rows={4}
                       value={editBio}
                       onChange={(e) => setEditBio(e.target.value)}
@@ -296,7 +296,7 @@ export function ProfilePage() {
                       <label className="form-label">Hourly Rate (€/hr)</label>
                       <input 
                         type="number" 
-                        className="form-control" 
+                        className="form-input" 
                         value={editHourlyRate}
                         onChange={(e) => setEditHourlyRate(Number(e.target.value))}
                       />
@@ -318,7 +318,7 @@ export function ProfilePage() {
                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                       <input 
                         type="text" 
-                        className="form-control" 
+                        className="form-input" 
                         placeholder="Add a certification (e.g. Certified Handyman IHK)"
                         value={newQualification}
                         onChange={(e) => setNewQualification(e.target.value)}
@@ -363,7 +363,7 @@ export function ProfilePage() {
                         <label className="form-label" style={{ fontSize: '11px' }}>Project Title</label>
                         <input 
                           type="text" 
-                          className="form-control" 
+                          className="form-input" 
                           placeholder="e.g. Wardrobe assembly"
                           value={newPortfolioItem.title}
                           onChange={(e) => setNewPortfolioItem({ ...newPortfolioItem, title: e.target.value })}
@@ -373,7 +373,7 @@ export function ProfilePage() {
                       <div className="form-group">
                         <label className="form-label" style={{ fontSize: '11px' }}>Description</label>
                         <textarea 
-                          className="form-control" 
+                          className="form-textarea" 
                           rows={2}
                           placeholder="Explain what work was done..."
                           value={newPortfolioItem.description}
@@ -385,7 +385,7 @@ export function ProfilePage() {
                         <label className="form-label" style={{ fontSize: '11px' }}>Image URL</label>
                         <input 
                           type="text" 
-                          className="form-control" 
+                          className="form-input" 
                           placeholder="https://images.unsplash.com/..."
                           value={newPortfolioItem.imageUrl}
                           onChange={(e) => setNewPortfolioItem({ ...newPortfolioItem, imageUrl: e.target.value })}
@@ -442,7 +442,7 @@ export function ProfilePage() {
                       </label>
                       <input 
                         type="text" 
-                        className="form-control" 
+                        className="form-input" 
                         placeholder="e.g. SUV, Mercedes Sprinter Van, Cargo Straps"
                         value={editTransport}
                         onChange={(e) => setEditTransport(e.target.value)}
@@ -457,7 +457,7 @@ export function ProfilePage() {
                       <div style={{ display: 'flex', gap: 'var(--space-1.5)', marginBottom: '8px' }}>
                         <input 
                           type="text" 
-                          className="form-control" 
+                          className="form-input" 
                           placeholder="e.g. Spanish (Basic)"
                           value={newLanguage}
                           onChange={(e) => setNewLanguage(e.target.value)}
@@ -510,7 +510,7 @@ export function ProfilePage() {
                       <div style={{ display: 'flex', gap: 'var(--space-1.5)', marginBottom: '8px' }}>
                         <input 
                           type="text" 
-                          className="form-control" 
+                          className="form-input" 
                           placeholder="e.g. Smart Home Setup"
                           value={newSkill}
                           onChange={(e) => setNewSkill(e.target.value)}

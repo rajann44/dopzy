@@ -2,10 +2,12 @@ import { useAppContext, markNotificationReadAction, markAllNotificationsReadActi
 import { useAuth } from '../../context/AuthContext';
 import { NotificationItem } from '../../components/notifications/NotificationItem';
 import { Check } from 'lucide-react';
+import { useTranslation } from '../../context/LanguageContext';
 
 export function NotificationsPage() {
   const { currentUser } = useAuth();
   const { state, dispatch } = useAppContext();
+  const { t } = useTranslation();
 
   const myNotifications = state.notifications
     .filter((n) => n.userId === currentUser?.id)
@@ -21,18 +23,24 @@ export function NotificationsPage() {
     dispatch(markAllNotificationsReadAction(currentUser!.id));
   };
 
+  const getSubtitle = () => {
+    if (unreadCount === 0) return t('notifications_page.all_caught_up');
+    if (unreadCount === 1) return t('notifications_page.unread_singular');
+    return t('notifications_page.unread_plural').replace('{count}', String(unreadCount));
+  };
+
   return (
     <div>
       <div className="page-topbar">
         <div>
-          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>Notifications</h1>
+          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>{t('notifications_page.title')}</h1>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
-            {unreadCount > 0 ? `You have ${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}` : 'All caught up!'}
+            {getSubtitle()}
           </p>
         </div>
         {unreadCount > 0 && (
           <button className="btn btn-ghost btn-sm" onClick={handleMarkAllRead} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Check size={14} /> Mark all read
+            <Check size={14} /> {t('notifications_page.mark_all_read')}
           </button>
         )}
       </div>
@@ -50,8 +58,8 @@ export function NotificationsPage() {
           ) : (
             <div className="empty-state">
               <div className="empty-state-icon">🔔</div>
-              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No notifications yet</h3>
-              <p>You'll see updates about your offers, tasks, and reviews here.</p>
+              <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>{t('notifications_page.empty_title')}</h3>
+              <p>{t('notifications_page.empty_desc')}</p>
             </div>
           )}
         </div>

@@ -10,6 +10,8 @@ export interface User {
   name: string;
   avatarUrl?: string;
   createdAt: string;
+  coTaskerStatus?: 'none' | 'pending' | 'approved' | 'rejected';
+  isDisabled?: boolean;
 }
 
 export interface ClientProfile {
@@ -103,6 +105,7 @@ export interface Task {
   offersCount: number;
   taskType?: 'in_person' | 'remote';
   mustHaves?: string[];
+  moderationStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 
@@ -220,6 +223,7 @@ export interface TaskFilters {
 // ─── App State ───────────────────────────────────────────────────────────────
 
 export interface AppState {
+  users: User[];
   tasks: Task[];
   offers: Offer[];
   reviews: Review[];
@@ -246,5 +250,14 @@ export type AppAction =
   | { type: 'CREATE_CHAT_REQUEST'; payload: ChatRequest }
   | { type: 'RESPOND_CHAT_REQUEST'; payload: { requestId: string; status: 'accepted' | 'declined'; conversation?: Conversation; systemMessage?: ChatMessage } }
   | { type: 'SEND_CHAT_MESSAGE'; payload: ChatMessage }
-  | { type: 'CREATE_CONVERSATION'; payload: Conversation };
+  | { type: 'CREATE_CONVERSATION'; payload: Conversation }
+  | { type: 'APPLY_COTASKER'; payload: { userId: string } }
+  | { type: 'APPROVE_COTASKER'; payload: { userId: string } }
+  | { type: 'REJECT_COTASKER'; payload: { userId: string } }
+  | { type: 'APPROVE_TASK'; payload: { taskId: string } }
+  | { type: 'REJECT_TASK'; payload: { taskId: string } }
+  | { type: 'DISABLE_USER'; payload: { userId: string } }
+  | { type: 'ENABLE_USER'; payload: { userId: string } }
+  | { type: 'TOGGLE_USER_COTASKER'; payload: { userId: string; shouldBeCoTasker: boolean } }
+  | { type: 'DELETE_TASK'; payload: { taskId: string } };
 

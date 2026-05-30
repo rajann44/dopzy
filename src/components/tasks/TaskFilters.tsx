@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, SlidersHorizontal, X, Tag, MapPin, DollarSign } from 'lucide-react';
 import type { TaskFilters } from '../../types';
 import { TASK_CATEGORIES, AUSTRALIAN_CITIES, STATUS_LABELS } from '../../utils/constants';
+import { useTranslation } from '../../context/LanguageContext';
 
 interface TaskFiltersProps {
   filters: TaskFilters;
@@ -10,6 +11,7 @@ interface TaskFiltersProps {
 }
 
 export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFiltersProps) {
+  const { t } = useTranslation();
   const hasActiveFilters = Object.keys(filters).some(
     (key) => {
       const val = filters[key as keyof TaskFilters];
@@ -50,7 +52,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
           />
           <input
             type="text"
-            placeholder="What service are you looking for today?..."
+            placeholder={t('filters.search_prompt')}
             value={filters.search ?? ''}
             onChange={(e) => update('search', e.target.value)}
             className="form-input"
@@ -108,7 +110,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
           }}
         >
           <SlidersHorizontal size={16} />
-          <span style={{ fontSize: 'var(--text-body-sm)', fontWeight: 700 }}>Filters</span>
+          <span style={{ fontSize: 'var(--text-body-sm)', fontWeight: 700 }}>{t('filters.toggle')}</span>
           {activeFiltersCount > 0 && (
             <span style={{
               background: isExpanded || hasActiveFilters ? 'var(--color-secondary)' : 'var(--color-outline)',
@@ -141,7 +143,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
               color: 'var(--color-on-surface-variant)',
             }}
           >
-            <X size={14} /> Reset
+            <X size={14} /> {t('filters.reset')}
           </button>
         )}
       </div>
@@ -160,7 +162,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
           {/* Category Filter */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-secondary-mid)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Tag size={12} /> Category
+              <Tag size={12} /> {t('filters.category')}
             </label>
             <select
               value={filters.category ?? ''}
@@ -175,7 +177,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
               }}
               aria-label="Filter by category"
             >
-              <option value="">All Categories</option>
+              <option value="">{t('filters.all_categories')}</option>
               {TASK_CATEGORIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -185,7 +187,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
           {/* Location/City Filter */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-secondary-mid)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin size={12} /> City
+              <MapPin size={12} /> {t('filters.city')}
             </label>
             <select
               value={filters.city ?? ''}
@@ -200,7 +202,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
               }}
               aria-label="Filter by city"
             >
-              <option value="">All Cities</option>
+              <option value="">{t('filters.all_cities')}</option>
               {AUSTRALIAN_CITIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -211,7 +213,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
           {showStatus && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-secondary-mid)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                Status
+                {t('filters.status')}
               </label>
               <select
                 value={filters.status ?? ''}
@@ -226,7 +228,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
                 }}
                 aria-label="Filter by status"
               >
-                <option value="">All Statuses</option>
+                <option value="">{t('filters.all_statuses')}</option>
                 {Object.entries(STATUS_LABELS).map(([k, v]) => (
                   <option key={k} value={k}>{v}</option>
                 ))}
@@ -237,12 +239,12 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
           {/* Budget Range Filter */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-secondary-mid)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <DollarSign size={12} /> Budget Range (€)
+              <DollarSign size={12} /> {t('filters.budget_range')}
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input
                 type="number"
-                placeholder="Min"
+                placeholder={t('filters.min')}
                 value={filters.budgetMin ?? ''}
                 onChange={(e) => update('budgetMin', e.target.value ? Number(e.target.value) : undefined)}
                 className="form-input"
@@ -260,7 +262,7 @@ export function TaskFiltersBar({ filters, onChange, showStatus = false }: TaskFi
               <span style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', fontWeight: 600 }}>to</span>
               <input
                 type="number"
-                placeholder="Max"
+                placeholder={t('filters.max')}
                 value={filters.budgetMax ?? ''}
                 onChange={(e) => update('budgetMax', e.target.value ? Number(e.target.value) : undefined)}
                 className="form-input"

@@ -13,20 +13,23 @@ import { TaskDetailPage } from './pages/TaskDetailPage';
 import { TaskMarketplace } from './pages/cotasker/TaskMarketplace';
 import { NotificationsPage } from './pages/shared/NotificationsPage';
 import { ProfilePage } from './pages/shared/ProfilePage';
-import { SettingsPage } from './pages/shared/PlaceholderPages';
+import { SettingsPage } from './pages/shared/SettingsPage';
 import { MessagesPage } from './pages/shared/MessagesPage';
+import { ModerationPanel } from './pages/shared/ModerationPanel';
 
+import { LanguageProvider } from './context/LanguageContext';
 import './styles/index.css';
 
 function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
-        <AuthProvider>
+        <LanguageProvider>
           <AppProvider>
-            <Routes>
-              {/* Public */}
-              <Route path="/login" element={<LoginPage />} />
+            <AuthProvider>
+              <Routes>
+                {/* Public */}
+                <Route path="/login" element={<LoginPage />} />
 
               {/* Private Unified Workspace Routes */}
               <Route element={<ProtectedRoute />}>
@@ -47,14 +50,16 @@ function App() {
                   <Route path="/messages" element={<MessagesPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                   <Route path="/profile/:id" element={<ProfilePage />} />
+                  <Route path="/admin/moderation" element={<ModerationPanel />} />
                 </Route>
               </Route>
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            </AuthProvider>
           </AppProvider>
-        </AuthProvider>
+        </LanguageProvider>
       </ToastProvider>
     </BrowserRouter>
   );

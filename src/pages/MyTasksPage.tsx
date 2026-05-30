@@ -1,16 +1,37 @@
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Briefcase, Star, ArrowRight, Wallet, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext, applyCoTaskerAction } from '../context/AppContext';
 import { StatusBadge } from '../components/ui/Badge';
 import { formatCurrency, formatDate, formatRelativeTime } from '../utils/formatters';
 import { CATEGORY_ICONS } from '../utils/constants';
+import { useTranslation } from '../context/LanguageContext';
 
 export function MyTasksPage() {
-  const { currentUser } = useAuth();
-  const { state } = useAppContext();
+  const { currentUser, updateCurrentUser } = useAuth();
+  const { state, dispatch } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'client';
+  const { t } = useTranslation();
+
+  // Application Form States
+  const [bio, setBio] = useState('');
+  const [skills, setSkills] = useState('');
+  const [rate, setRate] = useState('25');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleApply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bio.trim() || !rate || !currentUser) return;
+    setIsSubmitting(true);
+    await new Promise((r) => setTimeout(r, 600));
+    dispatch(applyCoTaskerAction(currentUser.id));
+    updateCurrentUser({ coTaskerStatus: 'pending' });
+    setIsSubmitting(false);
+  };
+
+  const dbUser = state.users.find((u) => u.id === currentUser?.id) || currentUser;
 
   // ── Client Calculations ──
   const clientTasks = state.tasks.filter((t) => t.clientId === currentUser?.id);
@@ -46,7 +67,7 @@ export function MyTasksPage() {
       {/* Sticky Header */}
       <div className="page-topbar">
         <div>
-          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>My Tasks</h1>
+          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>{t('nav.my_tasks')}</h1>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
             Manage tasks you have posted or jobs you are working on
           </p>
@@ -54,7 +75,7 @@ export function MyTasksPage() {
         {activeTab === 'client' && (
           <Link to="/tasks/new">
             <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <Plus size={16} /> Post a Task
+              <Plus size={16} /> {t('tasks.post_task')}
             </button>
           </Link>
         )}
@@ -226,25 +247,84 @@ export function MyTasksPage() {
                         <div className="card-body" style={{ padding: 'var(--space-4)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
                             <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
                                 <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
                                 </span>
-                                <StatusBadge status={task.status} />
+                                <StatusBadge status={task.status === 'open' && task.offersCount > 0 ? 'receiving_offers' : task.status} />
+                                {task.moderationStatus === 'pending' && (
+                                  <span className="badge badge-pending" style={{ fontSize: '10px' }}>⏳ {t('tasks.moderation_pending_badge')}</span>
+                                )}
+                                {task.moderationStatus === 'rejected' && (
+                                  <span className="badge badge-rejected" style={{ fontSize: '10px' }}>⚠️ {t('tasks.moderation_rejected_badge')}</span>
+                                )}
                               </div>
                               <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
                               <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
                                 {task.location} · Posted {formatDate(task.createdAt)}
                               </div>
+                              {task.moderationStatus === 'rejected' && (
+                                <div style={{ 
+                                  marginTop: '8px', 
+                                  padding: '6px 12px', 
+                                  background: 'rgba(211, 47, 47, 0.06)', 
+                                  borderLeft: '3px solid var(--color-status-error)', 
+                                  fontSize: '12px', 
+                                  color: 'var(--color-status-error)',
+                                  borderRadius: '0 4px 4px 0',
+                                  fontWeight: 500
+                                }}>
+                                  {t('tasks.moderation_rejected_desc')}
+                                </div>
+                              )}
+                              {task.moderationStatus === 'pending' && (
+                                <div style={{ 
+                                  marginTop: '8px', 
+                                  padding: '6px 12px', 
+                                  background: 'rgba(245, 127, 23, 0.06)', 
+                                  borderLeft: '3px solid #F57F17', 
+                                  fontSize: '12px', 
+                                  color: '#F57F17',
+                                  borderRadius: '0 4px 4px 0',
+                                  fontWeight: 500
+                                }}>
+                                  {t('tasks.moderation_pending_desc')}
+                                </div>
+                              )}
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                               <div style={{ textAlign: 'right' }}>
                                 <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
                                   {task.budget ? formatCurrency(task.budget) : 'Open Budget'}
                                 </div>
-                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase' }}>
-                                  {task.offersCount} offer{task.offersCount !== 1 ? 's' : ''} received
-                                </div>
+                                {task.offersCount > 0 ? (
+                                  <div style={{ 
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    background: 'rgba(255, 215, 0, 0.12)', 
+                                    color: 'var(--color-secondary)', 
+                                    padding: '4px 8px', 
+                                    borderRadius: 'var(--radius)', 
+                                    fontSize: '11px', 
+                                    fontWeight: 600,
+                                    marginTop: '4px',
+                                    border: '1px solid rgba(230, 194, 0, 0.3)'
+                                  }}>
+                                    <span style={{ 
+                                      width: '6px', 
+                                      height: '6px', 
+                                      borderRadius: '50%', 
+                                      background: 'var(--color-primary-container)', 
+                                      display: 'inline-block' 
+                                    }} />
+                                    <span>{task.offersCount} Offer{task.offersCount !== 1 ? 's' : ''} to review</span>
+                                  </div>
+                                ) : (
+                                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginTop: '4px' }}>
+                                    No offers yet
+                                  </div>
+                                )}
                               </div>
                               <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
                             </div>
@@ -289,7 +369,17 @@ export function MyTasksPage() {
                                 Assigned to provider · Scheduled: {formatDate(task.date)}
                               </div>
                             </div>
-                            <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
+                                  {task.budget ? formatCurrency(task.budget) : 'Open Budget'}
+                                </div>
+                                <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-status-success)', textTransform: 'uppercase', marginTop: '4px' }}>
+                                  Booked Price
+                                </div>
+                              </div>
+                              <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -306,15 +396,17 @@ export function MyTasksPage() {
                 <div className="transaction-rows-container">
                   <div className="transaction-row-header">
                     <span>Task Activity</span>
-                    <span style={{ textAlign: 'right', paddingRight: '220px' }}>Budget & Status</span>
+                    <span style={{ gridColumn: 'span 2' }}></span>
+                    <span style={{ textAlign: 'right', paddingRight: '16px' }}>Budget</span>
+                    <span style={{ textAlign: 'center' }}>Status</span>
                   </div>
                   {completedTasks.map((task) => {
-                    const initials = task.title.substring(0, 2).toUpperCase();
+                    const categoryIcon = CATEGORY_ICONS[task.category] || '📋';
                     return (
                       <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                         <div className="transaction-row-item">
                           <div>
-                            <div className="transaction-initials-badge">{initials}</div>
+                            <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
@@ -346,11 +438,117 @@ export function MyTasksPage() {
               </div>
             )}
           </div>
-        ) : (
-          /* ─────────────────────────────────────────────────────────────────
-             CO-TASKER VIEW
-             ───────────────────────────────────────────────────────────────── */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        ) : dbUser?.coTaskerStatus !== 'approved' ? (
+          <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
+                {dbUser?.coTaskerStatus === 'pending' ? (
+                  <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-primary)' }}>
+                    <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
+                    <h2 className="text-headline-sm" style={{ fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '8px' }}>
+                      {t('tasks.application_pending_title') || 'Application Pending Review'}
+                    </h2>
+                    <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', lineHeight: '1.6', margin: 0 }}>
+                      {t('tasks.application_pending_desc') || 'Your application to become a registered Co-Tasker is currently under review by our moderation team. You will receive a notification as soon as your profile is approved.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="card" style={{ padding: 'var(--space-6)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: 'var(--space-4)' }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: 'var(--color-primary-container)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'var(--color-secondary)', fontWeight: 'bold'
+                      }}>
+                        💼
+                      </div>
+                      <h2 className="text-headline-sm" style={{ margin: 0, fontWeight: 700, color: 'var(--color-secondary)', fontSize: '18px' }}>
+                        {t('tasks.apply_title') || 'Apply to Become a Co-Tasker'}
+                      </h2>
+                    </div>
+                    <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', lineHeight: '1.6', marginBottom: 'var(--space-5)' }}>
+                      {t('tasks.apply_desc') || 'Unlock the ability to bid on tasks, browse the service marketplace, and earn money. Fill out the quick details below for moderator approval.'}
+                    </p>
+                    <form onSubmit={handleApply} className="flex flex-col gap-4">
+                      <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label className="form-label required" style={{ fontWeight: 600 }}>
+                          {t('tasks.apply_bio') || 'Introduce Yourself (Bio)'}
+                        </label>
+                        <textarea
+                          className="form-textarea"
+                          rows={4}
+                          required
+                          placeholder={t('tasks.apply_bio_placeholder') || 'Describe your skills, experience, and the services you can offer...'}
+                          value={bio}
+                          onChange={(e) => setBio(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1.5px solid var(--color-outline-variant)',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-body-sm)',
+                            outline: 'none',
+                            background: 'transparent',
+                            color: 'var(--color-on-surface)',
+                            fontFamily: 'inherit'
+                          }}
+                        />
+                      </div>
+                      <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label className="form-label" style={{ fontWeight: 600 }}>
+                          {t('tasks.apply_skills') || 'Your Skills'}
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder={t('tasks.apply_skills_placeholder') || 'e.g. Cleaning, Painting, Furniture Assembly (comma separated)'}
+                          value={skills}
+                          onChange={(e) => setSkills(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '10px 0',
+                            border: 'none',
+                            borderBottom: '1.5px solid var(--color-outline-variant)',
+                            borderRadius: 0,
+                            fontSize: 'var(--text-body-sm)',
+                            outline: 'none',
+                            background: 'transparent',
+                            color: 'var(--color-on-surface)'
+                          }}
+                        />
+                      </div>
+                      <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label className="form-label required" style={{ fontWeight: 600 }}>
+                          {t('tasks.apply_rate') || 'Desired Hourly Rate (€/hour)'}
+                        </label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          required
+                          min={10}
+                          value={rate}
+                          onChange={(e) => setRate(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '10px 0',
+                            border: 'none',
+                            borderBottom: '1.5px solid var(--color-outline-variant)',
+                            borderRadius: 0,
+                            fontSize: 'var(--text-body-sm)',
+                            outline: 'none',
+                            background: 'transparent',
+                            color: 'var(--color-on-surface)'
+                          }}
+                        />
+                      </div>
+                      <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ marginTop: '12px', width: '100%', height: '42px', borderRadius: 'var(--radius)', fontWeight: 700 }}>
+                        {isSubmitting ? (t('tasks.apply_submitting') || 'Submitting...') : (t('tasks.apply_submit_btn') || 'Submit Application')}
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {/* Active Jobs */}
             <div>
               <div className="section-label">Active Jobs ({activeJobs.length})</div>
@@ -474,18 +672,20 @@ export function MyTasksPage() {
                 <div className="transaction-rows-container">
                   <div className="transaction-row-header">
                     <span>Job / Project Activity</span>
-                    <span style={{ textAlign: 'right', paddingRight: '220px' }}>Earnings & Status</span>
+                    <span style={{ gridColumn: 'span 2' }}></span>
+                    <span style={{ textAlign: 'right', paddingRight: '16px' }}>Earnings</span>
+                    <span style={{ textAlign: 'center' }}>Status</span>
                   </div>
                   {completedJobs.map((task) => {
                     const tx = state.walletTransactions.find(
                       (w) => w.taskId === task.id && w.coTaskerId === currentUser?.id
                     );
-                    const initials = task.title.substring(0, 2).toUpperCase();
+                    const categoryIcon = CATEGORY_ICONS[task.category] || '📋';
                     return (
                       <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                         <div className="transaction-row-item">
                           <div>
-                            <div className="transaction-initials-badge">{initials}</div>
+                            <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>

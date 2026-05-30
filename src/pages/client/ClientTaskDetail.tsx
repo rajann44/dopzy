@@ -34,6 +34,13 @@ export function ClientTaskDetail() {
   const [reviewComment, setReviewComment] = useState('');
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [selectedTaskerId, setSelectedTaskerId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'details' | 'offers' | 'review'>('details');
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editBudget, setEditBudget] = useState(0);
+  const [editDate, setEditDate] = useState('');
 
   const existingReview = state.reviews.find(
     (r) => r.taskId === id && r.fromUserId === currentUser?.id
@@ -44,6 +51,8 @@ export function ClientTaskDetail() {
       profileService.getUserById(task.assignedCoTaskerId).then(setAssignedUser);
     }
   }, [task?.assignedCoTaskerId]);
+
+
 
   if (!task) {
     return (
@@ -153,6 +162,29 @@ export function ClientTaskDetail() {
     setIsActionLoading(false);
   };
 
+  const handleSaveEdit = async () => {
+    if (!editTitle.trim() || !editDescription.trim()) {
+      showToast('Please fill out all required fields.', 'warning');
+      return;
+    }
+    setIsActionLoading(true);
+    await new Promise((r) => setTimeout(r, 500));
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: {
+        id: task.id,
+        title: editTitle.trim(),
+        description: editDescription.trim(),
+        budget: editBudget,
+        date: editDate,
+        moderationStatus: 'pending'
+      }
+    });
+    showToast('Task updated successfully! It has been submitted for moderation review.', 'success');
+    setShowEditModal(false);
+    setIsActionLoading(false);
+  };
+
   const canCancel = task.status === 'open' || task.status === 'receiving_offers';
   const canComplete = task.status === 'assigned' || task.status === 'in_progress';
   const emoji = CATEGORY_ICONS[task.category] ?? '📋';
@@ -183,9 +215,20 @@ export function ClientTaskDetail() {
         {/* Actions */}
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
           {canCancel && (
-            <button className="btn btn-danger btn-sm" onClick={() => setCancelConfirm(true)}>
-              <X size={14} /> Cancel Task
-            </button>
+            <>
+              <button className="btn btn-outlined btn-sm" onClick={() => {
+                setEditTitle(task.title);
+                setEditDescription(task.description);
+                setEditBudget(task.budget || 0);
+                setEditDate(task.date);
+                setShowEditModal(true);
+              }} style={{ borderColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
+                Edit Task
+              </button>
+              <button className="btn btn-danger btn-sm" onClick={() => setCancelConfirm(true)}>
+                <X size={14} /> Cancel Task
+              </button>
+            </>
           )}
           {canComplete && (
             <button className="btn btn-primary btn-sm" onClick={() => setCompleteConfirm(true)}>
@@ -198,112 +241,197 @@ export function ClientTaskDetail() {
       <div className="page-inner">
         <div className="bento-grid">
           {/* Main Column */}
-          <div className="bento-col-8 flex flex-col gap-6">
-            {/* Description */}
-            <div className="card">
-              <div className="card-header">
-                <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Task Details</h2>
-              </div>
-              <div className="card-body">
-                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)', margin: 0 }}>
-                  {task.description}
-                </p>
+          <div className="bento-col-8 flex flex-col gap-4">
+            {/* Tab Navigation Header */}
+            <div style={{ 
+              display: 'flex', 
+              borderBottom: '1px solid var(--color-outline-variant)',
+              marginBottom: 'var(--space-2)',
+              gap: 'var(--space-2)',
+              background: 'var(--color-surface-container-lowest)',
+              padding: '0 var(--space-4)',
+              borderRadius: 'var(--radius)'
+            }}>
+              <button
+                onClick={() => setActiveTab('details')}
+                style={{
+                  padding: '14px var(--space-4)',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeTab === 'details' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                  color: activeTab === 'details' ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
+                  fontWeight: 600,
+                  fontSize: 'var(--text-body-sm)',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                Task Details
+              </button>
+              {task.status !== 'cancelled' && (
+                <button
+                  onClick={() => setActiveTab('offers')}
+                  style={{
+                    padding: '14px var(--space-4)',
+                    background: 'none',
+                    border: 'none',
+                    borderBottom: activeTab === 'offers' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                    color: activeTab === 'offers' ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
+                    fontWeight: 600,
+                    fontSize: 'var(--text-body-sm)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  Offers Received
+                  <span style={{
+                    background: activeTab === 'offers' ? 'var(--color-primary)' : 'var(--color-surface-container-high)',
+                    color: activeTab === 'offers' ? 'var(--color-on-primary)' : 'var(--color-secondary)',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    padding: '1px 6px',
+                    borderRadius: 'var(--radius-full)'
+                  }}>
+                    {offers.filter(o => o.status !== 'withdrawn').length}
+                  </span>
+                </button>
+              )}
+              {task.status === 'completed' && task.assignedCoTaskerId && (
+                <button
+                  onClick={() => setActiveTab('review')}
+                  style={{
+                    padding: '14px var(--space-4)',
+                    background: 'none',
+                    border: 'none',
+                    borderBottom: activeTab === 'review' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                    color: activeTab === 'review' ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
+                    fontWeight: 600,
+                    fontSize: 'var(--text-body-sm)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)'
+                  }}
+                >
+                  Your Review
+                </button>
+              )}
+            </div>
 
-                {task.mustHaves && task.mustHaves.length > 0 && (
-                  <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>Must-Haves & Requirements</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                      {task.mustHaves.map((m, i) => (
-                        <div key={i} style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-3)',
-                          padding: '10px var(--space-4)',
-                          background: 'var(--color-surface-container-low)',
-                          border: '1px solid var(--color-outline-variant)',
-                          borderRadius: 'var(--radius)',
-                        }}>
-                          <div className="transaction-initials-badge" style={{ width: '24px', height: '24px', fontSize: '10px', flexShrink: 0, background: 'var(--color-primary-container)', borderColor: 'var(--color-outline-variant)', color: 'var(--color-secondary)' }}>
-                            ✓
+            {/* Tab content 1: Details */}
+            {activeTab === 'details' && (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Task Details</h2>
+                </div>
+                <div className="card-body">
+                  <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)', margin: 0 }}>
+                    {task.description}
+                  </p>
+
+                  {task.mustHaves && task.mustHaves.length > 0 && (
+                    <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>Must-Haves & Requirements</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                        {task.mustHaves.map((m, i) => (
+                          <div key={i} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 'var(--space-3)',
+                            padding: '10px var(--space-4)',
+                            background: 'var(--color-surface-container-low)',
+                            border: '1px solid var(--color-outline-variant)',
+                            borderRadius: 'var(--radius)',
+                          }}>
+                            <div className="transaction-initials-badge" style={{ width: '24px', height: '24px', fontSize: '10px', flexShrink: 0, background: 'var(--color-primary-container)', borderColor: 'var(--color-outline-variant)', color: 'var(--color-secondary)' }}>
+                              ✓
+                            </div>
+                            <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)', fontWeight: 500 }}>
+                              {m}
+                            </span>
                           </div>
-                          <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)', fontWeight: 500 }}>
-                            {m}
-                          </span>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {task.images && task.images.length > 0 && (
-                  <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Reference Images</div>
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      {task.images.map((img, i) => (
-                        <div key={i} style={{ borderRadius: 'var(--radius)', overflow: 'hidden', width: '180px', height: '120px', border: '1px solid var(--color-outline-variant)' }}>
-                          <img src={img} alt={`Reference ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                      ))}
+                  {task.images && task.images.length > 0 && (
+                    <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Reference Images</div>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {task.images.map((img, i) => (
+                          <div key={i} style={{ borderRadius: 'var(--radius)', overflow: 'hidden', width: '180px', height: '120px', border: '1px solid var(--color-outline-variant)' }}>
+                            <img src={img} alt={`Reference ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                  <div>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
-                      <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                      <span>{task.location} · {task.address}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
+                    <div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
+                        <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                        <span>{task.location} · {task.address}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Schedule</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
-                      <Calendar size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                      <span>
-                        {formatDate(task.date)} {task.time && `at ${task.time}`}
-                      </span>
+                    <div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Schedule</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
+                        <Calendar size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                        <span>
+                          {formatDate(task.date)} {task.time && `at ${task.time}`}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-                    {/* Offers Section */}
-            {task.status !== 'cancelled' && (
-              <div>
-                <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                  <span>Offers Received ({offers.filter(o => o.status !== 'withdrawn').length})</span>
-                </div>
-                {offers.length > 0 ? (
-                  <div className="transaction-rows-container">
-                    {offers.map((offer) => (
-                      <OfferCard
-                        key={offer.id}
-                        offer={offer}
-                        onAccept={task.status === 'receiving_offers' ? (id) => {
-                          const o = offers.find(x => x.id === id);
-                          if (o) setAcceptConfirm(o);
-                        } : undefined}
-                        onMessage={handleMessageTasker}
-                        onViewProfile={setSelectedTaskerId}
-                        viewerRole="client"
-                        showActions={task.status === 'receiving_offers'}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="card">
-                    <div className="empty-state">
-                      <div className="empty-state-icon">👥</div>
-                      <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No offers yet</h3>
-                      <p>Providers will start submitting offers soon. We'll notify you as they arrive.</p>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
-            {/* Review Section */}
-            {task.status === 'completed' && task.assignedCoTaskerId && (
+            {/* Tab content 2: Offers */}
+            {activeTab === 'offers' && task.status !== 'cancelled' && (
+              <div className="card">
+                <div className="card-header" style={{ borderBottom: '1px solid var(--color-outline-variant)', padding: 'var(--space-4) var(--space-5)' }}>
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    Offers Received ({offers.filter(o => o.status !== 'withdrawn').length})
+                  </h2>
+                </div>
+                <div className="card-body" style={{ padding: offers.length > 0 ? 0 : 'var(--space-6)' }}>
+                  {offers.length > 0 ? (
+                    <div className="transaction-rows-container" style={{ border: 'none', borderRadius: 0 }}>
+                      {offers.map((offer) => (
+                        <OfferCard
+                          key={offer.id}
+                          offer={offer}
+                          onAccept={task.status === 'receiving_offers' ? (id) => {
+                            const o = offers.find(x => x.id === id);
+                            if (o) setAcceptConfirm(o);
+                          } : undefined}
+                          onMessage={handleMessageTasker}
+                          onViewProfile={setSelectedTaskerId}
+                          viewerRole="client"
+                          showActions={task.status === 'receiving_offers'}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state" style={{ padding: 'var(--space-8) 0' }}>
+                      <div className="empty-state-icon" style={{ fontSize: '32px', marginBottom: '12px' }}>👥</div>
+                      <h3 className="text-headline-sm" style={{ marginBottom: '4px', fontSize: '15px', fontWeight: 700 }}>No offers received yet</h3>
+                      <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '13px', margin: 0 }}>
+                        Providers will start submitting bids shortly. We will notify you when a new offer is made.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab content 3: Review */}
+            {activeTab === 'review' && task.status === 'completed' && task.assignedCoTaskerId && (
               <div className="card">
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Your Review</h2>
@@ -374,7 +502,6 @@ export function ClientTaskDetail() {
               <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
                 {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
               </div>
-            </div>
             </div>
 
 
@@ -528,6 +655,113 @@ export function ClientTaskDetail() {
         userId={selectedTaskerId}
         onClose={() => setSelectedTaskerId(null)}
       />
+
+      {/* Edit Task Modal */}
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit Task Details"
+        footer={
+          <>
+            <button className="btn btn-ghost" onClick={() => setShowEditModal(false)}>Cancel</button>
+            <button className="btn btn-primary" onClick={handleSaveEdit} disabled={isActionLoading}>
+              {isActionLoading && <span className="spinner" style={{ width: 16, height: 16 }} />}
+              Save Changes
+            </button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div className="form-group">
+            <label className="form-label required">Task Title</label>
+            <input
+              type="text"
+              className="form-input"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder="e.g. Clean my 2-bedroom apartment"
+              required
+              style={{
+                width: '100%',
+                padding: '10px 0',
+                border: 'none',
+                borderBottom: '1.5px solid var(--color-outline-variant)',
+                borderRadius: 0,
+                fontSize: 'var(--text-body-sm)',
+                outline: 'none',
+                background: 'transparent',
+                color: 'var(--color-on-surface)'
+              }}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label required">Description</label>
+            <textarea
+              className="form-textarea"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              placeholder="Provide a detailed description of the task..."
+              rows={5}
+              required
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                border: '1.5px solid var(--color-outline-variant)',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-body-sm)',
+                outline: 'none',
+                background: 'transparent',
+                color: 'var(--color-on-surface)',
+                fontFamily: 'inherit'
+              }}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Task Date</label>
+            <input
+              type="date"
+              className="form-input"
+              value={editDate}
+              onChange={(e) => setEditDate(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 0',
+                border: 'none',
+                borderBottom: '1.5px solid var(--color-outline-variant)',
+                borderRadius: 0,
+                fontSize: 'var(--text-body-sm)',
+                outline: 'none',
+                background: 'transparent',
+                color: 'var(--color-on-surface)'
+              }}
+            />
+          </div>
+          {task.budgetType !== 'open_to_offers' && (
+            <div className="form-group">
+              <label className="form-label required">Budget (€)</label>
+              <input
+                type="number"
+                className="form-input"
+                value={editBudget}
+                onChange={(e) => setEditBudget(Number(e.target.value))}
+                min={5}
+                required
+                style={{
+                  width: '100%',
+                  padding: '10px 0',
+                  border: 'none',
+                  borderBottom: '1.5px solid var(--color-outline-variant)',
+                  borderRadius: 0,
+                  fontSize: 'var(--text-body-sm)',
+                  outline: 'none',
+                  background: 'transparent',
+                  color: 'var(--color-on-surface)'
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
