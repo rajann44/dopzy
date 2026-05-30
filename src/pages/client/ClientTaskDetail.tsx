@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Calendar, CheckCircle, X, Star, Wallet, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useAppContext, acceptOfferAction, updateTaskStatusAction, addReviewAction, addNotificationAction } from '../../context/AppContext';
+import { useAppContext, acceptOfferAction, updateTaskStatusAction, addReviewAction, addNotificationAction, createConversationAction, sendChatMessageAction } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { StatusBadge } from '../../components/ui/Badge';
 import { OfferCard } from '../../components/offers/OfferCard';
@@ -56,6 +56,38 @@ export function ClientTaskDetail() {
   if (task.clientId !== currentUser?.id && currentUser?.role !== 'admin') {
     return <div className="empty-state"><h3>Access denied</h3></div>;
   }
+
+  const handleMessageTasker = (coTaskerId: string) => {
+    const existingConv = state.conversations.find(
+      (c) => c.taskId === task.id && c.participantIds.includes(coTaskerId)
+    );
+    
+    if (existingConv) {
+      navigate(`/messages?conv=${existingConv.id}`);
+    } else {
+      const convId = generateId('conv');
+      const newConversation = {
+        id: convId,
+        participantIds: [currentUser!.id, coTaskerId],
+        lastMessage: `Hi! Let's chat about my task "${task.title}".`,
+        lastMessageAt: new Date().toISOString(),
+        unreadCount: 0,
+        taskId: task.id
+      };
+      dispatch(createConversationAction(newConversation));
+      
+      const newMessage = {
+        id: generateId('msg'),
+        conversationId: convId,
+        senderId: currentUser!.id,
+        text: `Hi! Let's chat about my task "${task.title}".`,
+        createdAt: new Date().toISOString()
+      };
+      dispatch(sendChatMessageAction(newMessage));
+
+      navigate(`/messages?conv=${convId}`);
+    }
+  };
 
   const handleAcceptOffer = async () => {
     if (!acceptConfirm) return;
@@ -249,6 +281,7 @@ export function ClientTaskDetail() {
                           const o = offers.find(x => x.id === id);
                           if (o) setAcceptConfirm(o);
                         } : undefined}
+                        onMessage={handleMessageTasker}
                         viewerRole="client"
                         showActions={task.status === 'receiving_offers'}
                       />

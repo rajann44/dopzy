@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Star, Clock } from 'lucide-react';
+import { Star, Clock, MessageSquare } from 'lucide-react';
 import type { Offer, User, CoTaskerProfile } from '../../types';
 import { StatusBadge } from '../ui/Badge';
 import { Avatar } from '../ui/Avatar';
@@ -10,11 +10,12 @@ interface OfferCardProps {
   offer: Offer;
   onAccept?: (offerId: string) => void;
   onWithdraw?: (offerId: string) => void;
+  onMessage?: (coTaskerId: string) => void;
   viewerRole: 'client' | 'cotasker' | 'admin';
   showActions?: boolean;
 }
 
-export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions = true }: OfferCardProps) {
+export function OfferCard({ offer, onAccept, onWithdraw, onMessage, viewerRole, showActions = true }: OfferCardProps) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<CoTaskerProfile | null>(null);
 
@@ -91,7 +92,17 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
         </div>
 
         {showActions && offer.status === 'pending' ? (
-          <div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {viewerRole === 'client' && onMessage && (
+              <button
+                className="btn btn-outlined btn-sm"
+                onClick={() => onMessage(offer.coTaskerId)}
+                title="Message Tasker"
+                style={{ padding: '6px', minWidth: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
+              >
+                <MessageSquare size={14} />
+              </button>
+            )}
             {viewerRole === 'client' && onAccept && (
               <button
                 className="btn btn-primary btn-sm"
@@ -112,7 +123,17 @@ export function OfferCard({ offer, onAccept, onWithdraw, viewerRole, showActions
             )}
           </div>
         ) : (
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+            {viewerRole === 'client' && onMessage && (
+              <button
+                className="btn btn-outlined btn-sm"
+                onClick={() => onMessage(offer.coTaskerId)}
+                title="Message Tasker"
+                style={{ padding: '6px', minWidth: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
+              >
+                <MessageSquare size={14} />
+              </button>
+            )}
             <StatusBadge status={offer.status} />
           </div>
         )}

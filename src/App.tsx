@@ -13,7 +13,8 @@ import { TaskDetailPage } from './pages/TaskDetailPage';
 import { TaskMarketplace } from './pages/cotasker/TaskMarketplace';
 import { NotificationsPage } from './pages/shared/NotificationsPage';
 import { ProfilePage } from './pages/shared/ProfilePage';
-import { MessagesPage, SettingsPage } from './pages/shared/PlaceholderPages';
+import { SettingsPage } from './pages/shared/PlaceholderPages';
+import { MessagesPage } from './pages/shared/MessagesPage';
 
 import './styles/index.css';
 

@@ -188,6 +188,24 @@ export interface Conversation {
   taskId?: string;
 }
 
+export interface ChatRequest {
+  id: string;
+  taskId: string;
+  senderId: string;
+  receiverId: string;
+  question: string;
+  status: 'pending' | 'accepted' | 'declined';
+  createdAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  text: string;
+  createdAt: string;
+}
+
 // ─── Filter types ────────────────────────────────────────────────────────────
 
 export interface TaskFilters {
@@ -208,6 +226,8 @@ export interface AppState {
   notifications: Notification[];
   walletTransactions: WalletTransaction[];
   conversations: Conversation[];
+  chatRequests: ChatRequest[];
+  chatMessages: ChatMessage[];
 }
 
 export type AppAction =
@@ -222,4 +242,9 @@ export type AppAction =
   | { type: 'MARK_NOTIFICATION_READ'; payload: { notificationId: string } }
   | { type: 'MARK_ALL_NOTIFICATIONS_READ'; payload: { userId: string } }
   | { type: 'ADD_NOTIFICATION'; payload: Notification }
-  | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; status: TaskStatus } };
+  | { type: 'UPDATE_TASK_STATUS'; payload: { taskId: string; status: TaskStatus } }
+  | { type: 'CREATE_CHAT_REQUEST'; payload: ChatRequest }
+  | { type: 'RESPOND_CHAT_REQUEST'; payload: { requestId: string; status: 'accepted' | 'declined'; conversation?: Conversation; systemMessage?: ChatMessage } }
+  | { type: 'SEND_CHAT_MESSAGE'; payload: ChatMessage }
+  | { type: 'CREATE_CONVERSATION'; payload: Conversation };
+

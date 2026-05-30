@@ -1,4 +1,4 @@
-import type { Notification, WalletTransaction, Conversation } from '../types';
+import type { Notification, WalletTransaction, Conversation, ChatRequest, ChatMessage } from '../types';
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
@@ -168,3 +168,75 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     taskId: 'task-3',
   },
 ];
+
+export const MOCK_CHAT_REQUESTS: ChatRequest[] = [
+  {
+    id: 'req-1',
+    taskId: 'task-1',
+    senderId: 'user-3', // Marcus Weber
+    receiverId: 'user-1', // Sarah Mitchell (OP)
+    question: 'Hello! I have a large Mercedes Sprinter van. Will we need to load any items that are wider than 2 meters?',
+    status: 'pending',
+    createdAt: '2025-06-01T10:10:00Z'
+  },
+  {
+    id: 'req-2',
+    taskId: 'task-4', // Paint living room
+    senderId: 'user-4', // Priya Sharma
+    receiverId: 'user-2', // James Holloway (OP)
+    question: 'Hi James, do we need to bring our own drop sheets and taping supplies, or are those provided with the paint?',
+    status: 'pending',
+    createdAt: '2025-06-02T14:20:00Z'
+  }
+];
+
+export const MOCK_CHAT_MESSAGES: ChatMessage[] = [
+  // Conversation 1 (conv-1): deep clean apartment
+  {
+    id: 'msg-1-1',
+    conversationId: 'conv-1',
+    senderId: 'user-3',
+    text: 'Hello Sarah, regarding the end-of-tenancy clean, are cleaning agents and a vacuum cleaner available at the apartment?',
+    createdAt: '2025-05-28T14:30:00Z'
+  },
+  {
+    id: 'msg-1-2',
+    conversationId: 'conv-1',
+    senderId: 'user-1',
+    text: 'Hi Marcus! Yes, I have a vacuum cleaner and mop there, but it would be great if you could bring your own high-strength oven cleaners and sponges.',
+    createdAt: '2025-05-28T15:00:00Z'
+  },
+  {
+    id: 'msg-1-3',
+    conversationId: 'conv-1',
+    senderId: 'user-3',
+    text: 'Understood, I will bring my professional supplies. Great, I\'ll be there at 9am sharp!',
+    createdAt: '2025-06-01T12:00:00Z'
+  },
+
+  // Conversation 2 (conv-2): weekly grocery delivery
+  {
+    id: 'msg-2-1',
+    conversationId: 'conv-2',
+    senderId: 'user-4',
+    text: 'Hi Sarah, is it okay to shop at REWE or Aldi? They usually have everything on your mother\'s list.',
+    createdAt: '2025-05-15T12:45:00Z'
+  },
+  {
+    id: 'msg-2-2',
+    conversationId: 'conv-2',
+    senderId: 'user-1',
+    text: 'REWE is perfect, thank you! Please make sure to get the organic milk. Thanks for the list! See you Thursday.',
+    createdAt: '2025-05-15T13:00:00Z'
+  },
+
+  // Conversation 3 (conv-3): IKEA PAX wardrobe
+  {
+    id: 'msg-3-1',
+    conversationId: 'conv-3',
+    senderId: 'user-3',
+    text: 'I will get started with the drawers first. All done! Left the keys under the mat as agreed.',
+    createdAt: '2025-05-23T16:30:00Z'
+  }
+];
+

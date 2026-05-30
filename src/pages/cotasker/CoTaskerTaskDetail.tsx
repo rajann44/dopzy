@@ -1,13 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, DollarSign, User, Wallet, Users } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, DollarSign, User, Wallet, Users, MessageSquare, HelpCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useAppContext, createOfferAction, withdrawOfferAction, updateTaskStatusAction, addNotificationAction } from '../../context/AppContext';
+import {
+  useAppContext,
+  createOfferAction,
+  withdrawOfferAction,
+  updateTaskStatusAction,
+  addNotificationAction,
+  createChatRequestAction,
+  createConversationAction,
+  sendChatMessageAction
+} from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { StatusBadge } from '../../components/ui/Badge';
 import { OfferForm } from '../../components/offers/OfferForm';
 import { OfferCard } from '../../components/offers/OfferCard';
-import { ConfirmModal } from '../../components/ui/Modal';
+import { ConfirmModal, Modal } from '../../components/ui/Modal';
 import { Avatar } from '../../components/ui/Avatar';
 import { profileService } from '../../services/profileService';
 import { formatDate, formatCurrency, generateId } from '../../utils/formatters';
@@ -32,6 +41,19 @@ export function CoTaskerTaskDetail() {
   const [withdrawConfirm, setWithdrawConfirm] = useState(false);
   const [updateStatusConfirm, setUpdateStatusConfirm] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [questionText, setQuestionText] = useState('');
+  const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
+
+  const pendingChatRequest = state.chatRequests?.find(
+    (r) => r.taskId === id && r.senderId === currentUser?.id && r.status === 'pending'
+  );
+  const acceptedChatRequest = state.chatRequests?.find(
+    (r) => r.taskId === id && r.senderId === currentUser?.id && r.status === 'accepted'
+  );
+  const conversation = state.conversations?.find(
+    (c) => c.taskId === id && c.participantIds.includes(currentUser!.id)
+  );
 
   useEffect(() => {
     if (task?.clientId) profileService.getUserById(task.clientId).then(setClientUser);
@@ -51,6 +73,40 @@ export function CoTaskerTaskDetail() {
   const isAssignedToMe = task.assignedCoTaskerId === currentUser?.id;
   const emoji = CATEGORY_ICONS[task.category] ?? '📋';
 
+  const handleAskQuestion = async () => {
+    if (!questionText.trim()) return;
+    setIsSubmittingQuestion(true);
+    await new Promise((r) => setTimeout(r, 600));
+
+    const newRequest = {
+      id: generateId('req'),
+      taskId: task.id,
+      senderId: currentUser!.id,
+      receiverId: task.clientId,
+      question: questionText.trim(),
+      status: 'pending' as const,
+      createdAt: new Date().toISOString()
+    };
+
+    dispatch(createChatRequestAction(newRequest));
+
+    dispatch(addNotificationAction({
+      id: generateId('notif'),
+      userId: task.clientId,
+      type: 'new_offer',
+      title: 'New task inquiry',
+      message: `${currentUser!.name} sent a question about your task "${task.title}".`,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+      linkTo: '/messages',
+    }));
+
+    showToast('Your question request has been sent to the client!', 'success');
+    setQuestionText('');
+    setShowQuestionModal(false);
+    setIsSubmittingQuestion(false);
+  };
+
   const handleSubmitOffer = async (data: { price: number; message: string; estimatedHours: number }) => {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 500));
@@ -65,6 +121,34 @@ export function CoTaskerTaskDetail() {
       createdAt: new Date().toISOString(),
     };
     dispatch(createOfferAction(newOffer));
+
+    // Auto-create chat conversation for direct offer submission
+    const existingConv = state.conversations.find(
+      (c) => c.taskId === task.id && c.participantIds.includes(currentUser!.id)
+    );
+    const convId = existingConv?.id || generateId('conv');
+    
+    if (!existingConv) {
+      const newConversation = {
+        id: convId,
+        participantIds: [currentUser!.id, task.clientId],
+        lastMessage: data.message,
+        lastMessageAt: new Date().toISOString(),
+        unreadCount: 1,
+        taskId: task.id
+      };
+      dispatch(createConversationAction(newConversation));
+    }
+
+    const newMessage = {
+      id: generateId('msg'),
+      conversationId: convId,
+      senderId: currentUser!.id,
+      text: `Offer Submitted: ${formatCurrency(data.price)}. "${data.message}"`,
+      createdAt: new Date().toISOString()
+    };
+    dispatch(sendChatMessageAction(newMessage));
+
     dispatch(addNotificationAction({
       id: generateId('notif'),
       userId: task.clientId,
@@ -230,11 +314,28 @@ export function CoTaskerTaskDetail() {
                   ) : (
                     <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
                       <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
-                        Interested in providing this service? Send your offer details to the client.
+                        Interested in providing this service? Send your offer details to the client or clarify details first.
                       </p>
-                      <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
-                        <DollarSign size={16} /> Submit Offer
-                      </button>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                        <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
+                          <DollarSign size={16} /> Submit Offer
+                        </button>
+                        {acceptedChatRequest || conversation ? (
+                          <Link to="/messages">
+                            <button className="btn btn-outlined" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                              <MessageSquare size={16} /> Go to Chat
+                            </button>
+                          </Link>
+                        ) : pendingChatRequest ? (
+                          <button className="btn btn-outlined" disabled style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.7 }}>
+                            <MessageSquare size={16} /> Inquiry Pending
+                          </button>
+                        ) : (
+                          <button className="btn btn-outlined" onClick={() => setShowQuestionModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <HelpCircle size={16} /> Ask a Question
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -365,6 +466,50 @@ export function CoTaskerTaskDetail() {
         confirmLabel="Confirm Update"
         isLoading={isLoading}
       />
+      <Modal
+        isOpen={showQuestionModal}
+        onClose={() => setShowQuestionModal(false)}
+        title="Clarify Task Details"
+        footer={
+          <>
+            <button className="btn btn-ghost" onClick={() => setShowQuestionModal(false)} disabled={isSubmittingQuestion}>
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleAskQuestion}
+              disabled={isSubmittingQuestion || !questionText.trim() || questionText.trim().length < 15}
+            >
+              {isSubmittingQuestion && <span className="spinner" style={{ width: '16px', height: '16px' }} />}
+              Send Question
+            </button>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0 }}>
+            Send a private inquiry to <strong>{clientUser?.name || 'the client'}</strong> regarding this task. They can accept your request to open a private conversation in Messages.
+          </p>
+          <div className="form-group" style={{ marginTop: 'var(--space-2)' }}>
+            <label className="form-label required">Your Question</label>
+            <textarea
+              className="form-input"
+              rows={4}
+              placeholder="e.g. Is there parking available? Do I need to bring specialized cleaning equipment?"
+              value={questionText}
+              onChange={(e) => setQuestionText(e.target.value)}
+              style={{ resize: 'none', fontSize: 'var(--text-body-sm)', padding: '10px var(--space-3)' }}
+              disabled={isSubmittingQuestion}
+            />
+            <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
+              {questionText.trim().length < 15 
+                ? `${15 - questionText.trim().length} more characters minimum`
+                : 'Meets length requirements'
+              }
+            </span>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
