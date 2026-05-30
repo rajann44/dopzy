@@ -68,20 +68,15 @@ export function LoginPage() {
       }} className="login-brand-panel">
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', zIndex: 1 }}>
-          <div style={{
-            width: 44, height: 44,
-            background: 'var(--color-primary-container)',
-            borderRadius: 'var(--radius)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-headline)',
-            fontWeight: 800, fontSize: '22px',
-            color: 'var(--color-on-primary-container)',
-          }}>
-            D
-          </div>
+          <svg width="44" height="44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius)', flexShrink: 0 }}>
+            <rect width="100" height="100" rx="16" fill="#004352"/>
+            <path d="M30 50L45 65L75 35" stroke="#FFE600" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M25 25L40 25" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
+            <path d="M25 75L40 75" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
+          </svg>
           <div>
             <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '20px', color: '#fff' }}>Dopzy</div>
-            <div style={{ fontSize: 'var(--text-label-md)', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Service Marketplace</div>
+            <div style={{ fontSize: 'var(--text-label-md)', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>One Tap, Task Done</div>
           </div>
         </div>
 

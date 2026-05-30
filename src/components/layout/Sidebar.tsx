@@ -59,19 +59,12 @@ export function Sidebar() {
         gap: '12px',
         flexShrink: 0,
       }}>
-        <div style={{
-          width: 38, height: 38,
-          background: 'var(--color-primary-container)',
-          borderRadius: 'var(--radius)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-headline)',
-          fontWeight: 800, fontSize: '17px',
-          color: 'var(--color-on-primary-container)',
-          flexShrink: 0,
-          letterSpacing: '-0.02em',
-        }}>
-          TB
-        </div>
+        <svg width="38" height="38" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius)', flexShrink: 0 }}>
+          <rect width="100" height="100" rx="16" fill="#004352"/>
+          <path d="M30 50L45 65L75 35" stroke="#FFE600" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M25 25L40 25" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
+          <path d="M25 75L40 75" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
+        </svg>
         <div>
           <div style={{
             fontFamily: 'var(--font-headline)',
@@ -89,7 +82,7 @@ export function Sidebar() {
             textTransform: 'uppercase',
             letterSpacing: '0.07em',
           }}>
-            Service Marketplace
+            One Tap, Task Done
           </div>
         </div>
       </div>

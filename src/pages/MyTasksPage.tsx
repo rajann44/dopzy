@@ -466,7 +466,7 @@ export function MyTasksPage() {
                       </h2>
                     </div>
                     <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', lineHeight: '1.6', marginBottom: 'var(--space-5)' }}>
-                      {t('tasks.apply_desc') || 'Unlock the ability to bid on tasks, browse the service marketplace, and earn money. Fill out the quick details below for moderator approval.'}
+                      {t('tasks.apply_desc') || 'Unlock the ability to bid on tasks, browse One Tap, Task Done, and earn money. Fill out the quick details below for moderator approval.'}
                     </p>
                     <form onSubmit={handleApply} className="flex flex-col gap-4">
                       <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
