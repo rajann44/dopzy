@@ -550,6 +550,10 @@ input, textarea, select { font-family: inherit; }
   backdrop-filter: blur(2px);
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
 
 .modal {
   background: var(--color-surface-white);

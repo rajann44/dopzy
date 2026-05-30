@@ -12,6 +12,7 @@ import { profileService } from '../../services/profileService';
 import { formatDate, formatCurrency, generateId } from '../../utils/formatters';
 import { CATEGORY_ICONS } from '../../utils/constants';
 import type { Offer, User as UserType, Review } from '../../types';
+import { CoTaskerProfileDrawer } from '../../components/profile/CoTaskerProfileDrawer';
 
 export function ClientTaskDetail() {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +33,7 @@ export function ClientTaskDetail() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [selectedTaskerId, setSelectedTaskerId] = useState<string | null>(null);
 
   const existingReview = state.reviews.find(
     (r) => r.taskId === id && r.fromUserId === currentUser?.id
@@ -282,6 +284,7 @@ export function ClientTaskDetail() {
                           if (o) setAcceptConfirm(o);
                         } : undefined}
                         onMessage={handleMessageTasker}
+                        onViewProfile={setSelectedTaskerId}
                         viewerRole="client"
                         showActions={task.status === 'receiving_offers'}
                       />
@@ -519,6 +522,12 @@ export function ClientTaskDetail() {
           </div>
         </div>
       </Modal>
+
+      {/* Profile & Reviews Drawer */}
+      <CoTaskerProfileDrawer 
+        userId={selectedTaskerId}
+        onClose={() => setSelectedTaskerId(null)}
+      />
     </div>
   );
 }

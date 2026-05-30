@@ -11,11 +11,12 @@ interface OfferCardProps {
   onAccept?: (offerId: string) => void;
   onWithdraw?: (offerId: string) => void;
   onMessage?: (coTaskerId: string) => void;
+  onViewProfile?: (coTaskerId: string) => void;
   viewerRole: 'client' | 'cotasker' | 'admin';
   showActions?: boolean;
 }
 
-export function OfferCard({ offer, onAccept, onWithdraw, onMessage, viewerRole, showActions = true }: OfferCardProps) {
+export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfile, viewerRole, showActions = true }: OfferCardProps) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<CoTaskerProfile | null>(null);
 
@@ -24,12 +25,13 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, viewerRole, 
     profileService.getCoTaskerProfile(offer.coTaskerId).then(setProfile);
   }, [offer.coTaskerId]);
 
-
-
   return (
     <div className="transaction-row-item" style={{ gridTemplateColumns: '56px 1.5fr 2fr 130px 160px', padding: '16px var(--space-4)' }}>
       {/* 1. Initials / Avatar Column */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div 
+        onClick={() => onViewProfile && onViewProfile(offer.coTaskerId)}
+        style={{ display: 'flex', alignItems: 'center', cursor: onViewProfile ? 'pointer' : 'default' }}
+      >
         <div style={{ position: 'relative' }}>
           <Avatar name={user?.name ?? '?'} avatarUrl={user?.avatarUrl} size="md" />
           <span style={{
@@ -46,8 +48,28 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, viewerRole, 
       </div>
 
       {/* 2. Provider Info & Rating */}
-      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, paddingRight: '12px' }}>
-        <span style={{ fontWeight: 700, color: 'var(--color-secondary)', fontSize: 'var(--text-body-sm)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      <div 
+        onClick={() => onViewProfile && onViewProfile(offer.coTaskerId)}
+        style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          minWidth: 0, 
+          paddingRight: '12px',
+          cursor: onViewProfile ? 'pointer' : 'default'
+        }}
+      >
+        <span 
+          style={{ 
+            fontWeight: 700, 
+            color: 'var(--color-secondary)', 
+            fontSize: 'var(--text-body-sm)', 
+            textOverflow: 'ellipsis', 
+            overflow: 'hidden', 
+            whiteSpace: 'nowrap',
+            textDecoration: onViewProfile ? 'underline decoration-transparent hover:decoration-primary' : 'none'
+          }}
+          className={onViewProfile ? "hover-underline" : ""}
+        >
           {user?.name ?? 'Loading...'}
         </span>
         {profile && (
