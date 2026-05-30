@@ -14,6 +14,7 @@ import { useToast } from '../../context/ToastContext';
 import { Avatar } from '../../components/ui/Avatar';
 import { formatCurrency, generateId } from '../../utils/formatters';
 import { MOCK_USERS } from '../../data/users';
+import { CoTaskerProfileDrawer } from '../../components/profile/CoTaskerProfileDrawer';
 
 export function MessagesPage() {
   const { currentUser } = useAuth();
@@ -24,6 +25,7 @@ export function MessagesPage() {
   const [activeTab, setActiveTab] = useState<'chats' | 'requests'>('chats');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
+  const [selectedTaskerId, setSelectedTaskerId] = useState<string | null>(null);
   
   const messageEndRef = useRef<HTMLDivElement>(null);
 
@@ -391,16 +393,39 @@ export function MessagesPage() {
               background: 'var(--color-surface-white)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Avatar name={activeChatParticipant?.name || 'User'} avatarUrl={activeChatParticipant?.avatarUrl} size="md" />
-                <div>
-                  <div style={{ fontWeight: 700, color: 'var(--color-secondary)', fontSize: '14px' }}>
-                    {activeChatParticipant?.name}
+                <div 
+                  onClick={() => {
+                    if (activeChatParticipant?.role === 'cotasker') {
+                      setSelectedTaskerId(activeChatParticipant.id);
+                    }
+                  }}
+                  style={{ 
+                    cursor: activeChatParticipant?.role === 'cotasker' ? 'pointer' : 'default',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}
+                >
+                  <Avatar name={activeChatParticipant?.name || 'User'} avatarUrl={activeChatParticipant?.avatarUrl} size="md" />
+                  <div>
+                    <div style={{ 
+                      fontWeight: 700, 
+                      color: 'var(--color-secondary)', 
+                      fontSize: '14px',
+                      textDecoration: activeChatParticipant?.role === 'cotasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
+                    }} className="hover-underline">
+                      {activeChatParticipant?.name}
+                    </div>
+                    {activeTask && (
+                      <Link 
+                        to={`/tasks/${activeTask.id}`} 
+                        onClick={(e) => e.stopPropagation()} // prevent opening profile drawer
+                        style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                      >
+                        <strong>Regarding:</strong> {activeTask.title} <ChevronRight size={12} />
+                      </Link>
+                    )}
                   </div>
-                  {activeTask && (
-                    <Link to={`/tasks/${activeTask.id}`} style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
-                      <strong>Regarding:</strong> {activeTask.title} <ChevronRight size={12} />
-                    </Link>
-                  )}
                 </div>
               </div>
             </div>
@@ -525,13 +550,33 @@ export function MessagesPage() {
           /* Scenario 2: Preview Pending Chat Request */
           <div style={{ padding: 'var(--space-8)', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
             <div className="card" style={{ maxWidth: '520px', width: '100%', padding: 'var(--space-6)' }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid var(--color-outline-variant)', paddingBottom: '16px', marginBottom: '20px' }}>
+              <div 
+                onClick={() => {
+                  if (activeRequestSender?.role === 'cotasker') {
+                    setSelectedTaskerId(activeRequestSender.id);
+                  }
+                }}
+                style={{ 
+                  display: 'flex', 
+                  gap: '12px', 
+                  alignItems: 'center', 
+                  borderBottom: '1px solid var(--color-outline-variant)', 
+                  paddingBottom: '16px', 
+                  marginBottom: '20px',
+                  cursor: activeRequestSender?.role === 'cotasker' ? 'pointer' : 'default'
+                }}
+              >
                 <Avatar name={activeRequestSender?.name || 'User'} avatarUrl={activeRequestSender?.avatarUrl} size="lg" />
                 <div>
                   <span className="chip" style={{ fontSize: '10px', background: 'var(--color-primary-container)', color: 'var(--color-secondary)', fontWeight: 700, marginBottom: '4px', display: 'inline-block' }}>
                     Clarification Request
                   </span>
-                  <h2 className="text-headline-sm" style={{ margin: 0, fontWeight: 700, fontSize: '16px' }}>
+                  <h2 className="text-headline-sm hover-underline" style={{ 
+                    margin: 0, 
+                    fontWeight: 700, 
+                    fontSize: '16px',
+                    textDecoration: activeRequestSender?.role === 'cotasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
+                  }}>
                     Inquiry from {activeRequestSender?.name}
                   </h2>
                 </div>
@@ -594,6 +639,11 @@ export function MessagesPage() {
         )}
       </div>
 
+      {/* Profile & Reviews Drawer */}
+      <CoTaskerProfileDrawer 
+        userId={selectedTaskerId}
+        onClose={() => setSelectedTaskerId(null)}
+      />
     </div>
   );
 }
