@@ -4,6 +4,7 @@ import type { Task } from '../../types';
 import { StatusBadge } from '../ui/Badge';
 import { CATEGORY_ICONS } from '../../utils/constants';
 import { formatDate, formatCurrency, truncate } from '../../utils/formatters';
+import { TaskPlaceholderImage } from './TaskPlaceholderImage';
 
 interface TaskCardProps {
   task: Task;
@@ -17,6 +18,8 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
 
   // Standardise links: if prefix is empty string, route to /tasks/:id
   const targetPath = linkPrefix === '' ? `/tasks/${task.id}` : `${linkPrefix}/tasks/${task.id}`;
+
+  const hasImage = task.images && task.images.length > 0 && task.images[0];
 
   return (
     <Link
@@ -41,6 +44,33 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
             </span>
           </div>
           <StatusBadge status={task.status} />
+        </div>
+
+        {/* Task Image or fallback placeholder SVG */}
+        <div style={{ 
+          width: '100%', 
+          height: '140px', 
+          overflow: 'hidden', 
+          borderBottom: '1px solid var(--color-outline-variant)',
+          background: 'var(--color-surface-container-low)'
+        }}>
+          {hasImage ? (
+            <img 
+              src={task.images[0]} 
+              alt={task.title} 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'cover',
+                transition: 'transform var(--transition-medium)'
+              }} 
+              className="task-card-image"
+            />
+          ) : (
+            <div style={{ width: '100%', height: '100%', transition: 'transform var(--transition-medium)' }} className="task-card-image">
+              <TaskPlaceholderImage />
+            </div>
+          )}
         </div>
 
         {/* Card Body */}

@@ -316,7 +316,10 @@ input, textarea, select { font-family: inherit; }
 }
 .card-hover:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+.card-hover:hover .task-card-image {
+  transform: scale(1.03);
 }
 
 /* Bento card — for dashboard grid cells */

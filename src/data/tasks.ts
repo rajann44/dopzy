@@ -12,7 +12,12 @@ export const MOCK_TASKS: Task[] = [
     time: '09:00',
     budgetType: 'fixed',
     budget: 450,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=600'],
+    mustHaves: [
+      'Must bring a large van or small truck',
+      'Must bring heavy-duty moving straps',
+      'Must have protective transit blankets'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: undefined,
     status: 'receiving_offers',
@@ -29,7 +34,12 @@ export const MOCK_TASKS: Task[] = [
     date: '2025-06-10',
     time: '10:00',
     budgetType: 'open_to_offers',
-    images: [],
+    images: ['https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600'],
+    mustHaves: [
+      'Must bring own professional cleaning chemicals',
+      'Must have high-powered wet-dry vacuum',
+      'Must guarantee passing landlord handover inspection'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: 'user-3',
     status: 'in_progress',
@@ -47,7 +57,12 @@ export const MOCK_TASKS: Task[] = [
     time: '14:00',
     budgetType: 'fixed',
     budget: 120,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=600'],
+    mustHaves: [
+      'Must bring own power tools (drill, level, rubber mallet)',
+      'Must have previous experience assembling PAX wardrobes',
+      'Must attach units securely to the plasterboard wall'
+    ],
     clientId: 'user-2',
     assignedCoTaskerId: 'user-3',
     status: 'completed',
@@ -65,7 +80,12 @@ export const MOCK_TASKS: Task[] = [
     time: '08:00',
     budgetType: 'fixed',
     budget: 300,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600'],
+    mustHaves: [
+      'Must bring own high-quality rollers and edging brushes',
+      'Must cover all floors and baseboards with tape/covers',
+      'Must clean up all paint residues after job is finished'
+    ],
     clientId: 'user-2',
     assignedCoTaskerId: undefined,
     status: 'open',
@@ -81,7 +101,11 @@ export const MOCK_TASKS: Task[] = [
     address: 'Neukölln, Berlin',
     date: '2025-06-08',
     budgetType: 'open_to_offers',
-    images: [],
+    images: ['https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600'],
+    mustHaves: [
+      'Must bring own pipe wrench and plumbers tape',
+      'Must check and clean drainage pipes while working'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: undefined,
     status: 'open',
@@ -99,7 +123,11 @@ export const MOCK_TASKS: Task[] = [
     time: '11:00',
     budgetType: 'fixed',
     budget: 60,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1542838132-92c53300491e?w=600'],
+    mustHaves: [
+      'Must be polite and patient with elderly parent',
+      'Must be able to carry heavy groceries up 3 floors'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: 'user-4',
     status: 'completed',
@@ -117,7 +145,11 @@ export const MOCK_TASKS: Task[] = [
     time: '13:00',
     budgetType: 'fixed',
     budget: 180,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600'],
+    mustHaves: [
+      'Must have style portfolio or references',
+      'Must speak fluent English or German'
+    ],
     clientId: 'user-2',
     assignedCoTaskerId: undefined,
     status: 'open',
@@ -134,7 +166,11 @@ export const MOCK_TASKS: Task[] = [
     date: '2025-06-28',
     time: '07:00',
     budgetType: 'open_to_offers',
-    images: [],
+    images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?w=600'],
+    mustHaves: [
+      'Must be able to lift standing desks (30kg+)',
+      'Must have experience handling electronics / tech boxes'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: undefined,
     status: 'receiving_offers',
@@ -152,7 +188,11 @@ export const MOCK_TASKS: Task[] = [
     time: '09:00',
     budgetType: 'fixed',
     budget: 220,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600'],
+    mustHaves: [
+      'Must use HEPA vacuum to filter plaster dust',
+      'Must wipe down interiors of all kitchen drawers/cabinets'
+    ],
     clientId: 'user-2',
     assignedCoTaskerId: 'user-4',
     status: 'completed',
@@ -170,7 +210,11 @@ export const MOCK_TASKS: Task[] = [
     time: '15:00',
     budgetType: 'fixed',
     budget: 80,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600'],
+    mustHaves: [
+      'Must bring a reliable laser level',
+      'Must have heavy-duty plasterboard plugs/anchors'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: undefined,
     status: 'open',
@@ -188,7 +232,11 @@ export const MOCK_TASKS: Task[] = [
     time: '10:00',
     budgetType: 'fixed',
     budget: 95,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600'],
+    mustHaves: [
+      'Must bring own spanners and screwdrivers',
+      'Must assemble outdoors in garden'
+    ],
     clientId: 'user-2',
     assignedCoTaskerId: undefined,
     status: 'open',
@@ -206,7 +254,11 @@ export const MOCK_TASKS: Task[] = [
     time: '09:00',
     budgetType: 'fixed',
     budget: 90,
-    images: [],
+    images: ['https://images.unsplash.com/photo-1527515545081-5db817172677?w=600'],
+    mustHaves: [
+      'Must be pet-friendly (we have a golden retriever)',
+      'Must have active personal liability insurance'
+    ],
     clientId: 'user-1',
     assignedCoTaskerId: undefined,
     status: 'receiving_offers',
