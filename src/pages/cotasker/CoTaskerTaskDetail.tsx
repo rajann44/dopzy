@@ -107,7 +107,7 @@ export function CoTaskerTaskDetail() {
       };
 
       // 2. Insert notification
-      const { data: dbNotif, error: notifErr } = await supabase
+      const { error: notifErr } = await supabase
         .from('notifications')
         .insert({
           user_id: task.clientId,
@@ -117,21 +117,19 @@ export function CoTaskerTaskDetail() {
           is_read: false,
           created_at: new Date().toISOString(),
           link_to: '/messages'
-        })
-        .select('id, created_at')
-        .single();
+        });
 
       if (notifErr) throw notifErr;
 
       dispatch(createChatRequestAction(newRequest));
       dispatch(addNotificationAction({
-        id: dbNotif.id,
+        id: 'temp-inquiry-notif',
         userId: task.clientId,
         type: 'new_offer',
         title: 'New task inquiry',
         message: `${currentUser!.name} sent a question about your task "${task.title}".`,
         isRead: false,
-        createdAt: dbNotif.created_at,
+        createdAt: new Date().toISOString(),
         linkTo: '/messages',
       }));
 
@@ -248,7 +246,7 @@ export function CoTaskerTaskDetail() {
       };
 
       // 4. Create Notification
-      const { data: dbNotif, error: notifErr } = await supabase
+      const { error: notifErr } = await supabase
         .from('notifications')
         .insert({
           user_id: task.clientId,
@@ -258,19 +256,17 @@ export function CoTaskerTaskDetail() {
           is_read: false,
           created_at: new Date().toISOString(),
           link_to: `/tasks/${task.id}`
-        })
-        .select('id, created_at')
-        .single();
+        });
       if (notifErr) throw notifErr;
 
       const newNotif = {
-        id: dbNotif.id,
+        id: 'temp-offer-notif',
         userId: task.clientId,
         type: 'new_offer' as const,
         title: 'New offer received',
         message: `${currentUser!.name} sent an offer of ${formatCurrency(data.price)} for your task "${task.title}".`,
         isRead: false,
-        createdAt: dbNotif.created_at,
+        createdAt: new Date().toISOString(),
         linkTo: `/tasks/${task.id}`,
       };
 
