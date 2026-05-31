@@ -74,7 +74,20 @@ export function OfferForm({ taskId: _taskId, coTaskerId: _coTaskerId, existingOf
         rows={4}
         hint="Tip: Mention your experience and relevant skills. Be specific!"
       />
-      <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => {
+            setPrice('120');
+            setEstimatedHours('4');
+            setMessage('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.');
+          }}
+          disabled={isLoading}
+          style={{ marginRight: 'auto', border: '1px dashed var(--color-outline)' }}
+        >
+          Demo Data
+        </Button>
         {onCancel && (
           <Button type="button" variant="ghost" onClick={onCancel} disabled={isLoading}>
             Cancel
