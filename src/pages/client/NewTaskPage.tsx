@@ -35,6 +35,89 @@ const POPULAR_CATEGORIES = [
   'Delivery',
 ];
 
+const DEMO_TASKS = [
+  {
+    title: 'Assemble IKEA Pax Wardrobe with sliding doors',
+    description: 'I need an experienced helper to assemble a standard IKEA Pax wardrobe (width 150cm, height 236cm) in my bedroom. All packages are delivered and inside the room. I have some basic tools but bringing a cordless screwdriver is recommended. Please help!',
+    category: 'Furniture Assembly',
+    taskType: 'in_person',
+    location: 'Berlin',
+    address: 'Friedrichstraße 12, 10117 Berlin',
+    mustHaves: [
+      'Must bring own tools (drill, level, rubber mallet)',
+      'Must have experience assembling IKEA Pax sliding doors',
+      'Must be careful not to scratch the wooden floor'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=600',
+    budgetType: 'fixed',
+    budget: '120',
+  },
+  {
+    title: 'Deep cleaning of 2-bedroom apartment',
+    description: 'Looking for a professional cleaner to perform a thorough deep clean of my 2-bedroom, 1-bathroom apartment. The clean should include dusting, vacuuming, mopping all floors, deep cleaning the bathroom, and cleaning kitchen surfaces/appliances (oven/fridge). Cleaning supplies can be provided, but bringing your own is a plus.',
+    category: 'Cleaning',
+    taskType: 'in_person',
+    location: 'Munich',
+    address: 'Sendlinger Str. 18, 80331 München',
+    mustHaves: [
+      'Must have high attention to detail',
+      'Must bring own quality cleaning detergents/cloths if possible',
+      'Eco-friendly cleaning supplies preferred'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600',
+    budgetType: 'hourly',
+    budget: '25',
+  },
+  {
+    title: 'Help moving couch and dining table to new flat',
+    description: 'Need two strong helpers with a van/truck to help move a 3-seater couch and a large wooden dining table with 4 chairs from my old apartment (3rd floor, no elevator) to my new apartment (ground floor). Distance between the two apartments is about 4 km. Will need help loading, driving, and unloading.',
+    category: 'Transport & Removals',
+    taskType: 'in_person',
+    location: 'Hamburg',
+    address: 'Reeperbahn 136, 20359 Hamburg',
+    mustHaves: [
+      'Must have a medium or large van/truck',
+      'Must be physically fit for lifting heavy furniture down stairs',
+      'Friendly and punctual'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=600',
+    budgetType: 'fixed',
+    budget: '85',
+  },
+  {
+    title: 'Hang 4 picture frames and mount a TV on drywall',
+    description: 'I need a handy person to mount a 55-inch TV on a drywall in the living room (bracket is already purchased) and hang 4 medium-sized picture frames in the hallway. You must bring a stud finder, a level, and a drill with suitable wall anchors/screws.',
+    category: 'Handy Person',
+    taskType: 'in_person',
+    location: 'Berlin',
+    address: 'Alexanderstraße 4, 10178 Berlin',
+    mustHaves: [
+      'Must bring a stud finder and drywall anchors',
+      'Must ensure the TV is perfectly level and secure',
+      'Previous TV mounting experience required'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600',
+    budgetType: 'fixed',
+    budget: '60',
+  },
+  {
+    title: 'Translate a 5-page document from German to English',
+    description: 'I need a professional translation of a 5-page business document (approx. 1,500 words) from German to English. The document contains marketing text and general business terms. Accuracy, proper terminology, and maintaining the original document layout/formatting are required. PDF/Word files will be shared.',
+    category: 'Delivery',
+    taskType: 'remote',
+    location: 'Remote',
+    address: 'Remote Task',
+    mustHaves: [
+      'Native English speaker or bilingual proficiency',
+      'Excellent written communication and grammar',
+      'Prior experience with marketing/business translation'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600',
+    budgetType: 'fixed',
+    budget: '75',
+  }
+];
+
 export function NewTaskPage() {
   const { currentUser } = useAuth();
   const { dispatch } = useAppContext();
@@ -262,27 +345,25 @@ export function NewTaskPage() {
   };
 
   const handleAutofillDemo = () => {
+    const randomIdx = Math.floor(Math.random() * DEMO_TASKS.length);
+    const template = DEMO_TASKS[randomIdx];
     setForm({
-      title: 'Assemble IKEA Pax Wardrobe with sliding doors',
-      description: 'I need an experienced helper to assemble a standard IKEA Pax wardrobe (width 150cm, height 236cm) in my bedroom. All packages are delivered and inside the room. I have some basic tools but bringing a cordless screwdriver is recommended. Please help!',
-      category: 'Furniture Assembly',
-      taskType: 'in_person',
-      location: 'Berlin',
-      address: 'Friedrichstraße 12, 10117 Berlin',
-      mustHaves: [
-        'Must bring own tools (drill, level, rubber mallet)',
-        'Must have experience assembling IKEA Pax sliding doors',
-        'Must be careful not to scratch the wooden floor'
-      ],
-      imageUrl: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=600',
+      title: template.title,
+      description: template.description,
+      category: template.category as any,
+      taskType: template.taskType as any,
+      location: template.location,
+      address: template.address,
+      mustHaves: [...template.mustHaves],
+      imageUrl: template.imageUrl,
       scheduleType: 'specific',
       date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       time: '10:00',
-      budgetType: 'fixed',
-      budget: '120',
+      budgetType: template.budgetType as any,
+      budget: template.budget,
     });
     setStep(1);
-    showToast('Demo task data populated successfully!', 'info');
+    showToast(`Loaded demo task: "${template.title}"`, 'info');
   };
 
   const getStepStatus = (itemStep: number) => {
