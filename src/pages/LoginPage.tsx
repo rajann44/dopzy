@@ -106,7 +106,7 @@ export function LoginPage() {
         overflow: 'hidden',
       }} className="login-brand-panel">
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', zIndex: 1 }}>
+        <div className="login-reveal login-reveal-1" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', zIndex: 1 }}>
           <svg width="44" height="44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius)', flexShrink: 0 }}>
             <rect width="100" height="100" rx="16" fill="#004352"/>
             <path d="M30 50L45 65L75 35" stroke="#FFE600" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -120,10 +120,10 @@ export function LoginPage() {
         </div>
 
         {/* Hero text */}
-        <div style={{ zIndex: 1 }}>
+        <div className="login-reveal login-reveal-2" style={{ zIndex: 1 }}>
           <h1 style={{ fontFamily: 'var(--font-headline)', fontSize: '42px', fontWeight: 800, color: '#fff', lineHeight: 1.15, marginBottom: 'var(--space-4)', letterSpacing: '-0.02em' }}>
             Your Tasks,<br />
-            <span style={{ color: 'var(--color-primary-container)' }}>Done.</span>
+            <span className="login-gold-accent" style={{ color: 'var(--color-primary-container)' }}>Done.</span>
           </h1>
           <p style={{ fontSize: 'var(--text-body-lg)', color: 'rgba(255,255,255,0.75)', lineHeight: 'var(--lh-body-lg)', maxWidth: '380px' }}>
             Connect with vetted, trusted service providers in your area. From moving to cleaning — every task, matched perfectly.
@@ -131,7 +131,7 @@ export function LoginPage() {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'flex', gap: 'var(--space-8)', zIndex: 1 }}>
+        <div className="login-reveal login-reveal-3" style={{ display: 'flex', gap: 'var(--space-8)', zIndex: 1 }}>
           {[['2,400+', 'Tasks Completed'], ['98%', 'Satisfaction Rate'], ['500+', 'Verified Providers']].map(([val, label]) => (
             <div key={label}>
               <div style={{ fontFamily: 'var(--font-headline)', fontSize: '28px', fontWeight: 700, color: 'var(--color-primary-container)' }}>{val}</div>
@@ -141,7 +141,7 @@ export function LoginPage() {
         </div>
 
         {/* Background decoration */}
-        <div style={{
+        <div className="login-orb login-orb-large" style={{
           position: 'absolute',
           bottom: -60, right: -60,
           width: 320, height: 320,
@@ -149,7 +149,7 @@ export function LoginPage() {
           background: 'rgba(255,215,0,0.07)',
           border: '1px solid rgba(255,215,0,0.12)',
         }} />
-        <div style={{
+        <div className="login-orb login-orb-small" style={{
           position: 'absolute',
           top: -80, right: 60,
           width: 200, height: 200,
@@ -168,7 +168,7 @@ export function LoginPage() {
         background: 'var(--color-surface-white)',
         overflowY: 'auto',
         position: 'relative'
-      }} className="login-form-panel">
+      }} className="login-form-panel login-form-panel-animated">
         {/* Language selector */}
         <div style={{
           position: 'absolute',
@@ -214,7 +214,7 @@ export function LoginPage() {
           </button>
         </div>
 
-        <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
+        <div key={`${isForgotPassword ? 'forgot' : isSignUp ? 'signup' : 'signin'}-${language}`} className="login-form-shell" style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: 'var(--space-8)' }}>
             <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: 'var(--text-headline-lg)', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: 'var(--space-2)' }}>
               {isForgotPassword ? 'Reset Password' : (isSignUp ? 'Create an Account' : t('login.login_btn'))}
@@ -478,6 +478,93 @@ export function LoginPage() {
       </div>
 
       <style>{`
+        .login-form-panel-animated {
+          animation: loginPanelIn 700ms cubic-bezier(0.16, 0.8, 0.25, 1) both;
+        }
+
+        .login-form-shell {
+          animation: loginFormIn 620ms cubic-bezier(0.16, 0.8, 0.25, 1) both;
+        }
+
+        .login-reveal {
+          opacity: 0;
+          transform: translateY(28px);
+          animation: loginReveal 900ms cubic-bezier(0.16, 0.8, 0.25, 1) forwards;
+        }
+
+        .login-reveal-1 { animation-delay: 120ms; }
+        .login-reveal-2 { animation-delay: 300ms; }
+        .login-reveal-3 { animation-delay: 500ms; }
+
+        .login-gold-accent {
+          display: inline-block;
+          animation: loginGoldPulse 2.8s ease-in-out 0.8s infinite;
+        }
+
+        .login-orb {
+          animation: loginOrbFloat 6.5s ease-in-out infinite;
+          transform-origin: center;
+        }
+
+        .login-orb-small {
+          animation-duration: 8s;
+          animation-delay: 0.6s;
+        }
+
+        @keyframes loginReveal {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes loginPanelIn {
+          from {
+            opacity: 0;
+            transform: translateX(26px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes loginFormIn {
+          from {
+            opacity: 0;
+            transform: translateY(22px) scale(0.975);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes loginOrbFloat {
+          0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+          50% { transform: translateY(-18px) translateX(12px) scale(1.06); }
+        }
+
+        @keyframes loginGoldPulse {
+          0%, 100% {
+            text-shadow: 0 0 0 rgba(255,215,0,0);
+          }
+          50% {
+            text-shadow: 0 0 18px rgba(255,215,0,0.42);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .login-form-panel-animated,
+          .login-form-shell,
+          .login-reveal,
+          .login-orb {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
+        }
+
         @media (max-width: 767px) {
           .login-brand-panel { display: none !important; }
           [style*="grid-template-columns: 1fr 1fr"] {
