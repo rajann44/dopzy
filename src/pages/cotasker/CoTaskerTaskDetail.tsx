@@ -71,6 +71,16 @@ export function CoTaskerTaskDetail() {
   }
 
   const canOffer = (task.status === 'open' || task.status === 'receiving_offers') && !myOffer;
+  const canWithdrawOffer = !!myOffer && myOffer.status === 'pending' && (task.status === 'open' || task.status === 'receiving_offers');
+  const myOfferStatusForDisplay = myOffer
+    ? myOffer.status !== 'pending'
+      ? myOffer.status
+      : (task.status === 'open' || task.status === 'receiving_offers')
+        ? 'pending'
+        : task.assignedCoTaskerId === myOffer.coTaskerId
+          ? 'accepted'
+          : 'rejected'
+    : undefined;
   const isAssignedToMe = task.assignedCoTaskerId === currentUser?.id;
   const emoji = CATEGORY_ICONS[task.category] ?? '📋';
 
@@ -292,7 +302,7 @@ export function CoTaskerTaskDetail() {
   };
 
   const handleWithdraw = async () => {
-    if (!myOffer) return;
+    if (!canWithdrawOffer || !myOffer) return;
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -447,7 +457,8 @@ export function CoTaskerTaskDetail() {
                     offer={myOffer}
                     onWithdraw={() => setWithdrawConfirm(true)}
                     viewerRole="cotasker"
-                    showActions={myOffer.status === 'pending'}
+                    showActions={canWithdrawOffer}
+                    statusOverride={myOfferStatusForDisplay}
                   />
                 </div>
               </div>

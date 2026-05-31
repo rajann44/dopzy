@@ -12,6 +12,7 @@ import {
 } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { Avatar } from '../../components/ui/Avatar';
+import { StatusBadge } from '../../components/ui/Badge';
 import { formatCurrency, generateId } from '../../utils/formatters';
 import { CoTaskerProfileDrawer } from '../../components/profile/CoTaskerProfileDrawer';
 import { useTranslation } from '../../context/LanguageContext';
@@ -94,6 +95,10 @@ export function MessagesPage() {
       ? state.tasks.find((t) => t.id === activeRequest.taskId)
       : null;
 
+  const taskStatusForDisplay = activeTask
+    ? (activeTask.status === 'open' && activeTask.offersCount > 0 ? 'receiving_offers' : activeTask.status)
+    : null;
+
   // Active offer context (if tasker has bid on this task)
   const taskerId = activeConversation
     ? activeConversation.participantIds.find((id) => id !== currentUser.id)
@@ -101,11 +106,50 @@ export function MessagesPage() {
       ? activeRequest.senderId
       : null;
 
+  const otherParticipantId = activeConversation
+    ? activeConversation.participantIds.find((id) => id !== currentUser.id) ?? null
+    : null;
+
+  const isAssignedTaskChatOpen = !!activeTask && (
+    activeTask.status === 'assigned' || activeTask.status === 'in_progress'
+  );
+
+  const canSendInAssignedTask = !!activeTask && !!otherParticipantId && !!activeTask.assignedCoTaskerId && (
+    isAssignedTaskChatOpen && (
+      (currentUser.id === activeTask.clientId && otherParticipantId === activeTask.assignedCoTaskerId) ||
+      (currentUser.id === activeTask.assignedCoTaskerId && otherParticipantId === activeTask.clientId)
+    )
+  );
+
+  const canSendMessages = !!activeTask && (
+    activeTask.status === 'open' ||
+    activeTask.status === 'receiving_offers' ||
+    canSendInAssignedTask
+  );
+
+  const readOnlyMessage = activeTask?.status === 'completed'
+    ? t('messages.read_only_completed_msg')
+    : t('messages.read_only_msg');
+
+  const isTaskHireable = !!activeTask && (
+    (activeTask.status === 'open' || activeTask.status === 'receiving_offers') &&
+    !activeTask.assignedCoTaskerId
+  );
+
   const activeOffer = activeTask && taskerId
     ? state.offers.find(
-        (o) => o.taskId === activeTask.id && o.coTaskerId === taskerId && o.status !== 'withdrawn'
+        (o) =>
+          o.taskId === activeTask.id &&
+          o.coTaskerId === taskerId &&
+          (o.status === 'pending' || o.status === 'accepted')
       )
     : null;
+
+  const isAssignedOfferContext = !!activeTask && !!activeOffer && !!activeTask.assignedCoTaskerId && (
+    activeTask.assignedCoTaskerId === activeOffer.coTaskerId && activeOffer.status === 'accepted'
+  );
+
+  const showOfferBanner = !!activeOffer && (isTaskHireable || isAssignedOfferContext);
 
   // Active message stream
   const activeMessages = activeConversation
@@ -240,7 +284,7 @@ export function MessagesPage() {
   };
 
   const handleAcceptOffer = async () => {
-    if (!activeOffer || !activeTask) return;
+    if (!activeOffer || !activeTask || !isTaskHireable || activeOffer.status !== 'pending') return;
     try {
       // 1. Update accepted offer status
       const { error: acceptErr } = await supabase
@@ -265,11 +309,9 @@ export function MessagesPage() {
       if (taskErr) throw taskErr;
 
       // 4. Record wallet transaction
-      const txId = generateId('wallet');
       const { error: walletErr } = await supabase
         .from('wallet_transactions')
         .insert({
-          id: txId,
           task_id: activeTask.id,
           client_id: currentUser!.id,
           cotasker_id: activeOffer.coTaskerId,
@@ -560,13 +602,23 @@ export function MessagesPage() {
                       {activeChatParticipant?.name}
                     </div>
                     {activeTask && (
-                      <Link 
-                        to={`/tasks/${activeTask.id}`} 
-                        onClick={(e) => e.stopPropagation()} // prevent opening profile drawer
-                        style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
-                      >
-                        <strong>{t('messages.regarding')}</strong> {activeTask.title} <ChevronRight size={12} />
-                      </Link>
+                      <>
+                        <Link 
+                          to={`/tasks/${activeTask.id}`} 
+                          onClick={(e) => e.stopPropagation()} // prevent opening profile drawer
+                          style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                        >
+                          <strong>{t('messages.regarding')}</strong> {activeTask.title} <ChevronRight size={12} />
+                        </Link>
+                        {taskStatusForDisplay && (
+                          <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
+                              {t('tasks.status')}
+                            </span>
+                            <StatusBadge status={taskStatusForDisplay} />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -574,7 +626,7 @@ export function MessagesPage() {
             </div>
 
             {/* Contextual Offer Banner */}
-            {activeTask && activeOffer && (
+            {activeTask && activeOffer && showOfferBanner && (
               <div style={{
                 background: 'var(--color-surface-container-low)',
                 borderBottom: '1px solid var(--color-outline-variant)',
@@ -591,12 +643,12 @@ export function MessagesPage() {
                     {activeOffer.status === 'accepted' ? t('messages.status_hired') : t('messages.status_pending')}
                   </span>
                 </div>
-                {activeTask.clientId === currentUser.id && activeOffer.status === 'pending' && (
+                {activeTask.clientId === currentUser.id && isTaskHireable && activeOffer.status === 'pending' && (
                   <button className="btn btn-primary btn-sm" onClick={handleAcceptOffer}>
                     {t('messages.accept_and_hire')}
                   </button>
                 )}
-                {activeOffer.coTaskerId === currentUser.id && (
+                {activeOffer.coTaskerId === currentUser.id && isTaskHireable && activeOffer.status === 'pending' && (
                   <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
                     {t('messages.waiting_decision')}
                   </span>
@@ -650,7 +702,7 @@ export function MessagesPage() {
             </div>
 
             {/* Chat room message input footer */}
-            {activeTask && (activeTask.status === 'open' || activeTask.status === 'receiving_offers' || activeTask.assignedCoTaskerId === taskerId) ? (
+            {canSendMessages ? (
               <form onSubmit={handleSendMessage} style={{
                 padding: 'var(--space-4) var(--space-6)',
                 borderTop: '1px solid var(--color-outline-variant)',
@@ -684,7 +736,7 @@ export function MessagesPage() {
                 gap: '6px'
               }}>
                 <AlertTriangle size={14} style={{ color: 'var(--color-status-warning)' }} />
-                {t('messages.read_only_msg')}
+                {readOnlyMessage}
               </div>
             )}
           </>
@@ -735,6 +787,14 @@ export function MessagesPage() {
                     <span>📍 {activeTask.location}</span>
                     <span>💶 {activeTask.budgetType === 'open_to_offers' ? t('messages.open_bids') : `${formatCurrency(activeTask.budget || 0)}`}</span>
                   </div>
+                  {taskStatusForDisplay && (
+                    <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
+                        {t('tasks.status')}
+                      </span>
+                      <StatusBadge status={taskStatusForDisplay} />
+                    </div>
+                  )}
                 </div>
               )}
 

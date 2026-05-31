@@ -2,6 +2,13 @@ import React from 'react';
 import type { TaskStatus, OfferStatus } from '../../types';
 import { STATUS_LABELS } from '../../utils/constants';
 
+const OFFER_STATUS_LABELS: Record<string, string> = {
+  pending: 'Pending',
+  accepted: 'Accepted',
+  rejected: 'Rejected',
+  withdrawn: 'Withdrawn',
+};
+
 interface BadgeProps {
   status: TaskStatus | OfferStatus | string;
   showDot?: boolean;
@@ -12,7 +19,7 @@ export function StatusBadge({ status, showDot = false, size: _size = 'md' }: Bad
   return (
     <span className={`badge badge-${status}`}>
       {showDot && <span className={`status-dot status-dot-${status}`} />}
-      {STATUS_LABELS[status] ?? status}
+      {STATUS_LABELS[status] ?? OFFER_STATUS_LABELS[status] ?? status}
     </span>
   );
 }

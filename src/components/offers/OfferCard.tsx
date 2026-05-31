@@ -14,9 +14,10 @@ interface OfferCardProps {
   onViewProfile?: (coTaskerId: string) => void;
   viewerRole: 'client' | 'cotasker' | 'admin';
   showActions?: boolean;
+  statusOverride?: string;
 }
 
-export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfile, viewerRole, showActions = true }: OfferCardProps) {
+export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfile, viewerRole, showActions = true, statusOverride }: OfferCardProps) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<CoTaskerProfile | null>(null);
 
@@ -156,7 +157,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfil
                 <MessageSquare size={14} />
               </button>
             )}
-            <StatusBadge status={offer.status} />
+            <StatusBadge status={statusOverride ?? offer.status} />
           </div>
         )}
       </div>

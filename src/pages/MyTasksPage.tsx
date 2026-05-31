@@ -650,6 +650,16 @@ export function MyTasksPage() {
                   {myOffers.map((offer) => {
                     const task = state.tasks.find((t) => t.id === offer.taskId);
                     if (!task) return null;
+                    const isBiddingOpen = task.status === 'open' || task.status === 'receiving_offers';
+                    const isWinningOffer = task.assignedCoTaskerId === offer.coTaskerId;
+                    const offerStatusForDisplay =
+                      offer.status !== 'pending'
+                        ? offer.status
+                        : isBiddingOpen
+                          ? 'pending'
+                          : isWinningOffer
+                            ? 'accepted'
+                            : 'rejected';
                     return (
                       <div key={offer.id} className="card">
                         <div className="card-body" style={{ padding: 'var(--space-4)' }}>
@@ -659,7 +669,7 @@ export function MyTasksPage() {
                                 <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
                                 </span>
-                                <StatusBadge status={offer.status} />
+                                <StatusBadge status={offerStatusForDisplay} />
                               </div>
                               <Link to={`/tasks/${task.id}`} style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)', textDecoration: 'none', display: 'block' }}>
                                 {task.title}

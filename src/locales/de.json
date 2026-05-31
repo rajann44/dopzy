@@ -212,6 +212,7 @@
     "accept_and_hire": "Angebot annehmen & Beauftragen",
     "waiting_decision": "Warten auf Entscheidung des Auftraggebers",
     "read_only_msg": "Diese Aufgabe wurde an einen anderen Dienstleister vergeben. Der Chat ist schreibgeschützt.",
+    "read_only_completed_msg": "Diese Aufgabe ist abgeschlossen. Der Chat ist für diesen Verlauf geschlossen.",
     "clarification_request": "Klärungsanfrage",
     "inquiry_from": "Anfrage von",
     "task_details": "Details zur Aufgabe",

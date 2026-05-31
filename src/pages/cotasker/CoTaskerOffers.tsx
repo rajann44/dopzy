@@ -69,6 +69,17 @@ export function CoTaskerOffers() {
             {myOffers.map((offer) => {
               const task = state.tasks.find((t) => t.id === offer.taskId);
               if (!task) return null;
+              const canWithdraw = offer.status === 'pending' && (task.status === 'open' || task.status === 'receiving_offers');
+              const isBiddingOpen = task.status === 'open' || task.status === 'receiving_offers';
+              const isWinningOffer = task.assignedCoTaskerId === offer.coTaskerId;
+              const offerStatusForDisplay =
+                offer.status !== 'pending'
+                  ? offer.status
+                  : isBiddingOpen
+                    ? 'pending'
+                    : isWinningOffer
+                      ? 'accepted'
+                      : 'rejected';
               const emoji = CATEGORY_ICONS[task.category] ?? '📋';
               return (
                 <div key={offer.id} className="card">
@@ -79,7 +90,7 @@ export function CoTaskerOffers() {
                           <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <span>{emoji}</span> {task.category}
                           </span>
-                          <StatusBadge status={offer.status} />
+                          <StatusBadge status={offerStatusForDisplay} />
                         </div>
                         <Link to={`/cotasker/tasks/${task.id}`} className="truncate" style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)', textDecoration: 'none', display: 'block' }}>
                           {task.title}
@@ -110,7 +121,7 @@ export function CoTaskerOffers() {
                         <Link to={`/cotasker/tasks/${task.id}`}>
                           <button className="btn btn-outlined btn-sm">View Task</button>
                         </Link>
-                        {offer.status === 'pending' && (
+                        {canWithdraw && (
                           <button className="btn btn-danger btn-sm" onClick={() => setWithdrawTarget(offer.id)}>
                             Withdraw
                           </button>

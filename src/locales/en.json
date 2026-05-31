@@ -212,6 +212,7 @@
     "accept_and_hire": "Accept Offer & Hire",
     "waiting_decision": "Waiting for client decision",
     "read_only_msg": "This task has been assigned to another provider. Chat is now read-only.",
+    "read_only_completed_msg": "This task is completed. Chat is closed for this thread.",
     "clarification_request": "Clarification Request",
     "inquiry_from": "Inquiry from",
     "task_details": "Task Details",
