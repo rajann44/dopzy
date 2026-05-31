@@ -46,8 +46,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: data.role as UserRole,
         name: data.name,
         avatarUrl: data.avatar_url || undefined,
-        coTaskerStatus: data.co_tasker_status || 'none',
+        taskerStatus: data.tasker_status || 'none',
         isDisabled: data.is_disabled,
+        bio: data.bio || undefined,
+        location: data.location || undefined,
+        isVerified: data.is_verified || false,
+        taskerSkills: data.tasker_skills || [],
+        taskerCategories: data.tasker_categories || [],
+        taskerRating: Number(data.tasker_rating || 5),
+        taskerReviewCount: data.tasker_review_count || 0,
+        taskerCompletedJobs: data.tasker_completed_jobs || 0,
+        taskerResponseTime: data.tasker_response_time || '< 1 hour',
+        taskerIsTopRated: data.tasker_is_top_rated || false,
+        taskerIsFastResponder: data.tasker_is_fast_responder || false,
+        taskerTotalEarnings: Number(data.tasker_total_earnings || 0),
+        taskerAvailability: data.tasker_availability || 'Flexible',
+        taskerHourlyRate: data.tasker_hourly_rate ? Number(data.tasker_hourly_rate) : undefined,
+        taskerQualifications: data.tasker_qualifications || [],
+        taskerLanguages: data.tasker_languages || [],
+        taskerTransport: data.tasker_transport || undefined,
+        taskerPortfolio: data.tasker_portfolio || [],
         createdAt: data.created_at,
         password: '',
       };
@@ -176,7 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: data.user.email ?? email,
             role: 'client',
             name,
-            coTaskerStatus: 'none',
+            taskerStatus: 'none',
             isDisabled: false,
             createdAt: new Date().toISOString(),
             password: '',
@@ -224,4 +242,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
-

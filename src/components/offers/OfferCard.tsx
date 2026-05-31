@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Star, Clock, MessageSquare } from 'lucide-react';
-import type { Offer, User, CoTaskerProfile } from '../../types';
+import type { Offer, User, TaskerProfile } from '../../types';
 import { StatusBadge } from '../ui/Badge';
 import { Avatar } from '../ui/Avatar';
 import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
@@ -10,27 +10,27 @@ interface OfferCardProps {
   offer: Offer;
   onAccept?: (offerId: string) => void;
   onWithdraw?: (offerId: string) => void;
-  onMessage?: (coTaskerId: string) => void;
-  onViewProfile?: (coTaskerId: string) => void;
-  viewerRole: 'client' | 'cotasker' | 'admin';
+  onMessage?: (taskerId: string) => void;
+  onViewProfile?: (taskerId: string) => void;
+  viewerRole: 'client' | 'tasker' | 'admin';
   showActions?: boolean;
   statusOverride?: string;
 }
 
 export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfile, viewerRole, showActions = true, statusOverride }: OfferCardProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<CoTaskerProfile | null>(null);
+  const [profile, setProfile] = useState<TaskerProfile | null>(null);
 
   useEffect(() => {
-    profileService.getUserById(offer.coTaskerId).then(setUser);
-    profileService.getCoTaskerProfile(offer.coTaskerId).then(setProfile);
-  }, [offer.coTaskerId]);
+    profileService.getUserById(offer.taskerId).then(setUser);
+    profileService.getTaskerProfile(offer.taskerId).then(setProfile);
+  }, [offer.taskerId]);
 
   return (
     <div className="transaction-row-item" style={{ gridTemplateColumns: '56px 1.5fr 2fr 130px 160px', padding: '16px var(--space-4)' }}>
       {/* 1. Initials / Avatar Column */}
       <div 
-        onClick={() => onViewProfile && onViewProfile(offer.coTaskerId)}
+        onClick={() => onViewProfile && onViewProfile(offer.taskerId)}
         style={{ display: 'flex', alignItems: 'center', cursor: onViewProfile ? 'pointer' : 'default' }}
       >
         <div style={{ position: 'relative' }}>
@@ -50,7 +50,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfil
 
       {/* 2. Provider Info & Rating */}
       <div 
-        onClick={() => onViewProfile && onViewProfile(offer.coTaskerId)}
+        onClick={() => onViewProfile && onViewProfile(offer.taskerId)}
         style={{ 
           display: 'flex', 
           flexDirection: 'column', 
@@ -119,7 +119,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfil
             {viewerRole === 'client' && onMessage && (
               <button
                 className="btn btn-outlined btn-sm"
-                onClick={() => onMessage(offer.coTaskerId)}
+                onClick={() => onMessage(offer.taskerId)}
                 title="Message Tasker"
                 style={{ padding: '6px', minWidth: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
               >
@@ -135,7 +135,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfil
                 Accept
               </button>
             )}
-            {viewerRole === 'cotasker' && onWithdraw && (
+            {viewerRole === 'tasker' && onWithdraw && (
               <button
                 className="btn btn-danger btn-sm"
                 onClick={() => onWithdraw(offer.id)}
@@ -150,7 +150,7 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfil
             {viewerRole === 'client' && onMessage && (
               <button
                 className="btn btn-outlined btn-sm"
-                onClick={() => onMessage(offer.coTaskerId)}
+                onClick={() => onMessage(offer.taskerId)}
                 title="Message Tasker"
                 style={{ padding: '6px', minWidth: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
               >

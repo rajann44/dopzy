@@ -4,9 +4,6 @@ Last verified against live Supabase `public` schema on 2026-06-01.
 
 ```mermaid
 erDiagram
-  users ||--o| client_profiles : has
-  users ||--o| cotasker_profiles : has
-
   users ||--o{ tasks : creates
   users ||--o{ tasks : assigned_to
 
@@ -15,7 +12,7 @@ erDiagram
 
   tasks ||--o{ wallet_transactions : tracks
   users ||--o{ wallet_transactions : client
-  users ||--o{ wallet_transactions : cotasker
+  users ||--o{ wallet_transactions : tasker
 
   tasks ||--o{ reviews : belongs_to
   users ||--o{ reviews : writes
@@ -36,28 +33,29 @@ erDiagram
     text email
     user_role role
     text name
-    cotasker_status co_tasker_status
-    bool is_disabled
-  }
-
-  client_profiles {
-    uuid user_id PK,FK
+    tasker_status tasker_status
+    text bio
     text location
     bool is_verified
-  }
-
-  cotasker_profiles {
-    uuid user_id PK,FK
-    text bio
-    jsonb skills
-    numeric rating
-    integer completed_jobs
+    jsonb tasker_skills
+    jsonb tasker_categories
+    numeric tasker_rating
+    integer tasker_review_count
+    integer tasker_completed_jobs
+    text tasker_response_time
+    text tasker_availability
+    numeric tasker_hourly_rate
+    jsonb tasker_qualifications
+    jsonb tasker_languages
+    text tasker_transport
+    jsonb tasker_portfolio
+    bool is_disabled
   }
 
   tasks {
     uuid id PK
     uuid client_id FK
-    uuid assigned_cotasker_id FK
+    uuid assigned_tasker_id FK
     task_status status
     moderation_status moderation_status
     integer offers_count
@@ -66,7 +64,7 @@ erDiagram
   offers {
     uuid id PK
     uuid task_id FK
-    uuid cotasker_id FK
+    uuid tasker_id FK
     numeric price
     offer_status status
   }
@@ -75,7 +73,7 @@ erDiagram
     uuid id PK
     uuid task_id FK
     uuid client_id FK
-    uuid cotasker_id FK
+    uuid tasker_id FK
     numeric amount
     payment_status status
   }

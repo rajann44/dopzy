@@ -6,14 +6,14 @@ import type { Offer } from '../../types';
 
 interface OfferFormProps {
   taskId: string;
-  coTaskerId: string;
+  taskerId: string;
   existingOffer?: Offer;
   onSubmit: (data: { price: number; message: string; estimatedHours: number }) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
 }
 
-export function OfferForm({ taskId: _taskId, coTaskerId: _coTaskerId, existingOffer, onSubmit, onCancel, isLoading }: OfferFormProps) {
+export function OfferForm({ taskId: _taskId, taskerId: _taskerId, existingOffer, onSubmit, onCancel, isLoading }: OfferFormProps) {
   const [price, setPrice] = useState(existingOffer?.price?.toString() ?? '');
   const [message, setMessage] = useState(existingOffer?.message ?? '');
   const [estimatedHours, setEstimatedHours] = useState(existingOffer?.estimatedHours?.toString() ?? '');

@@ -103,7 +103,7 @@ export function ClientOffers() {
                     <tbody>
                       {taskOffers.map((offer) => {
                         const biddingOpen = task.status === 'open' || task.status === 'receiving_offers';
-                        const isAcceptedOffer = task.assignedCoTaskerId === offer.coTaskerId;
+                        const isAcceptedOffer = task.assignedTaskerId === offer.taskerId;
                         const displayStatus: typeof offer.status =
                           offer.status !== 'pending'
                             ? offer.status
@@ -115,7 +115,7 @@ export function ClientOffers() {
                         return (
                           <tr key={offer.id}>
                             <td style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>
-                              <ProviderName id={offer.coTaskerId} />
+                              <ProviderName id={offer.taskerId} />
                             </td>
                             <td style={{ fontWeight: 700, fontFamily: 'var(--font-headline)', color: 'var(--color-secondary)' }}>
                               {formatCurrency(offer.price)}

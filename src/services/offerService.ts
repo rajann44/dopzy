@@ -8,10 +8,10 @@ export const offerService = {
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   },
 
-  async getOffersByCoTasker(offers: Offer[], coTaskerId: string): Promise<Offer[]> {
+  async getOffersByTasker(offers: Offer[], taskerId: string): Promise<Offer[]> {
     await new Promise((r) => setTimeout(r, 80));
     return offers
-      .filter((o) => o.coTaskerId === coTaskerId)
+      .filter((o) => o.taskerId === taskerId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
@@ -20,16 +20,16 @@ export const offerService = {
     return offers.find((o) => o.taskId === taskId && o.status === 'accepted') ?? null;
   },
 
-  async hasCoTaskerOffered(
+  async hasTaskerOffered(
     offers: Offer[],
     taskId: string,
-    coTaskerId: string
+    taskerId: string
   ): Promise<boolean> {
     await new Promise((r) => setTimeout(r, 60));
     return offers.some(
       (o) =>
         o.taskId === taskId &&
-        o.coTaskerId === coTaskerId &&
+        o.taskerId === taskerId &&
         o.status !== 'withdrawn'
     );
   },

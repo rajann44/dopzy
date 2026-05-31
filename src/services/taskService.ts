@@ -54,10 +54,10 @@ export const taskService = {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
-  async getTasksByCoTasker(tasks: Task[], coTaskerId: string): Promise<Task[]> {
+  async getTasksByTasker(tasks: Task[], taskerId: string): Promise<Task[]> {
     await new Promise((r) => setTimeout(r, 80));
     return tasks
-      .filter((t) => t.assignedCoTaskerId === coTaskerId)
+      .filter((t) => t.assignedTaskerId === taskerId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 

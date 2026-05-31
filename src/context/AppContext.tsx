@@ -145,7 +145,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'ACCEPT_OFFER': {
-      const { offerId, taskId, coTaskerId } = action.payload;
+      const { offerId, taskId, taskerId } = action.payload;
       const updatedOffers = state.offers.map((o) => {
         if (o.id === offerId) return { ...o, status: 'accepted' as const };
         if (o.taskId === taskId && o.id !== offerId) return { ...o, status: 'rejected' as const };
@@ -153,7 +153,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       });
       const updatedTasks = state.tasks.map((t) =>
         t.id === taskId
-          ? { ...t, status: 'assigned' as const, assignedCoTaskerId: coTaskerId }
+          ? { ...t, status: 'assigned' as const, assignedTaskerId: taskerId }
           : t
       );
       // Add wallet reservation
@@ -163,7 +163,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
             id: generateId('wallet'),
             taskId,
             clientId: state.tasks.find((t) => t.id === taskId)?.clientId ?? '',
-            coTaskerId,
+            taskerId,
             amount: acceptedOffer.price,
             status: 'reserved' as const,
             createdAt: new Date().toISOString(),
@@ -280,29 +280,29 @@ function appReducer(state: AppState, action: AppAction): AppState {
         conversations: [action.payload, ...state.conversations],
       };
 
-    case 'APPLY_COTASKER':
+    case 'APPLY_TASKER':
       return {
         ...state,
         users: state.users.map((u) =>
-          u.id === action.payload.userId ? { ...u, coTaskerStatus: 'pending' } : u
+          u.id === action.payload.userId ? { ...u, taskerStatus: 'pending' } : u
         ),
       };
 
-    case 'APPROVE_COTASKER':
+    case 'APPROVE_TASKER':
       return {
         ...state,
         users: state.users.map((u) =>
           u.id === action.payload.userId
-            ? { ...u, coTaskerStatus: 'approved', role: 'cotasker' }
+            ? { ...u, taskerStatus: 'approved', role: 'tasker' }
             : u
         ),
       };
 
-    case 'REJECT_COTASKER':
+    case 'REJECT_TASKER':
       return {
         ...state,
         users: state.users.map((u) =>
-          u.id === action.payload.userId ? { ...u, coTaskerStatus: 'rejected' } : u
+          u.id === action.payload.userId ? { ...u, taskerStatus: 'rejected' } : u
         ),
       };
 
@@ -338,15 +338,15 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ),
       };
 
-    case 'TOGGLE_USER_COTASKER':
+    case 'TOGGLE_USER_TASKER':
       return {
         ...state,
         users: state.users.map((u) =>
           u.id === action.payload.userId
             ? {
                 ...u,
-                role: action.payload.shouldBeCoTasker ? 'cotasker' : 'client',
-                coTaskerStatus: action.payload.shouldBeCoTasker ? 'approved' : 'none',
+                role: action.payload.shouldBeTasker ? 'tasker' : 'client',
+                taskerStatus: action.payload.shouldBeTasker ? 'approved' : 'none',
               }
             : u
         ),
@@ -520,7 +520,7 @@ const mapTask = (t: any): Task => ({
   images: t.images || [],
   mustHaves: t.must_haves || [],
   clientId: t.client_id,
-  assignedCoTaskerId: t.assigned_cotasker_id || undefined,
+  assignedTaskerId: t.assigned_tasker_id || undefined,
   status: t.status,
   createdAt: t.created_at,
   offersCount: t.offers_count || 0,
@@ -533,8 +533,26 @@ const mapUser = (u: any): User => ({
   role: u.role as UserRole,
   name: u.name,
   avatarUrl: u.avatar_url || undefined,
-  coTaskerStatus: u.co_tasker_status || 'none',
+  taskerStatus: u.tasker_status || 'none',
   isDisabled: u.is_disabled,
+  bio: u.bio || undefined,
+  location: u.location || undefined,
+  isVerified: u.is_verified || false,
+  taskerSkills: u.tasker_skills || [],
+  taskerCategories: u.tasker_categories || [],
+  taskerRating: Number(u.tasker_rating || 5),
+  taskerReviewCount: u.tasker_review_count || 0,
+  taskerCompletedJobs: u.tasker_completed_jobs || 0,
+  taskerResponseTime: u.tasker_response_time || '< 1 hour',
+  taskerIsTopRated: u.tasker_is_top_rated || false,
+  taskerIsFastResponder: u.tasker_is_fast_responder || false,
+  taskerTotalEarnings: Number(u.tasker_total_earnings || 0),
+  taskerAvailability: u.tasker_availability || 'Flexible',
+  taskerHourlyRate: u.tasker_hourly_rate ? Number(u.tasker_hourly_rate) : undefined,
+  taskerQualifications: u.tasker_qualifications || [],
+  taskerLanguages: u.tasker_languages || [],
+  taskerTransport: u.tasker_transport || undefined,
+  taskerPortfolio: u.tasker_portfolio || [],
   createdAt: u.created_at,
   password: '',
 });
@@ -542,7 +560,7 @@ const mapUser = (u: any): User => ({
 const mapOffer = (o: any): Offer => ({
   id: o.id,
   taskId: o.task_id,
-  coTaskerId: o.cotasker_id,
+  taskerId: o.tasker_id,
   price: Number(o.price),
   message: o.message,
   estimatedHours: o.estimated_hours,
@@ -565,7 +583,7 @@ const mapWalletTransaction = (w: any): WalletTransaction => ({
   id: w.id,
   taskId: w.task_id,
   clientId: w.client_id,
-  coTaskerId: w.cotasker_id || undefined,
+  taskerId: w.tasker_id || undefined,
   amount: Number(w.amount),
   status: w.status,
   createdAt: w.created_at,
@@ -639,7 +657,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             images: t.images || [],
             mustHaves: t.must_haves || [],
             clientId: t.client_id,
-            assignedCoTaskerId: t.assigned_cotasker_id || undefined,
+            assignedTaskerId: t.assigned_tasker_id || undefined,
             status: t.status,
             createdAt: t.created_at,
             offersCount: t.offers_count || 0,
@@ -673,8 +691,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             role: u.role as UserRole,
             name: u.name,
             avatarUrl: u.avatar_url || undefined,
-            coTaskerStatus: u.co_tasker_status || 'none',
+            taskerStatus: u.tasker_status || 'none',
             isDisabled: u.is_disabled,
+            bio: u.bio || undefined,
+            location: u.location || undefined,
+            isVerified: u.is_verified || false,
+            taskerSkills: u.tasker_skills || [],
+            taskerCategories: u.tasker_categories || [],
+            taskerRating: Number(u.tasker_rating || 5),
+            taskerReviewCount: u.tasker_review_count || 0,
+            taskerCompletedJobs: u.tasker_completed_jobs || 0,
+            taskerResponseTime: u.tasker_response_time || '< 1 hour',
+            taskerIsTopRated: u.tasker_is_top_rated || false,
+            taskerIsFastResponder: u.tasker_is_fast_responder || false,
+            taskerTotalEarnings: Number(u.tasker_total_earnings || 0),
+            taskerAvailability: u.tasker_availability || 'Flexible',
+            taskerHourlyRate: u.tasker_hourly_rate ? Number(u.tasker_hourly_rate) : undefined,
+            taskerQualifications: u.tasker_qualifications || [],
+            taskerLanguages: u.tasker_languages || [],
+            taskerTransport: u.tasker_transport || undefined,
+            taskerPortfolio: u.tasker_portfolio || [],
             createdAt: u.created_at,
             password: '',
           }));
@@ -701,7 +737,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           const mappedOffers: Offer[] = dbOffers.map((o: any) => ({
             id: o.id,
             taskId: o.task_id,
-            coTaskerId: o.cotasker_id,
+            taskerId: o.tasker_id,
             price: Number(o.price),
             message: o.message,
             estimatedHours: o.estimated_hours,
@@ -751,7 +787,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             id: t.id,
             taskId: t.task_id,
             clientId: t.client_id,
-            coTaskerId: t.cotasker_id || undefined,
+            taskerId: t.tasker_id || undefined,
             amount: Number(t.amount),
             status: t.status,
             createdAt: t.created_at,
@@ -976,8 +1012,8 @@ export function createOfferAction(offer: Offer): AppAction {
   return { type: 'CREATE_OFFER', payload: offer };
 }
 
-export function acceptOfferAction(offerId: string, taskId: string, coTaskerId: string): AppAction {
-  return { type: 'ACCEPT_OFFER', payload: { offerId, taskId, coTaskerId } };
+export function acceptOfferAction(offerId: string, taskId: string, taskerId: string): AppAction {
+  return { type: 'ACCEPT_OFFER', payload: { offerId, taskId, taskerId } };
 }
 
 export function withdrawOfferAction(offerId: string): AppAction {
@@ -1028,16 +1064,16 @@ export function createConversationAction(conversation: Conversation): AppAction 
   return { type: 'CREATE_CONVERSATION', payload: conversation };
 }
 
-export function applyCoTaskerAction(userId: string): AppAction {
-  return { type: 'APPLY_COTASKER', payload: { userId } };
+export function applyTaskerAction(userId: string): AppAction {
+  return { type: 'APPLY_TASKER', payload: { userId } };
 }
 
-export function approveCoTaskerAction(userId: string): AppAction {
-  return { type: 'APPROVE_COTASKER', payload: { userId } };
+export function approveTaskerAction(userId: string): AppAction {
+  return { type: 'APPROVE_TASKER', payload: { userId } };
 }
 
-export function rejectCoTaskerAction(userId: string): AppAction {
-  return { type: 'REJECT_COTASKER', payload: { userId } };
+export function rejectTaskerAction(userId: string): AppAction {
+  return { type: 'REJECT_TASKER', payload: { userId } };
 }
 
 export function approveTaskAction(taskId: string): AppAction {
@@ -1056,12 +1092,11 @@ export function enableUserAction(userId: string): AppAction {
   return { type: 'ENABLE_USER', payload: { userId } };
 }
 
-export function toggleUserCoTaskerAction(userId: string, shouldBeCoTasker: boolean): AppAction {
-  return { type: 'TOGGLE_USER_COTASKER', payload: { userId, shouldBeCoTasker } };
+export function toggleUserTaskerAction(userId: string, shouldBeTasker: boolean): AppAction {
+  return { type: 'TOGGLE_USER_TASKER', payload: { userId, shouldBeTasker } };
 }
 
 export function deleteTaskAction(taskId: string): AppAction {
   return { type: 'DELETE_TASK', payload: { taskId } };
 }
-
 

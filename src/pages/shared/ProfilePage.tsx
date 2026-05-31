@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Avatar } from '../../components/ui/Avatar';
 import { ProfileBadge } from '../../components/ui/Badge';
 import { formatCurrency, formatDate, formatRelativeTime } from '../../utils/formatters';
-import type { User, CoTaskerProfile, ClientProfile } from '../../types';
+import type { User, TaskerProfile, ClientProfile } from '../../types';
 
 export function ProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +20,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState<User | null>(null);
-  const [coTaskerProfile, setCoTaskerProfile] = useState<CoTaskerProfile | null>(null);
+  const [taskerProfile, setTaskerProfile] = useState<TaskerProfile | null>(null);
   const [clientProfile, setClientProfile] = useState<ClientProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -53,11 +53,11 @@ export function ProfilePage() {
       setIsLoading(true);
       const [u, co, cl] = await Promise.all([
         profileService.getUserById(id),
-        profileService.getCoTaskerProfile(id),
+        profileService.getTaskerProfile(id),
         profileService.getClientProfile(id),
       ]);
       setUser(u);
-      setCoTaskerProfile(co);
+      setTaskerProfile(co);
       setClientProfile(cl);
       setIsLoading(false);
     };
@@ -68,21 +68,21 @@ export function ProfilePage() {
     if (user) {
       setEditName(user.name);
     }
-    if (coTaskerProfile) {
-      setEditBio(coTaskerProfile.bio);
-      setEditLocation(coTaskerProfile.location);
-      setEditHourlyRate(coTaskerProfile.hourlyRate || 0);
-      setEditTransport(coTaskerProfile.transport || '');
-      setEditQualifications(coTaskerProfile.qualifications || []);
-      setEditLanguages(coTaskerProfile.languages || []);
-      setEditSkills(coTaskerProfile.skills || []);
-      setEditCategories(coTaskerProfile.categories || []);
-      setEditPortfolio(coTaskerProfile.portfolio || []);
+    if (taskerProfile) {
+      setEditBio(taskerProfile.bio);
+      setEditLocation(taskerProfile.location);
+      setEditHourlyRate(taskerProfile.hourlyRate || 0);
+      setEditTransport(taskerProfile.transport || '');
+      setEditQualifications(taskerProfile.qualifications || []);
+      setEditLanguages(taskerProfile.languages || []);
+      setEditSkills(taskerProfile.skills || []);
+      setEditCategories(taskerProfile.categories || []);
+      setEditPortfolio(taskerProfile.portfolio || []);
     } else if (clientProfile) {
       setEditBio(clientProfile.bio || '');
       setEditLocation(clientProfile.location);
     }
-  }, [user, coTaskerProfile, clientProfile, isEditing]);
+  }, [user, taskerProfile, clientProfile, isEditing]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -94,8 +94,8 @@ export function ProfilePage() {
         setUser(prev => prev ? { ...prev, name: editName } : null);
       }
 
-      if (coTaskerProfile) {
-        const updated = await profileService.updateCoTaskerProfile(user.id, {
+      if (taskerProfile) {
+        const updated = await profileService.updateTaskerProfile(user.id, {
           bio: editBio,
           location: editLocation,
           hourlyRate: editHourlyRate,
@@ -106,7 +106,7 @@ export function ProfilePage() {
           categories: editCategories,
           portfolio: editPortfolio,
         });
-        setCoTaskerProfile(updated);
+        setTaskerProfile(updated);
       } else if (clientProfile) {
         const updated = await profileService.updateClientProfile(user.id, {
           bio: editBio,
@@ -230,7 +230,7 @@ export function ProfilePage() {
               {isEditing ? 'Edit Profile' : user.name}
             </h1>
             <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0', textTransform: 'capitalize' }}>
-              {user.role === 'cotasker' ? 'Service Provider' : 'Client Profile'}
+              {user.role === 'tasker' ? 'Service Provider' : 'Client Profile'}
             </p>
           </div>
         </div>
@@ -297,7 +297,7 @@ export function ProfilePage() {
                     />
                   </div>
 
-                  {coTaskerProfile && (
+                  {taskerProfile && (
                     <div className="form-group">
                       <label className="form-label">Hourly Rate (€/hr)</label>
                       <input 
@@ -312,7 +312,7 @@ export function ProfilePage() {
               </div>
 
               {/* Certified Qualifications Edit */}
-              {coTaskerProfile && (
+              {taskerProfile && (
                 <div className="card">
                   <div className="card-header">
                     <h3 className="text-headline-sm" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}>
@@ -355,7 +355,7 @@ export function ProfilePage() {
               )}
 
               {/* Portfolio & Past Work Edit */}
-              {coTaskerProfile && (
+              {taskerProfile && (
                 <div className="card">
                   <div className="card-header">
                     <h3 className="text-headline-sm" style={{ fontWeight: 700 }}>Portfolio & Past Work</h3>
@@ -435,7 +435,7 @@ export function ProfilePage() {
             {/* Editing Right Column */}
             <div className="bento-col-4 flex flex-col gap-6">
               {/* Logistics & Communication Edit */}
-              {coTaskerProfile && (
+              {taskerProfile && (
                 <div className="card">
                   <div className="card-header">
                     <h3 className="text-headline-sm" style={{ fontWeight: 700 }}>Logistics & Langs</h3>
@@ -487,7 +487,7 @@ export function ProfilePage() {
               )}
 
               {/* Skills & Categories Edit */}
-              {coTaskerProfile && (
+              {taskerProfile && (
                 <div className="card">
                   <div className="card-header">
                     <h3 className="text-headline-sm" style={{ fontWeight: 700 }}>Skills & Categories</h3>
@@ -566,28 +566,28 @@ export function ProfilePage() {
                     )}
                   </div>
 
-                  {coTaskerProfile && (
+                  {taskerProfile && (
                     <div className="flex flex-col gap-4">
                       <p style={{ color: 'var(--color-on-surface-variant)', lineHeight: '1.6', margin: 0, fontSize: 'var(--text-body-md)' }}>
-                        {coTaskerProfile.bio || 'No bio provided yet.'}
+                        {taskerProfile.bio || 'No bio provided yet.'}
                       </p>
                       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                        {coTaskerProfile.isVerified && <ProfileBadge type="verified" />}
-                        {coTaskerProfile.isTopRated && <ProfileBadge type="top-rated" />}
-                        {coTaskerProfile.isFastResponder && <ProfileBadge type="fast" />}
+                        {taskerProfile.isVerified && <ProfileBadge type="verified" />}
+                        {taskerProfile.isTopRated && <ProfileBadge type="top-rated" />}
+                        {taskerProfile.isFastResponder && <ProfileBadge type="fast" />}
                       </div>
                       <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)', marginTop: 'var(--space-2)' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                          {coTaskerProfile.location}
+                          {taskerProfile.location}
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Clock size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                          Responds {coTaskerProfile.responseTime}
+                          Responds {taskerProfile.responseTime}
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Briefcase size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                          {coTaskerProfile.completedJobs} jobs completed
+                          {taskerProfile.completedJobs} jobs completed
                         </span>
                       </div>
                     </div>
@@ -618,7 +618,7 @@ export function ProfilePage() {
               </div>
 
               {/* Qualifications Section */}
-              {coTaskerProfile && coTaskerProfile.qualifications && coTaskerProfile.qualifications.length > 0 && (
+              {taskerProfile && taskerProfile.qualifications && taskerProfile.qualifications.length > 0 && (
                 <div className="card">
                   <div className="card-header" style={{ padding: 'var(--space-4) var(--space-6)' }}>
                     <h3 className="text-headline-sm" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', fontWeight: 700 }}>
@@ -627,7 +627,7 @@ export function ProfilePage() {
                     </h3>
                   </div>
                   <div className="card-body flex flex-col gap-3" style={{ padding: 'var(--space-5)' }}>
-                    {coTaskerProfile.qualifications.map((q) => (
+                    {taskerProfile.qualifications.map((q) => (
                       <div key={q} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <CheckCircle size={16} style={{ color: 'var(--color-status-success)', flexShrink: 0 }} />
                         <span style={{ fontSize: 'var(--text-body-md)', color: 'var(--color-on-surface)', fontWeight: 500 }}>{q}</span>
@@ -638,11 +638,11 @@ export function ProfilePage() {
               )}
 
               {/* Portfolio Section */}
-              {coTaskerProfile && coTaskerProfile.portfolio && coTaskerProfile.portfolio.length > 0 && (
+              {taskerProfile && taskerProfile.portfolio && taskerProfile.portfolio.length > 0 && (
                 <div>
                   <div className="section-label">Portfolio & Past Work</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
-                    {coTaskerProfile.portfolio.map((item) => (
+                    {taskerProfile.portfolio.map((item) => (
                       <div key={item.title} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div style={{ overflow: 'hidden', height: '170px', background: 'var(--color-surface-container-high)' }}>
                           <img
@@ -701,7 +701,7 @@ export function ProfilePage() {
 
             {/* View Mode Right Column */}
             <div className="bento-col-4 flex flex-col gap-6">
-              {coTaskerProfile && (
+              {taskerProfile && (
                 <>
                   {/* Stats Card */}
                   <div className="card">
@@ -711,20 +711,20 @@ export function ProfilePage() {
                     <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-4)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)' }}>
                         <div className="stat-card" style={{ padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <div className="stat-value" style={{ fontSize: '20px' }}>{coTaskerProfile.rating}</div>
+                          <div className="stat-value" style={{ fontSize: '20px' }}>{taskerProfile.rating}</div>
                           <div className="stat-label" style={{ fontSize: '10px' }}>Rating</div>
                         </div>
                         <div className="stat-card" style={{ padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <div className="stat-value" style={{ fontSize: '20px' }}>{coTaskerProfile.completedJobs}</div>
+                          <div className="stat-value" style={{ fontSize: '20px' }}>{taskerProfile.completedJobs}</div>
                           <div className="stat-label" style={{ fontSize: '10px' }}>Jobs Done</div>
                         </div>
                       </div>
 
-                      {coTaskerProfile.hourlyRate && (
+                      {taskerProfile.hourlyRate && (
                         <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', border: '1px solid var(--color-outline-variant)' }}>
                           <div className="section-label" style={{ fontSize: '10px', marginBottom: '4px' }}>Hourly Rate</div>
                           <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '22px', color: 'var(--color-secondary)' }}>
-                            {formatCurrency(coTaskerProfile.hourlyRate)}/hr
+                            {formatCurrency(taskerProfile.hourlyRate)}/hr
                           </div>
                         </div>
                       )}
@@ -737,25 +737,25 @@ export function ProfilePage() {
                       <h3 className="text-headline-sm" style={{ fontWeight: 700 }}>Logistics</h3>
                     </div>
                     <div className="card-body flex flex-col gap-4" style={{ padding: 'var(--space-4)' }}>
-                      {coTaskerProfile.transport && (
+                      {taskerProfile.transport && (
                         <div>
                           <div className="section-label" style={{ fontSize: '10px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <Truck size={12} style={{ color: 'var(--color-secondary-mid)' }} />
                             Transport
                           </div>
                           <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)', lineHeight: '18px', fontWeight: 500 }}>
-                            {coTaskerProfile.transport}
+                            {taskerProfile.transport}
                           </div>
                         </div>
                       )}
-                      {coTaskerProfile.languages && coTaskerProfile.languages.length > 0 && (
+                      {taskerProfile.languages && taskerProfile.languages.length > 0 && (
                         <div>
                           <div className="section-label" style={{ fontSize: '10px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <Languages size={12} style={{ color: 'var(--color-secondary-mid)' }} />
                             Languages Spoken
                           </div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                            {coTaskerProfile.languages.map((l) => (
+                            {taskerProfile.languages.map((l) => (
                               <span key={l} className="chip" style={{ fontSize: '10px', textTransform: 'none', letterSpacing: 'normal', padding: '3px 8px' }}>
                                 {l}
                               </span>
@@ -778,16 +778,16 @@ export function ProfilePage() {
                       <div>
                         <div className="section-label" style={{ fontSize: '10px', marginBottom: '6px' }}>Core Categories</div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1.5)' }}>
-                          {coTaskerProfile.categories.map((cat) => (
+                          {taskerProfile.categories.map((cat) => (
                             <span key={cat} className="chip chip-active" style={{ fontSize: '10px' }}>{cat}</span>
                           ))}
                         </div>
                       </div>
-                      {coTaskerProfile.skills && coTaskerProfile.skills.length > 0 && (
+                      {taskerProfile.skills && taskerProfile.skills.length > 0 && (
                         <div>
                           <div className="section-label" style={{ fontSize: '10px', marginBottom: '6px' }}>Specialist Skills</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1.5)' }}>
-                            {coTaskerProfile.skills.map((skill) => (
+                            {taskerProfile.skills.map((skill) => (
                               <span key={skill} className="chip" style={{ fontSize: '10px', background: 'var(--color-surface-container-low)' }}>{skill}</span>
                             ))}
                           </div>

@@ -1,10 +1,10 @@
 -- ============================================================================
--- SUPABASE MIGRATION AND DATABASE SCHEMA FOR TASKBUDDY
+-- SUPABASE MIGRATION AND DATABASE SCHEMA FOR DOPZY
 -- ============================================================================
 
 -- ─── 1. CUSTOM TYPES & ENUMS ────────────────────────────────────────────────
-create type public.user_role as enum ('client', 'cotasker', 'admin');
-create type public.cotasker_status as enum ('none', 'pending', 'approved', 'rejected');
+create type public.user_role as enum ('client', 'tasker', 'admin');
+create type public.tasker_status as enum ('none', 'pending', 'approved', 'rejected');
 create type public.task_status as enum ('open', 'receiving_offers', 'assigned', 'in_progress', 'completed', 'cancelled');
 create type public.moderation_status as enum ('approved', 'pending', 'rejected');
 create type public.offer_status as enum ('pending', 'accepted', 'rejected', 'withdrawn');
@@ -19,37 +19,26 @@ create table public.users (
   role public.user_role not null default 'client',
   name text not null,
   avatar_url text,
-  co_tasker_status public.cotasker_status not null default 'none',
+  tasker_status public.tasker_status not null default 'none',
   is_disabled boolean not null default false,
-  created_at timestamp with time zone not null default timezone('utc'::text, now())
-);
-
--- Client profiles details
-create table public.client_profiles (
-  user_id uuid references public.users on delete cascade primary key,
-  bio text,
-  location text not null,
+  bio text not null default '',
+  location text not null default 'Berlin',
   is_verified boolean not null default false,
-  created_at timestamp with time zone not null default timezone('utc'::text, now())
-);
-
--- Co-tasker profile details (handyman listings, qualifications, portfolio)
-create table public.cotasker_profiles (
-  user_id uuid references public.users on delete cascade primary key,
-  bio text not null,
-  skills jsonb not null default '[]'::jsonb,
-  categories jsonb not null default '[]'::jsonb,
-  location text not null,
-  rating numeric(3,2) not null default 5.00 check (rating >= 1.00 and rating <= 5.00),
-  review_count integer not null default 0,
-  completed_jobs integer not null default 0,
-  response_time text not null default '< 1 hour',
-  availability text not null,
-  hourly_rate numeric(10,2),
-  qualifications jsonb not null default '[]'::jsonb,
-  languages jsonb not null default '[]'::jsonb,
-  transport text,
-  portfolio jsonb not null default '[]'::jsonb,
+  tasker_skills jsonb not null default '[]'::jsonb,
+  tasker_categories jsonb not null default '[]'::jsonb,
+  tasker_rating numeric(3,2) not null default 5.00 check (tasker_rating >= 1.00 and tasker_rating <= 5.00),
+  tasker_review_count integer not null default 0,
+  tasker_completed_jobs integer not null default 0,
+  tasker_response_time text not null default '< 1 hour',
+  tasker_is_top_rated boolean not null default false,
+  tasker_is_fast_responder boolean not null default false,
+  tasker_total_earnings numeric(10,2) not null default 0,
+  tasker_availability text not null default 'Flexible',
+  tasker_hourly_rate numeric(10,2),
+  tasker_qualifications jsonb not null default '[]'::jsonb,
+  tasker_languages jsonb not null default '[]'::jsonb,
+  tasker_transport text,
+  tasker_portfolio jsonb not null default '[]'::jsonb,
   created_at timestamp with time zone not null default timezone('utc'::text, now())
 );
 
@@ -68,17 +57,17 @@ create table public.tasks (
   images jsonb not null default '[]'::jsonb,
   must_haves jsonb not null default '[]'::jsonb,
   client_id uuid not null references public.users(id) on delete cascade,
-  assigned_cotasker_id uuid references public.users(id) on delete set null,
+  assigned_tasker_id uuid references public.users(id) on delete set null,
   status public.task_status not null default 'open',
   moderation_status public.moderation_status not null default 'pending',
   created_at timestamp with time zone not null default timezone('utc'::text, now())
 );
 
--- Job offers submitted by co-taskers
+-- Job offers submitted by taskers
 create table public.offers (
   id uuid primary key default gen_random_uuid(),
   task_id uuid not null references public.tasks(id) on delete cascade,
-  cotasker_id uuid not null references public.users(id) on delete cascade,
+  tasker_id uuid not null references public.users(id) on delete cascade,
   price numeric(10,2) not null,
   message text not null,
   estimated_hours integer not null,
@@ -114,7 +103,7 @@ create table public.wallet_transactions (
   id uuid primary key default gen_random_uuid(),
   task_id uuid not null references public.tasks(id) on delete cascade,
   client_id uuid not null references public.users(id) on delete cascade,
-  cotasker_id uuid references public.users(id) on delete set null,
+  tasker_id uuid references public.users(id) on delete set null,
   amount numeric(10,2) not null,
   status public.payment_status not null default 'pending',
   created_at timestamp with time zone not null default timezone('utc'::text, now())
@@ -154,7 +143,7 @@ create table public.chat_messages (
 create index idx_tasks_moderation_status on public.tasks(moderation_status);
 create index idx_tasks_client_id on public.tasks(client_id);
 create index idx_offers_task_id on public.offers(task_id);
-create index idx_offers_cotasker_id on public.offers(cotasker_id);
+create index idx_offers_tasker_id on public.offers(tasker_id);
 create index idx_chat_messages_conversation_id on public.chat_messages(conversation_id);
 create index idx_notifications_user_id_unread on public.notifications(user_id) where is_read = false;
 
@@ -162,7 +151,7 @@ create index idx_notifications_user_id_unread on public.notifications(user_id) w
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.users (id, email, role, name, co_tasker_status, is_disabled)
+  insert into public.users (id, email, role, name, tasker_status, is_disabled)
   values (
     new.id,
     new.email,
@@ -172,10 +161,6 @@ begin
     false
   );
   
-  -- Create a default blank client profile as well
-  insert into public.client_profiles (user_id, location)
-  values (new.id, 'Berlin');
-
   return new;
 end;
 $$ language plpgsql security definer;
@@ -189,8 +174,6 @@ create or replace trigger on_auth_user_created
 
 -- Enable RLS
 alter table public.users enable row level security;
-alter table public.client_profiles enable row level security;
-alter table public.cotasker_profiles enable row level security;
 alter table public.tasks enable row level security;
 alter table public.offers enable row level security;
 alter table public.reviews enable row level security;
@@ -211,18 +194,6 @@ create policy "Allow users to update own profile or admins to manage" on public.
       where id = auth.uid() and role = 'admin'
     )
   );
-
--- Client Profiles policies
-create policy "Allow read access to client profiles" on public.client_profiles 
-  for select using (true);
-create policy "Allow clients to manage own profile" on public.client_profiles 
-  for all using (auth.uid() = user_id);
-
--- Co-tasker Profiles policies
-create policy "Allow read access to co-tasker profiles" on public.cotasker_profiles 
-  for select using (true);
-create policy "Allow co-taskers to manage own profile" on public.cotasker_profiles 
-  for all using (auth.uid() = user_id);
 
 -- Tasks policies
 create policy "Allow read access to approved tasks, owners, and admins" on public.tasks 
@@ -256,13 +227,13 @@ create policy "Allow clients and admins to delete tasks" on public.tasks
 -- Offers policies
 create policy "Allow read access to offers for clients and applicants" on public.offers 
   for select using (
-    auth.uid() = cotasker_id or 
+    auth.uid() = tasker_id or 
     exists (select 1 from public.tasks where id = task_id and client_id = auth.uid())
   );
-create policy "Allow co-taskers to make offers" on public.offers 
-  for insert with check (auth.uid() = cotasker_id);
-create policy "Allow co-taskers to update own offers" on public.offers 
-  for update using (auth.uid() = cotasker_id);
+create policy "Allow taskers to make offers" on public.offers 
+  for insert with check (auth.uid() = tasker_id);
+create policy "Allow taskers to update own offers" on public.offers 
+  for update using (auth.uid() = tasker_id);
 
 -- Notifications policies
 create policy "Allow private notifications read and update" on public.notifications 
@@ -303,8 +274,8 @@ create policy "Allow users to create reviews from themselves" on public.reviews
   for insert with check (auth.uid() = from_user_id);
 
 -- Wallet transactions policies
-create policy "Allow wallet transaction access to client and cotasker" on public.wallet_transactions
-  for all using (auth.uid() = client_id or auth.uid() = cotasker_id);
+create policy "Allow wallet transaction access to client and tasker" on public.wallet_transactions
+  for all using (auth.uid() = client_id or auth.uid() = tasker_id);
 
 create policy "Allow client to create wallet transactions" on public.wallet_transactions
   for insert with check (auth.role() = 'authenticated');
@@ -366,4 +337,3 @@ drop trigger if exists on_offer_count_change on public.offers;
 create trigger on_offer_count_change
   after insert or delete or update of status on public.offers
   for each row execute function public.handle_offer_count_change();
-

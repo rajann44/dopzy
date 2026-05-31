@@ -6,19 +6,19 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import { CATEGORY_ICONS } from '../../utils/constants';
 import { ArrowRight, CheckCircle, Clock } from 'lucide-react';
 
-export function CoTaskerJobs() {
+export function TaskerJobs() {
   const { currentUser } = useAuth();
   const { state } = useAppContext();
 
   const myJobs = state.tasks
-    .filter((t) => t.assignedCoTaskerId === currentUser?.id)
+    .filter((t) => t.assignedTaskerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const active = myJobs.filter((t) => t.status === 'assigned' || t.status === 'in_progress');
   const completed = myJobs.filter((t) => t.status === 'completed');
 
   const totalEarned = state.walletTransactions
-    .filter((w) => w.coTaskerId === currentUser?.id && w.status === 'released')
+    .filter((w) => w.taskerId === currentUser?.id && w.status === 'released')
     .reduce((sum, w) => sum + w.amount, 0);
 
   return (
@@ -43,10 +43,10 @@ export function CoTaskerJobs() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {active.map((task) => {
                 const myOffer = state.offers.find(
-                  (o) => o.taskId === task.id && o.coTaskerId === currentUser?.id && o.status === 'accepted'
+                  (o) => o.taskId === task.id && o.taskerId === currentUser?.id && o.status === 'accepted'
                 );
                 return (
-                  <Link key={task.id} to={`/cotasker/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
+                  <Link key={task.id} to={`/tasker/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
                     <div className="card card-hover">
                       <div className="card-body" style={{ padding: 'var(--space-4)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
@@ -88,7 +88,7 @@ export function CoTaskerJobs() {
                 <div className="empty-state-icon">📋</div>
                 <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No active jobs</h3>
                 <p style={{ marginBottom: 'var(--space-4)' }}>Browse available tasks and send offers to get assigned jobs.</p>
-                <Link to="/cotasker/tasks">
+                <Link to="/tasker/tasks">
                   <button className="btn btn-primary">Browse Tasks</button>
                 </Link>
               </div>
@@ -118,12 +118,12 @@ export function CoTaskerJobs() {
                   <tbody>
                     {completed.map((task) => {
                       const tx = state.walletTransactions.find(
-                        (w) => w.taskId === task.id && w.coTaskerId === currentUser?.id
+                        (w) => w.taskId === task.id && w.taskerId === currentUser?.id
                       );
                       return (
                         <tr key={task.id}>
                           <td style={{ fontWeight: 600 }}>
-                            <Link to={`/cotasker/tasks/${task.id}`} style={{ color: 'var(--color-secondary)', textDecoration: 'none' }}>
+                            <Link to={`/tasker/tasks/${task.id}`} style={{ color: 'var(--color-secondary)', textDecoration: 'none' }}>
                               {task.title}
                             </Link>
                           </td>

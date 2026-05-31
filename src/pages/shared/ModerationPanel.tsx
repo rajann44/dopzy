@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { 
   useAppContext, 
-  approveCoTaskerAction, 
-  rejectCoTaskerAction, 
+  approveTaskerAction, 
+  rejectTaskerAction, 
   approveTaskAction, 
   rejectTaskAction,
   disableUserAction,
   enableUserAction,
-  toggleUserCoTaskerAction,
+  toggleUserTaskerAction,
   deleteTaskAction
 } from '../../context/AppContext';
 import { useTranslation } from '../../context/LanguageContext';
@@ -27,7 +27,7 @@ export function ModerationPanel() {
   const [taskSearch, setTaskSearch] = useState('');
 
   // Filter pending data
-  const pendingUsers = state.users.filter((u) => u.coTaskerStatus === 'pending');
+  const pendingUsers = state.users.filter((u) => u.taskerStatus === 'pending');
   const pendingTasks = state.tasks.filter((t) => t.moderationStatus === 'pending');
 
   // Search filtered users
@@ -47,11 +47,11 @@ export function ModerationPanel() {
     try {
       const { error } = await supabase
         .from('users')
-        .update({ co_tasker_status: 'approved', role: 'cotasker' })
+        .update({ tasker_status: 'approved', role: 'tasker' })
         .eq('id', userId);
       if (error) throw error;
-      dispatch(approveCoTaskerAction(userId));
-      showToast('Co-Tasker application approved successfully!', 'success');
+      dispatch(approveTaskerAction(userId));
+      showToast('Tasker application approved successfully!', 'success');
     } catch (err: any) {
       console.error('Failed to approve user:', err);
       showToast(err.message || 'Failed to approve user in database.', 'error');
@@ -62,11 +62,11 @@ export function ModerationPanel() {
     try {
       const { error } = await supabase
         .from('users')
-        .update({ co_tasker_status: 'rejected' })
+        .update({ tasker_status: 'rejected' })
         .eq('id', userId);
       if (error) throw error;
-      dispatch(rejectCoTaskerAction(userId));
-      showToast('Co-Tasker application declined.', 'info');
+      dispatch(rejectTaskerAction(userId));
+      showToast('Tasker application declined.', 'info');
     } catch (err: any) {
       console.error('Failed to reject user:', err);
       showToast(err.message || 'Failed to reject user in database.', 'error');
@@ -124,25 +124,25 @@ export function ModerationPanel() {
     }
   };
 
-  const handleToggleCoTasker = async (userId: string, isCoTasker: boolean) => {
+  const handleToggleTasker = async (userId: string, isTasker: boolean) => {
     try {
-      const nextRole = isCoTasker ? 'client' : 'cotasker';
-      const nextStatus = isCoTasker ? 'none' : 'approved';
+      const nextRole = isTasker ? 'client' : 'tasker';
+      const nextStatus = isTasker ? 'none' : 'approved';
       const { error } = await supabase
         .from('users')
-        .update({ role: nextRole, co_tasker_status: nextStatus })
+        .update({ role: nextRole, tasker_status: nextStatus })
         .eq('id', userId);
       if (error) throw error;
 
-      dispatch(toggleUserCoTaskerAction(userId, !isCoTasker));
+      dispatch(toggleUserTaskerAction(userId, !isTasker));
       showToast(
-        isCoTasker 
-          ? 'Co-Tasker status revoked. User is now a regular client.' 
-          : 'User promoted to approved Co-Tasker status.', 
+        isTasker 
+          ? 'Tasker status revoked. User is now a regular client.' 
+          : 'User promoted to approved Tasker status.', 
         'success'
       );
     } catch (err: any) {
-      console.error('Failed to toggle co-tasker role:', err);
+      console.error('Failed to toggle tasker role:', err);
       showToast(err.message || 'Failed to update user role in database.', 'error');
     }
   };
@@ -210,10 +210,10 @@ export function ModerationPanel() {
         {/* Tab Content 1: Pending Approvals */}
         {activeTab === 'pending' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            {/* Co-Tasker applications */}
+            {/* Tasker applications */}
             <div>
               <div className="section-label" style={{ marginBottom: 'var(--space-3)' }}>
-                Pending Co-Tasker Applications ({pendingUsers.length})
+                Pending Tasker Applications ({pendingUsers.length})
               </div>
               {pendingUsers.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -351,12 +351,12 @@ export function ModerationPanel() {
               <div className="transaction-row-header" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr' }}>
                 <span>User Info</span>
                 <span>Role</span>
-                <span>Co-Tasker Status</span>
+                <span>Tasker Status</span>
                 <span style={{ textAlign: 'right', paddingRight: '16px' }}>Actions</span>
               </div>
               
               {filteredUsers.map((user) => {
-                const isCoTasker = user.role === 'cotasker';
+                const isTasker = user.role === 'tasker';
                 const isUserAdmin = user.role === 'admin';
                 return (
                   <div key={user.id} className="transaction-row-item" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', cursor: 'default' }}>
@@ -376,8 +376,8 @@ export function ModerationPanel() {
                     </div>
 
                     <div>
-                      <span className={`badge badge-${user.coTaskerStatus || 'none'}`} style={{ textTransform: 'uppercase', fontSize: '10px' }}>
-                        {user.coTaskerStatus || 'none'}
+                      <span className={`badge badge-${user.taskerStatus || 'none'}`} style={{ textTransform: 'uppercase', fontSize: '10px' }}>
+                        {user.taskerStatus || 'none'}
                       </span>
                     </div>
 
@@ -385,11 +385,11 @@ export function ModerationPanel() {
                       {!isUserAdmin && (
                         <>
                           <button
-                            onClick={() => handleToggleCoTasker(user.id, isCoTasker)}
+                            onClick={() => handleToggleTasker(user.id, isTasker)}
                             className="btn btn-outlined btn-xs"
                             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', padding: '4px 8px' }}
                           >
-                            {isCoTasker ? 'Revoke Co-Tasker' : 'Promote Co-Tasker'}
+                            {isTasker ? 'Revoke Tasker' : 'Promote Tasker'}
                           </button>
                           <button
                             onClick={() => handleToggleDisableUser(user.id, !!user.isDisabled)}

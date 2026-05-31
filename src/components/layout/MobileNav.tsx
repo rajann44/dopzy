@@ -23,9 +23,9 @@ export function MobileNav() {
         { to: '/notifications', label: 'Alerts', icon: Bell },
       ]
     : [
-        { to: '/cotasker/dashboard', label: 'Home', icon: LayoutDashboard },
-        { to: '/cotasker/tasks', label: 'Browse', icon: Search },
-        { to: '/cotasker/jobs', label: 'Jobs', icon: Briefcase },
+        { to: '/tasker/dashboard', label: 'Home', icon: LayoutDashboard },
+        { to: '/tasker/tasks', label: 'Browse', icon: Search },
+        { to: '/tasker/jobs', label: 'Jobs', icon: Briefcase },
         { to: '/notifications', label: 'Alerts', icon: Bell },
       ];
 

@@ -9,7 +9,7 @@ import { CATEGORY_ICONS } from '../../utils/constants';
 import { useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 
-export function CoTaskerOffers() {
+export function TaskerOffers() {
   const { currentUser } = useAuth();
   const { state, dispatch } = useAppContext();
   const { showToast } = useToast();
@@ -17,7 +17,7 @@ export function CoTaskerOffers() {
   const [isLoading, setIsLoading] = useState(false);
 
   const myOffers = state.offers
-    .filter((o) => o.coTaskerId === currentUser?.id)
+    .filter((o) => o.taskerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const handleWithdraw = async () => {
@@ -59,7 +59,7 @@ export function CoTaskerOffers() {
               <div className="empty-state-icon">📬</div>
               <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No offers yet</h3>
               <p>Browse available tasks and send your first offer.</p>
-              <Link to="/cotasker/tasks">
+              <Link to="/tasker/tasks">
                 <button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Browse Tasks</button>
               </Link>
             </div>
@@ -71,7 +71,7 @@ export function CoTaskerOffers() {
               if (!task) return null;
               const canWithdraw = offer.status === 'pending' && (task.status === 'open' || task.status === 'receiving_offers');
               const isBiddingOpen = task.status === 'open' || task.status === 'receiving_offers';
-              const isWinningOffer = task.assignedCoTaskerId === offer.coTaskerId;
+              const isWinningOffer = task.assignedTaskerId === offer.taskerId;
               const offerStatusForDisplay =
                 offer.status !== 'pending'
                   ? offer.status
@@ -92,7 +92,7 @@ export function CoTaskerOffers() {
                           </span>
                           <StatusBadge status={offerStatusForDisplay} />
                         </div>
-                        <Link to={`/cotasker/tasks/${task.id}`} className="truncate" style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)', textDecoration: 'none', display: 'block' }}>
+                        <Link to={`/tasker/tasks/${task.id}`} className="truncate" style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)', textDecoration: 'none', display: 'block' }}>
                           {task.title}
                         </Link>
                         <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
@@ -118,7 +118,7 @@ export function CoTaskerOffers() {
                         SUBMITTED {formatRelativeTime(offer.createdAt)}
                       </span>
                       <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                        <Link to={`/cotasker/tasks/${task.id}`}>
+                        <Link to={`/tasker/tasks/${task.id}`}>
                           <button className="btn btn-outlined btn-sm">View Task</button>
                         </Link>
                         {canWithdraw && (

@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 import { X, Star, Calendar, MapPin, ShieldCheck, Award, Clock, DollarSign, Globe } from 'lucide-react';
-import type { User, CoTaskerProfile, Review } from '../../types';
+import type { User, TaskerProfile, Review } from '../../types';
 import { Avatar } from '../ui/Avatar';
 import { profileService } from '../../services/profileService';
 import { useAppContext } from '../../context/AppContext';
 import { formatDate } from '../../utils/formatters';
 
-interface CoTaskerProfileDrawerProps {
+interface TaskerProfileDrawerProps {
   userId: string | null;
   onClose: () => void;
 }
 
-export function CoTaskerProfileDrawer({ userId, onClose }: CoTaskerProfileDrawerProps) {
+export function TaskerProfileDrawer({ userId, onClose }: TaskerProfileDrawerProps) {
   const { state } = useAppContext();
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<CoTaskerProfile | null>(null);
+  const [profile, setProfile] = useState<TaskerProfile | null>(null);
   const [reviews, setReviews] = useState<(Review & { clientName?: string; clientAvatar?: string })[]>([]);
   const [activeTab, setActiveTab] = useState<'about' | 'reviews'>('about');
 
@@ -23,7 +23,7 @@ export function CoTaskerProfileDrawer({ userId, onClose }: CoTaskerProfileDrawer
     
     // Load profile
     profileService.getUserById(userId).then(setUser);
-    profileService.getCoTaskerProfile(userId).then(setProfile);
+    profileService.getTaskerProfile(userId).then(setProfile);
     
     // Get all reviews for this tasker
     const taskerReviews = state.reviews

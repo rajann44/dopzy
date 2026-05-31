@@ -8,7 +8,7 @@
 do $$
 declare
   client_id uuid := 'a1111111-1111-1111-1111-111111111111';
-  cotasker_id uuid := 'b2222222-2222-2222-2222-222222222222';
+  tasker_id uuid := 'b2222222-2222-2222-2222-222222222222';
   admin_id uuid := 'c3333333-3333-3333-3333-333333333333';
 begin
 
@@ -30,8 +30,8 @@ begin
   -- Insert Co-tasker User
   insert into auth.users (id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, role, aud)
   values (
-    cotasker_id,
-    'cotasker@dopzy.com',
+    tasker_id,
+    'tasker@dopzy.com',
     crypt('123456', gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
@@ -58,31 +58,30 @@ begin
   -- so we update them with their specific roles and status values:
 
   update public.users
-  set role = 'client', name = 'Sarah Client'
+  set role = 'client', name = 'Sarah Client', location = 'Berlin', bio = 'Reliable client in Berlin looking for quality local help.'
   where id = client_id;
 
   update public.users
-  set role = 'cotasker', co_tasker_status = 'approved', name = 'Marcus Tasker'
-  where id = cotasker_id;
+  set role = 'tasker',
+      tasker_status = 'approved',
+      name = 'Marcus Tasker',
+      bio = 'Experienced local handyman specializing in flat-pack furniture assembly, wall mounting, and basic repairs. Quick responder and reliable service.',
+      location = 'Berlin',
+      is_verified = true,
+      tasker_skills = '["Furniture Assembly", "Wall Mounting", "Painting", "Basic Plumbing"]'::jsonb,
+      tasker_categories = '["Handy Person", "Furniture Assembly", "Repairs"]'::jsonb,
+      tasker_rating = 4.9,
+      tasker_review_count = 14,
+      tasker_completed_jobs = 28,
+      tasker_response_time = '< 1 hour',
+      tasker_availability = 'Flexible hours, weekends available',
+      tasker_hourly_rate = 35.00,
+      tasker_languages = '["German", "English"]'::jsonb
+  where id = tasker_id;
 
   update public.users
   set role = 'admin', name = 'Dopzy Administrator'
   where id = admin_id;
-
-  -- Insert cotasker profile details
-  insert into public.cotasker_profiles (user_id, bio, skills, categories, location, rating, review_count, completed_jobs, availability, hourly_rate)
-  values (
-    cotasker_id,
-    'Experienced local handyman specializing in flat-pack furniture assembly, wall mounting, and basic repairs. Quick responder and reliable service.',
-    '["Furniture Assembly", "Wall Mounting", "Painting", "Basic Plumbing"]'::jsonb,
-    '["Handy Person", "Furniture Assembly", "Repairs"]'::jsonb,
-    'Berlin',
-    4.9,
-    14,
-    28,
-    'Flexible hours, weekends available',
-    35.00
-  ) on conflict (user_id) do nothing;
 
   -- ─── 4. SEED SAMPLE TASKS ──────────────────────────────────────────────────
   

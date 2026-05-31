@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Briefcase, Star, ArrowRight, Wallet, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useAppContext, applyCoTaskerAction } from '../context/AppContext';
+import { useAppContext, applyTaskerAction } from '../context/AppContext';
 import { StatusBadge } from '../components/ui/Badge';
 import { formatCurrency, formatDate, formatRelativeTime } from '../utils/formatters';
 import { CATEGORY_ICONS } from '../utils/constants';
@@ -29,36 +29,36 @@ export function MyTasksPage() {
     setIsSubmitting(true);
     
     try {
-      // 1. Update user co_tasker_status in users table
+      // 1. Update user tasker_status in users table
       const { error: userError } = await supabase
         .from('users')
-        .update({ co_tasker_status: 'pending' })
+        .update({ tasker_status: 'pending' })
         .eq('id', currentUser.id);
       
       if (userError) throw userError;
 
-      // 2. Upsert the cotasker profile
+      // 2. Update Tasker profile fields on users table
       const skillsArray = skills.split(',').map((s) => s.trim()).filter(Boolean);
       const { error: profileError } = await supabase
-        .from('cotasker_profiles')
-        .upsert({
-          user_id: currentUser.id,
+        .from('users')
+        .update({
           bio: bio.trim(),
-          skills: skillsArray,
-          hourly_rate: Number(rate),
           location: 'Berlin',
-          availability: 'Flexible',
-        });
+          tasker_skills: skillsArray,
+          tasker_hourly_rate: Number(rate),
+          tasker_availability: 'Flexible',
+        })
+        .eq('id', currentUser.id);
 
       if (profileError) throw profileError;
 
-      dispatch(applyCoTaskerAction(currentUser.id));
-      posthog.capture('cotasker_application_submitted', {
+      dispatch(applyTaskerAction(currentUser.id));
+      posthog.capture('tasker_application_submitted', {
         hourly_rate: Number(rate),
       });
-      updateCurrentUser({ coTaskerStatus: 'pending' });
+      updateCurrentUser({ taskerStatus: 'pending' });
     } catch (err: any) {
-      console.error('Failed to submit Co-Tasker application:', err);
+      console.error('Failed to submit Tasker application:', err);
       alert(err.message || 'Failed to submit application to database.');
     } finally {
       setIsSubmitting(false);
@@ -77,19 +77,19 @@ export function MyTasksPage() {
     .filter((w) => w.clientId === currentUser?.id && w.status === 'reserved')
     .reduce((sum, w) => sum + w.amount, 0);
 
-  // ── Co-Tasker Calculations ──
+  // ── Tasker Calculations ──
   const myOffers = state.offers
-    .filter((o) => o.coTaskerId === currentUser?.id)
+    .filter((o) => o.taskerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const myAssignedTasks = state.tasks
-    .filter((t) => t.assignedCoTaskerId === currentUser?.id)
+    .filter((t) => t.assignedTaskerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const activeJobs = myAssignedTasks.filter((t) => t.status === 'assigned' || t.status === 'in_progress');
   const completedJobs = myAssignedTasks.filter((t) => t.status === 'completed');
 
   const totalEarned = state.walletTransactions
-    .filter((w) => w.coTaskerId === currentUser?.id && w.status === 'released')
+    .filter((w) => w.taskerId === currentUser?.id && w.status === 'released')
     .reduce((sum, w) => sum + w.amount, 0);
 
   const setTab = (tab: 'client' | 'tasker') => {
@@ -472,16 +472,16 @@ export function MyTasksPage() {
               </div>
             )}
           </div>
-        ) : dbUser?.coTaskerStatus !== 'approved' ? (
+        ) : dbUser?.taskerStatus !== 'approved' ? (
           <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-                {dbUser?.coTaskerStatus === 'pending' ? (
+                {dbUser?.taskerStatus === 'pending' ? (
                   <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-primary)' }}>
                     <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
                     <h2 className="text-headline-sm" style={{ fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '8px' }}>
                       {t('tasks.application_pending_title') || 'Application Pending Review'}
                     </h2>
                     <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', lineHeight: '1.6', margin: 0 }}>
-                      {t('tasks.application_pending_desc') || 'Your application to become a registered Co-Tasker is currently under review by our moderation team. You will receive a notification as soon as your profile is approved.'}
+                      {t('tasks.application_pending_desc') || 'Your application to become a registered Tasker is currently under review by our moderation team. You will receive a notification as soon as your profile is approved.'}
                     </p>
                   </div>
                 ) : (
@@ -496,7 +496,7 @@ export function MyTasksPage() {
                         💼
                       </div>
                       <h2 className="text-headline-sm" style={{ margin: 0, fontWeight: 700, color: 'var(--color-secondary)', fontSize: '18px' }}>
-                        {t('tasks.apply_title') || 'Apply to Become a Co-Tasker'}
+                        {t('tasks.apply_title') || 'Apply to Become a Tasker'}
                       </h2>
                     </div>
                     <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', lineHeight: '1.6', marginBottom: 'var(--space-5)' }}>
@@ -590,7 +590,7 @@ export function MyTasksPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                   {activeJobs.map((task) => {
                     const acceptedOffer = state.offers.find(
-                      (o) => o.taskId === task.id && o.coTaskerId === currentUser?.id && o.status === 'accepted'
+                      (o) => o.taskId === task.id && o.taskerId === currentUser?.id && o.status === 'accepted'
                     );
                     return (
                       <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
@@ -651,7 +651,7 @@ export function MyTasksPage() {
                     const task = state.tasks.find((t) => t.id === offer.taskId);
                     if (!task) return null;
                     const isBiddingOpen = task.status === 'open' || task.status === 'receiving_offers';
-                    const isWinningOffer = task.assignedCoTaskerId === offer.coTaskerId;
+                    const isWinningOffer = task.assignedTaskerId === offer.taskerId;
                     const offerStatusForDisplay =
                       offer.status !== 'pending'
                         ? offer.status
@@ -722,7 +722,7 @@ export function MyTasksPage() {
                   </div>
                   {completedJobs.map((task) => {
                     const tx = state.walletTransactions.find(
-                      (w) => w.taskId === task.id && w.coTaskerId === currentUser?.id
+                      (w) => w.taskId === task.id && w.taskerId === currentUser?.id
                     );
                     const categoryIcon = CATEGORY_ICONS[task.category] || '📋';
                     return (

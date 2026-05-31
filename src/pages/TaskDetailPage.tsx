@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppContext } from '../context/AppContext';
 import { ClientTaskDetail } from './client/ClientTaskDetail';
-import { CoTaskerTaskDetail } from './cotasker/CoTaskerTaskDetail';
+import { TaskerTaskDetail } from './tasker/TaskerTaskDetail';
 import posthog from '../utils/posthogClient';
 
 export function TaskDetailPage() {
@@ -40,7 +40,7 @@ export function TaskDetailPage() {
   if (task.clientId === currentUser?.id) {
     return <ClientTaskDetail />;
   } else {
-    return <CoTaskerTaskDetail />;
+    return <TaskerTaskDetail />;
   }
 }
 export default TaskDetailPage;

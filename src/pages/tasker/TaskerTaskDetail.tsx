@@ -25,7 +25,7 @@ import { CATEGORY_ICONS } from '../../utils/constants';
 import type { Offer, User as UserType } from '../../types';
 import { supabase } from '../../utils/supabaseClient';
 
-export function CoTaskerTaskDetail() {
+export function TaskerTaskDetail() {
   const { id } = useParams<{ id: string }>();
   const { currentUser } = useAuth();
   const { state, dispatch } = useAppContext();
@@ -34,7 +34,7 @@ export function CoTaskerTaskDetail() {
 
   const task = state.tasks.find((t) => t.id === id);
   const myOffer = state.offers.find(
-    (o) => o.taskId === id && o.coTaskerId === currentUser?.id && o.status !== 'withdrawn'
+    (o) => o.taskId === id && o.taskerId === currentUser?.id && o.status !== 'withdrawn'
   );
 
   const [clientUser, setClientUser] = useState<UserType | null>(null);
@@ -77,11 +77,11 @@ export function CoTaskerTaskDetail() {
       ? myOffer.status
       : (task.status === 'open' || task.status === 'receiving_offers')
         ? 'pending'
-        : task.assignedCoTaskerId === myOffer.coTaskerId
+        : task.assignedTaskerId === myOffer.taskerId
           ? 'accepted'
           : 'rejected'
     : undefined;
-  const isAssignedToMe = task.assignedCoTaskerId === currentUser?.id;
+  const isAssignedToMe = task.assignedTaskerId === currentUser?.id;
   const emoji = CATEGORY_ICONS[task.category] ?? '📋';
 
   const handleAskQuestion = async () => {
@@ -162,7 +162,7 @@ export function CoTaskerTaskDetail() {
         .from('offers')
         .insert({
           task_id: task.id,
-          cotasker_id: currentUser!.id,
+          tasker_id: currentUser!.id,
           price: data.price,
           message: data.message,
           estimated_hours: Math.round(data.estimatedHours),
@@ -176,7 +176,7 @@ export function CoTaskerTaskDetail() {
       const newOffer: Offer = {
         id: dbOffer.id,
         taskId: task.id,
-        coTaskerId: currentUser!.id,
+        taskerId: currentUser!.id,
         price: data.price,
         message: data.message,
         estimatedHours: data.estimatedHours,
@@ -456,13 +456,13 @@ export function CoTaskerTaskDetail() {
                   <OfferCard
                     offer={myOffer}
                     onWithdraw={() => setWithdrawConfirm(true)}
-                    viewerRole="cotasker"
+                    viewerRole="tasker"
                     showActions={canWithdrawOffer}
                     statusOverride={myOfferStatusForDisplay}
                   />
                 </div>
               </div>
-            ) : currentUser?.role === 'cotasker' ? (
+            ) : currentUser?.role === 'tasker' ? (
               canOffer ? (
                 <div className="card">
                   <div className="card-header">
@@ -472,7 +472,7 @@ export function CoTaskerTaskDetail() {
                     {showOfferForm ? (
                       <OfferForm
                         taskId={task.id}
-                        coTaskerId={currentUser!.id}
+                        taskerId={currentUser!.id}
                         onSubmit={handleSubmitOffer}
                         onCancel={() => setShowOfferForm(false)}
                         isLoading={isLoading}

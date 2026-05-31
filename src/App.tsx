@@ -10,7 +10,7 @@ import { LoginPage } from './pages/LoginPage';
 import { MyTasksPage } from './pages/MyTasksPage';
 import { NewTaskPage } from './pages/client/NewTaskPage';
 import { TaskDetailPage } from './pages/TaskDetailPage';
-import { TaskMarketplace } from './pages/cotasker/TaskMarketplace';
+import { TaskMarketplace } from './pages/tasker/TaskMarketplace';
 import { NotificationsPage } from './pages/shared/NotificationsPage';
 import { ProfilePage } from './pages/shared/ProfilePage';
 import { SettingsPage } from './pages/shared/SettingsPage';

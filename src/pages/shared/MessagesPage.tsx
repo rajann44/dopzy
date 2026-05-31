@@ -14,7 +14,7 @@ import { useToast } from '../../context/ToastContext';
 import { Avatar } from '../../components/ui/Avatar';
 import { StatusBadge } from '../../components/ui/Badge';
 import { formatCurrency, generateId } from '../../utils/formatters';
-import { CoTaskerProfileDrawer } from '../../components/profile/CoTaskerProfileDrawer';
+import { TaskerProfileDrawer } from '../../components/profile/TaskerProfileDrawer';
 import { useTranslation } from '../../context/LanguageContext';
 import { supabase } from '../../utils/supabaseClient';
 
@@ -114,10 +114,10 @@ export function MessagesPage() {
     activeTask.status === 'assigned' || activeTask.status === 'in_progress'
   );
 
-  const canSendInAssignedTask = !!activeTask && !!otherParticipantId && !!activeTask.assignedCoTaskerId && (
+  const canSendInAssignedTask = !!activeTask && !!otherParticipantId && !!activeTask.assignedTaskerId && (
     isAssignedTaskChatOpen && (
-      (currentUser.id === activeTask.clientId && otherParticipantId === activeTask.assignedCoTaskerId) ||
-      (currentUser.id === activeTask.assignedCoTaskerId && otherParticipantId === activeTask.clientId)
+      (currentUser.id === activeTask.clientId && otherParticipantId === activeTask.assignedTaskerId) ||
+      (currentUser.id === activeTask.assignedTaskerId && otherParticipantId === activeTask.clientId)
     )
   );
 
@@ -133,20 +133,20 @@ export function MessagesPage() {
 
   const isTaskHireable = !!activeTask && (
     (activeTask.status === 'open' || activeTask.status === 'receiving_offers') &&
-    !activeTask.assignedCoTaskerId
+    !activeTask.assignedTaskerId
   );
 
   const activeOffer = activeTask && taskerId
     ? state.offers.find(
         (o) =>
           o.taskId === activeTask.id &&
-          o.coTaskerId === taskerId &&
+          o.taskerId === taskerId &&
           (o.status === 'pending' || o.status === 'accepted')
       )
     : null;
 
-  const isAssignedOfferContext = !!activeTask && !!activeOffer && !!activeTask.assignedCoTaskerId && (
-    activeTask.assignedCoTaskerId === activeOffer.coTaskerId && activeOffer.status === 'accepted'
+  const isAssignedOfferContext = !!activeTask && !!activeOffer && !!activeTask.assignedTaskerId && (
+    activeTask.assignedTaskerId === activeOffer.taskerId && activeOffer.status === 'accepted'
   );
 
   const showOfferBanner = !!activeOffer && (isTaskHireable || isAssignedOfferContext);
@@ -304,7 +304,7 @@ export function MessagesPage() {
       // 3. Update task
       const { error: taskErr } = await supabase
         .from('tasks')
-        .update({ status: 'assigned', assigned_cotasker_id: activeOffer.coTaskerId })
+        .update({ status: 'assigned', assigned_tasker_id: activeOffer.taskerId })
         .eq('id', activeTask.id);
       if (taskErr) throw taskErr;
 
@@ -314,17 +314,17 @@ export function MessagesPage() {
         .insert({
           task_id: activeTask.id,
           client_id: currentUser!.id,
-          cotasker_id: activeOffer.coTaskerId,
+          tasker_id: activeOffer.taskerId,
           amount: activeOffer.price,
           status: 'reserved',
           created_at: new Date().toISOString()
         });
       if (walletErr) throw walletErr;
 
-      // 5. Send notification to CoTasker
+      // 5. Send notification to Tasker
       const newNotif = {
         id: generateId('notif'),
-        userId: activeOffer.coTaskerId,
+        userId: activeOffer.taskerId,
         type: 'offer_accepted' as const,
         title: 'Your offer was accepted!',
         message: `Your offer for "${activeTask.title}" has been accepted. Check your jobs to get started.`,
@@ -346,7 +346,7 @@ export function MessagesPage() {
           link_to: newNotif.linkTo
         });
 
-      dispatch(acceptOfferAction(activeOffer.id, activeTask.id, activeOffer.coTaskerId));
+      dispatch(acceptOfferAction(activeOffer.id, activeTask.id, activeOffer.taskerId));
       showToast(t('messages.toast_offer_accepted'), 'success');
     } catch (err: any) {
       console.error(err);
@@ -580,12 +580,12 @@ export function MessagesPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div 
                   onClick={() => {
-                    if (activeChatParticipant?.role === 'cotasker') {
+                    if (activeChatParticipant?.role === 'tasker') {
                       setSelectedTaskerId(activeChatParticipant.id);
                     }
                   }}
                   style={{ 
-                    cursor: activeChatParticipant?.role === 'cotasker' ? 'pointer' : 'default',
+                    cursor: activeChatParticipant?.role === 'tasker' ? 'pointer' : 'default',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px'
@@ -597,7 +597,7 @@ export function MessagesPage() {
                       fontWeight: 700, 
                       color: 'var(--color-secondary)', 
                       fontSize: '14px',
-                      textDecoration: activeChatParticipant?.role === 'cotasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
+                      textDecoration: activeChatParticipant?.role === 'tasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
                     }} className="hover-underline">
                       {activeChatParticipant?.name}
                     </div>
@@ -648,7 +648,7 @@ export function MessagesPage() {
                     {t('messages.accept_and_hire')}
                   </button>
                 )}
-                {activeOffer.coTaskerId === currentUser.id && isTaskHireable && activeOffer.status === 'pending' && (
+                {activeOffer.taskerId === currentUser.id && isTaskHireable && activeOffer.status === 'pending' && (
                   <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
                     {t('messages.waiting_decision')}
                   </span>
@@ -747,7 +747,7 @@ export function MessagesPage() {
             <div className="card" style={{ maxWidth: '520px', width: '100%', padding: 'var(--space-6)' }}>
               <div 
                 onClick={() => {
-                  if (activeRequestSender?.role === 'cotasker') {
+                  if (activeRequestSender?.role === 'tasker') {
                     setSelectedTaskerId(activeRequestSender.id);
                   }
                 }}
@@ -758,7 +758,7 @@ export function MessagesPage() {
                   borderBottom: '1px solid var(--color-outline-variant)', 
                   paddingBottom: '16px', 
                   marginBottom: '20px',
-                  cursor: activeRequestSender?.role === 'cotasker' ? 'pointer' : 'default'
+                  cursor: activeRequestSender?.role === 'tasker' ? 'pointer' : 'default'
                 }}
               >
                 <Avatar name={activeRequestSender?.name || 'User'} avatarUrl={activeRequestSender?.avatarUrl} size="lg" />
@@ -770,7 +770,7 @@ export function MessagesPage() {
                     margin: 0, 
                     fontWeight: 700, 
                     fontSize: '16px',
-                    textDecoration: activeRequestSender?.role === 'cotasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
+                    textDecoration: activeRequestSender?.role === 'tasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
                   }}>
                     {t('messages.inquiry_from')} {activeRequestSender?.name}
                   </h2>
@@ -843,7 +843,7 @@ export function MessagesPage() {
       </div>
 
       {/* Profile & Reviews Drawer */}
-      <CoTaskerProfileDrawer 
+      <TaskerProfileDrawer 
         userId={selectedTaskerId}
         onClose={() => setSelectedTaskerId(null)}
       />

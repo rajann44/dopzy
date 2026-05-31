@@ -6,12 +6,12 @@ export const ROUTES = {
   CLIENT_TASK_NEW: '/client/tasks/new',
   CLIENT_TASK_DETAIL: '/client/tasks/:id',
   CLIENT_OFFERS: '/client/offers',
-  // CoTasker
-  COTASKER_DASHBOARD: '/cotasker/dashboard',
-  COTASKER_TASKS: '/cotasker/tasks',
-  COTASKER_TASK_DETAIL: '/cotasker/tasks/:id',
-  COTASKER_MY_OFFERS: '/cotasker/my-offers',
-  COTASKER_JOBS: '/cotasker/jobs',
+  // Tasker
+  TASKER_DASHBOARD: '/tasker/dashboard',
+  TASKER_TASKS: '/tasker/tasks',
+  TASKER_TASK_DETAIL: '/tasker/tasks/:id',
+  TASKER_MY_OFFERS: '/tasker/my-offers',
+  TASKER_JOBS: '/tasker/jobs',
   // Shared
   PROFILE: '/profile/:id',
   NOTIFICATIONS: '/notifications',

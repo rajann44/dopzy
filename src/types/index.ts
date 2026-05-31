@@ -1,6 +1,6 @@
 // ─── User & Auth ────────────────────────────────────────────────────────────
 
-export type UserRole = 'client' | 'cotasker' | 'admin';
+export type UserRole = 'client' | 'tasker' | 'admin';
 
 export interface User {
   id: string;
@@ -10,8 +10,26 @@ export interface User {
   name: string;
   avatarUrl?: string;
   createdAt: string;
-  coTaskerStatus?: 'none' | 'pending' | 'approved' | 'rejected';
+  taskerStatus?: 'none' | 'pending' | 'approved' | 'rejected';
   isDisabled?: boolean;
+  bio?: string;
+  location?: string;
+  isVerified?: boolean;
+  taskerSkills?: string[];
+  taskerCategories?: string[];
+  taskerRating?: number;
+  taskerReviewCount?: number;
+  taskerCompletedJobs?: number;
+  taskerResponseTime?: string;
+  taskerIsTopRated?: boolean;
+  taskerIsFastResponder?: boolean;
+  taskerTotalEarnings?: number;
+  taskerAvailability?: string;
+  taskerHourlyRate?: number;
+  taskerQualifications?: string[];
+  taskerLanguages?: string[];
+  taskerTransport?: string;
+  taskerPortfolio?: { title: string; imageUrl: string; description?: string }[];
 }
 
 export interface ClientProfile {
@@ -25,7 +43,7 @@ export interface ClientProfile {
   createdAt: string;
 }
 
-export interface CoTaskerProfile {
+export interface TaskerProfile {
   userId: string;
   bio: string;
   skills: string[];
@@ -99,7 +117,7 @@ export interface Task {
   budget?: number;
   images: string[];
   clientId: string;
-  assignedCoTaskerId?: string;
+  assignedTaskerId?: string;
   status: TaskStatus;
   createdAt: string;
   offersCount: number;
@@ -123,7 +141,7 @@ export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn';
 export interface Offer {
   id: string;
   taskId: string;
-  coTaskerId: string;
+  taskerId: string;
   price: number;
   message: string;
   estimatedHours: number;
@@ -174,7 +192,7 @@ export interface WalletTransaction {
   id: string;
   taskId: string;
   clientId: string;
-  coTaskerId?: string;
+  taskerId?: string;
   amount: number;
   status: PaymentStatus;
   createdAt: string;
@@ -249,7 +267,7 @@ export type AppAction =
   | { type: 'CANCEL_TASK'; payload: { taskId: string } }
   | { type: 'CREATE_OFFER'; payload: Offer }
   | { type: 'UPDATE_OFFER'; payload: Partial<Offer> & { id: string } }
-  | { type: 'ACCEPT_OFFER'; payload: { offerId: string; taskId: string; coTaskerId: string } }
+  | { type: 'ACCEPT_OFFER'; payload: { offerId: string; taskId: string; taskerId: string } }
   | { type: 'WITHDRAW_OFFER'; payload: { offerId: string } }
   | { type: 'ADD_REVIEW'; payload: Review }
   | { type: 'MARK_NOTIFICATION_READ'; payload: { notificationId: string } }
@@ -260,14 +278,14 @@ export type AppAction =
   | { type: 'RESPOND_CHAT_REQUEST'; payload: { requestId: string; status: 'accepted' | 'declined'; conversation?: Conversation; systemMessage?: ChatMessage } }
   | { type: 'SEND_CHAT_MESSAGE'; payload: ChatMessage }
   | { type: 'CREATE_CONVERSATION'; payload: Conversation }
-  | { type: 'APPLY_COTASKER'; payload: { userId: string } }
-  | { type: 'APPROVE_COTASKER'; payload: { userId: string } }
-  | { type: 'REJECT_COTASKER'; payload: { userId: string } }
+  | { type: 'APPLY_TASKER'; payload: { userId: string } }
+  | { type: 'APPROVE_TASKER'; payload: { userId: string } }
+  | { type: 'REJECT_TASKER'; payload: { userId: string } }
   | { type: 'APPROVE_TASK'; payload: { taskId: string } }
   | { type: 'REJECT_TASK'; payload: { taskId: string } }
   | { type: 'DISABLE_USER'; payload: { userId: string } }
   | { type: 'ENABLE_USER'; payload: { userId: string } }
-  | { type: 'TOGGLE_USER_COTASKER'; payload: { userId: string; shouldBeCoTasker: boolean } }
+  | { type: 'TOGGLE_USER_TASKER'; payload: { userId: string; shouldBeTasker: boolean } }
   | { type: 'DELETE_TASK'; payload: { taskId: string } }
   | { type: 'UPSERT_TASK'; payload: Task }
   | { type: 'UPSERT_USER'; payload: User }
@@ -284,4 +302,3 @@ export type AppAction =
   | { type: 'REMOVE_CHAT_MESSAGE'; payload: { messageId: string } }
   | { type: 'REMOVE_WALLET_TRANSACTION'; payload: { transactionId: string } }
   | { type: 'REMOVE_REVIEW'; payload: { reviewId: string } };
-

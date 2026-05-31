@@ -13,7 +13,7 @@ import { profileService } from '../../services/profileService';
 import { formatDate, formatCurrency, generateId } from '../../utils/formatters';
 import { CATEGORY_ICONS } from '../../utils/constants';
 import type { Offer, User as UserType, Review } from '../../types';
-import { CoTaskerProfileDrawer } from '../../components/profile/CoTaskerProfileDrawer';
+import { TaskerProfileDrawer } from '../../components/profile/TaskerProfileDrawer';
 import { supabase } from '../../utils/supabaseClient';
 
 export function ClientTaskDetail() {
@@ -49,10 +49,10 @@ export function ClientTaskDetail() {
   );
 
   useEffect(() => {
-    if (task?.assignedCoTaskerId) {
-      profileService.getUserById(task.assignedCoTaskerId).then(setAssignedUser);
+    if (task?.assignedTaskerId) {
+      profileService.getUserById(task.assignedTaskerId).then(setAssignedUser);
     }
-  }, [task?.assignedCoTaskerId]);
+  }, [task?.assignedTaskerId]);
 
 
 
@@ -70,9 +70,9 @@ export function ClientTaskDetail() {
     return <div className="empty-state"><h3>Access denied</h3></div>;
   }
 
-  const handleMessageTasker = (coTaskerId: string) => {
+  const handleMessageTasker = (taskerId: string) => {
     const existingConv = state.conversations.find(
-      (c) => c.taskId === task.id && c.participantIds.includes(coTaskerId)
+      (c) => c.taskId === task.id && c.participantIds.includes(taskerId)
     );
     
     if (existingConv) {
@@ -81,7 +81,7 @@ export function ClientTaskDetail() {
       const convId = generateId('conv');
       const newConversation = {
         id: convId,
-        participantIds: [currentUser!.id, coTaskerId],
+        participantIds: [currentUser!.id, taskerId],
         lastMessage: `Hi! Let's chat about my task "${task.title}".`,
         lastMessageAt: new Date().toISOString(),
         unreadCount: 0,
@@ -125,7 +125,7 @@ export function ClientTaskDetail() {
       // 3. Update task
       const { error: taskErr } = await supabase
         .from('tasks')
-        .update({ status: 'assigned', assigned_cotasker_id: acceptConfirm.coTaskerId })
+        .update({ status: 'assigned', assigned_tasker_id: acceptConfirm.taskerId })
         .eq('id', task.id);
       if (taskErr) throw taskErr;
 
@@ -135,17 +135,17 @@ export function ClientTaskDetail() {
         .insert({
           task_id: task.id,
           client_id: currentUser!.id,
-          cotasker_id: acceptConfirm.coTaskerId,
+          tasker_id: acceptConfirm.taskerId,
           amount: acceptConfirm.price,
           status: 'reserved',
           created_at: new Date().toISOString()
         });
       if (walletErr) throw walletErr;
 
-      // 5. Send notification to CoTasker
+      // 5. Send notification to Tasker
       const newNotif = {
         id: 'temp-accept-notif',
-        userId: acceptConfirm.coTaskerId,
+        userId: acceptConfirm.taskerId,
         type: 'offer_accepted' as const,
         title: 'Your offer was accepted!',
         message: `Your offer for "${task.title}" has been accepted. Check your jobs to get started.`,
@@ -166,7 +166,7 @@ export function ClientTaskDetail() {
           link_to: newNotif.linkTo
         });
 
-      dispatch(acceptOfferAction(acceptConfirm.id, task.id, acceptConfirm.coTaskerId));
+      dispatch(acceptOfferAction(acceptConfirm.id, task.id, acceptConfirm.taskerId));
       dispatch(addNotificationAction(newNotif));
 
       posthog.capture('offer_accepted', {
@@ -254,7 +254,7 @@ export function ClientTaskDetail() {
       id: generateId('review'),
       taskId: task.id,
       fromUserId: currentUser!.id,
-      toUserId: task.assignedCoTaskerId!,
+      toUserId: task.assignedTaskerId!,
       rating: reviewRating,
       comment: reviewComment.trim(),
       createdAt: new Date().toISOString(),
@@ -499,7 +499,7 @@ export function ClientTaskDetail() {
                   </span>
                 </button>
               )}
-              {task.status === 'completed' && task.assignedCoTaskerId && (
+              {task.status === 'completed' && task.assignedTaskerId && (
                 <button
                   onClick={() => setActiveTab('review')}
                   style={{
@@ -631,7 +631,7 @@ export function ClientTaskDetail() {
             )}
 
             {/* Tab content 3: Review */}
-            {activeTab === 'review' && task.status === 'completed' && task.assignedCoTaskerId && (
+            {activeTab === 'review' && task.status === 'completed' && task.assignedTaskerId && (
               <div className="card">
                 <div className="card-header">
                   <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Your Review</h2>
@@ -874,7 +874,7 @@ export function ClientTaskDetail() {
       </Modal>
 
       {/* Profile & Reviews Drawer */}
-      <CoTaskerProfileDrawer 
+      <TaskerProfileDrawer 
         userId={selectedTaskerId}
         onClose={() => setSelectedTaskerId(null)}
       />

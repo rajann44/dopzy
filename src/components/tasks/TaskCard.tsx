@@ -8,7 +8,7 @@ import { TaskPlaceholderImage } from './TaskPlaceholderImage';
 
 interface TaskCardProps {
   task: Task;
-  linkPrefix?: string; // '/client' or '/cotasker'
+  linkPrefix?: string; // '/client' or '/tasker'
   showClient?: boolean;
   clientName?: string;
 }

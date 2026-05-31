@@ -7,26 +7,26 @@ import { profileService } from '../../services/profileService';
 import { StatusBadge } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
 import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
-import type { CoTaskerProfile } from '../../types';
+import type { TaskerProfile } from '../../types';
 
-export function CoTaskerDashboard() {
+export function TaskerDashboard() {
   const { currentUser } = useAuth();
   const { state } = useAppContext();
-  const [profile, setProfile] = useState<CoTaskerProfile | null>(null);
+  const [profile, setProfile] = useState<TaskerProfile | null>(null);
 
   useEffect(() => {
-    if (currentUser) profileService.getCoTaskerProfile(currentUser.id).then(setProfile);
+    if (currentUser) profileService.getTaskerProfile(currentUser.id).then(setProfile);
   }, [currentUser]);
 
-  const myOffers = state.offers.filter((o) => o.coTaskerId === currentUser?.id);
+  const myOffers = state.offers.filter((o) => o.taskerId === currentUser?.id);
   const pendingOffers = myOffers.filter((o) => o.status === 'pending');
-  const assignedTasks = state.tasks.filter((t) => t.assignedCoTaskerId === currentUser?.id);
+  const assignedTasks = state.tasks.filter((t) => t.assignedTaskerId === currentUser?.id);
   const activeTasks = assignedTasks.filter((t) => t.status === 'assigned' || t.status === 'in_progress');
   const completedTasks = assignedTasks.filter((t) => t.status === 'completed');
   const myReviews = state.reviews.filter((r) => r.toUserId === currentUser?.id).slice(0, 3);
 
   const totalEarned = state.walletTransactions
-    .filter((w) => w.coTaskerId === currentUser?.id && w.status === 'released')
+    .filter((w) => w.taskerId === currentUser?.id && w.status === 'released')
     .reduce((sum, w) => sum + w.amount, 0);
 
   const openTasksCount = state.tasks.filter(
@@ -52,7 +52,7 @@ export function CoTaskerDashboard() {
             </p>
           )}
         </div>
-        <Link to="/cotasker/tasks">
+        <Link to="/tasker/tasks">
           <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             Browse Tasks
             <ArrowRight size={16} />
@@ -117,7 +117,7 @@ export function CoTaskerDashboard() {
                   New tasks posted today. Be the first to send an offer!
                 </div>
               </div>
-              <Link to="/cotasker/tasks" style={{ flexShrink: 0, zIndex: 1 }}>
+              <Link to="/tasker/tasks" style={{ flexShrink: 0, zIndex: 1 }}>
                 <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   Browse All <ArrowRight size={14} />
                 </button>
@@ -131,7 +131,7 @@ export function CoTaskerDashboard() {
                 <div className="section-label">Active Jobs</div>
                 <div className="flex flex-col gap-3">
                   {activeTasks.map((task) => (
-                    <Link key={task.id} to={`/cotasker/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
+                    <Link key={task.id} to={`/tasker/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
                       <div className="card card-hover" style={{ padding: 'var(--space-4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
                         <div style={{ minWidth: 0 }}>
                           <div className="truncate" style={{ fontWeight: 600, color: 'var(--color-on-surface)', fontSize: 'var(--text-body-md)' }}>{task.title}</div>
