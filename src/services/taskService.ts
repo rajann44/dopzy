@@ -2,12 +2,12 @@
 // All methods accept/return promises so they can be swapped with real API calls.
 // The actual data lives in AppContext; these services are thin async wrappers
 // that the context dispatch handles.
+// NOTE: Artificial delays removed — these operate on in-memory arrays.
 
 import type { Task, TaskFilters } from '../types';
 
 export const taskService = {
   async getTasks(tasks: Task[], filters?: TaskFilters): Promise<Task[]> {
-    await new Promise((r) => setTimeout(r, 100));
     let result = [...tasks];
 
     if (filters?.category) {
@@ -43,26 +43,22 @@ export const taskService = {
   },
 
   async getTaskById(tasks: Task[], id: string): Promise<Task | null> {
-    await new Promise((r) => setTimeout(r, 80));
     return tasks.find((t) => t.id === id) ?? null;
   },
 
   async getTasksByClient(tasks: Task[], clientId: string): Promise<Task[]> {
-    await new Promise((r) => setTimeout(r, 80));
     return tasks
       .filter((t) => t.clientId === clientId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
   async getTasksByTasker(tasks: Task[], taskerId: string): Promise<Task[]> {
-    await new Promise((r) => setTimeout(r, 80));
     return tasks
       .filter((t) => t.assignedTaskerId === taskerId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
   async getOpenTasks(tasks: Task[]): Promise<Task[]> {
-    await new Promise((r) => setTimeout(r, 80));
     return tasks
       .filter((t) => t.status === 'open' || t.status === 'receiving_offers')
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

@@ -4,10 +4,13 @@ import { supabase } from '../utils/supabaseClient';
 import { useToast } from './ToastContext';
 import posthog from '../utils/posthogClient';
 
+const PROFILE_CACHE_KEY = 'dopzy_user_profile';
+
 interface AuthContextValue {
   currentUser: User | null;
   isEmailVerified: boolean;
   isLoading: boolean;
+  isWarmingUp: boolean; // true when waiting for Supabase cold-start
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -16,10 +19,31 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Try to read cached profile from localStorage */
+function getCachedProfile(): User | null {
+  try {
+    const cached = localStorage.getItem(PROFILE_CACHE_KEY);
+    if (cached) return JSON.parse(cached);
+  } catch { /* ignore parse errors */ }
+  return null;
+}
+
+/** Write profile to localStorage */
+function setCachedProfile(profile: User | null) {
+  try {
+    if (profile) {
+      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
+    } else {
+      localStorage.removeItem(PROFILE_CACHE_KEY);
+    }
+  } catch { /* quota exceeded — ignore */ }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isWarmingUp, setIsWarmingUp] = useState(false);
   const { showToast } = useToast();
 
   const fetchUserProfile = useCallback(async (userId: string): Promise<User | null> => {
@@ -40,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
 
-      return {
+      const profile: User = {
         id: data.id,
         email: data.email,
         role: data.role as UserRole,
@@ -69,6 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         createdAt: data.created_at,
         password: '',
       };
+
+      // Cache for instant load on next visit
+      setCachedProfile(profile);
+      return profile;
     } catch (e) {
       return null;
     }
@@ -83,12 +111,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!active) return;
       if (session) {
         setIsEmailVerified(!!session.user.email_confirmed_at);
+
+        // Optimistic: show cached profile immediately while fresh one loads
+        const cached = getCachedProfile();
+        if (cached && cached.id === session.user.id) {
+          setCurrentUser(cached);
+          setIsLoading(false);
+          // Still fetch fresh data in the background
+          setIsWarmingUp(true);
+        }
+
         fetchUserProfile(session.user.id).then((profile) => {
           if (!active) return;
+          setIsWarmingUp(false);
           if (profile) {
             if (profile.isDisabled) {
               supabase.auth.signOut();
               setCurrentUser(null);
+              setCachedProfile(null);
               showToast('Your account has been disabled by an administrator.', 'error');
             } else {
               setCurrentUser(profile);
@@ -112,6 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (profile.isDisabled) {
             supabase.auth.signOut();
             setCurrentUser(null);
+            setCachedProfile(null);
             showToast('Your account has been disabled by an administrator.', 'error');
           } else {
             setCurrentUser(profile);
@@ -120,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setIsEmailVerified(true);
         setCurrentUser(null);
+        setCachedProfile(null);
       }
       setIsLoading(false);
     });
@@ -217,6 +259,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await supabase.auth.signOut();
       setCurrentUser(null);
+      setCachedProfile(null);
       posthog.reset();
     } finally {
       setIsLoading(false);
@@ -226,12 +269,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateCurrentUser = useCallback((userData: Partial<User>) => {
     setCurrentUser((prev) => {
       if (!prev) return null;
-      return { ...prev, ...userData };
+      const updated = { ...prev, ...userData };
+      setCachedProfile(updated);
+      return updated;
     });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, isEmailVerified, isLoading, login, signUp, logout, updateCurrentUser }}>
+    <AuthContext.Provider value={{ currentUser, isEmailVerified, isLoading, isWarmingUp, login, signUp, logout, updateCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

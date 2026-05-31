@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { UserRole } from '../types';
+import { PageSkeleton } from '../components/ui/PageSkeleton';
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
@@ -11,11 +12,7 @@ export function ProtectedRoute({ redirectTo = '/login' }: ProtectedRouteProps) {
   const { currentUser, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <div className="spinner" style={{ width: 40, height: 40 }} />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (!currentUser) {
@@ -24,3 +21,4 @@ export function ProtectedRoute({ redirectTo = '/login' }: ProtectedRouteProps) {
 
   return <Outlet />;
 }
+

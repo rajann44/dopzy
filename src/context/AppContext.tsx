@@ -728,12 +728,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     async function fetchUserScopedData(userId: string) {
       try {
-        // 1. Fetch Offers
-        const { data: dbOffers } = await supabase
-          .from('offers')
-          .select('*');
+        // Fire all 7 queries in parallel instead of sequentially
+        const [
+          offersResult,
+          notificationsResult,
+          transactionsResult,
+          reviewsResult,
+          conversationsResult,
+          chatRequestsResult,
+          chatMessagesResult,
+        ] = await Promise.allSettled([
+          supabase.from('offers').select('*'),
+          supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('wallet_transactions').select('*'),
+          supabase.from('reviews').select('*'),
+          supabase.from('conversations').select('*'),
+          supabase.from('chat_requests').select('*'),
+          supabase.from('chat_messages').select('*'),
+        ]);
 
-        if (dbOffers) {
+        // 1. Offers
+        if (offersResult.status === 'fulfilled' && offersResult.value.data) {
+          const dbOffers = offersResult.value.data;
           const mappedOffers: Offer[] = dbOffers.map((o: any) => ({
             id: o.id,
             taskId: o.task_id,
@@ -749,14 +765,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           dispatch({ type: 'SET_OFFERS', payload: [...mappedOffers, ...nonDuplicateMocks] });
         }
 
-        // 2. Fetch Notifications
-        const { data: dbNotifications } = await supabase
-          .from('notifications')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-
-        if (dbNotifications) {
+        // 2. Notifications
+        if (notificationsResult.status === 'fulfilled' && notificationsResult.value.data) {
+          const dbNotifications = notificationsResult.value.data;
           const mappedNotifications: Notification[] = dbNotifications.map((n: any) => ({
             id: n.id,
             userId: n.user_id,
@@ -777,12 +788,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // 3. Fetch Wallet Transactions
-        const { data: dbTransactions } = await supabase
-          .from('wallet_transactions')
-          .select('*');
-
-        if (dbTransactions) {
+        // 3. Wallet Transactions
+        if (transactionsResult.status === 'fulfilled' && transactionsResult.value.data) {
+          const dbTransactions = transactionsResult.value.data;
           const mappedTransactions: WalletTransaction[] = dbTransactions.map((t: any) => ({
             id: t.id,
             taskId: t.task_id,
@@ -800,12 +808,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // 4. Fetch Reviews
-        const { data: dbReviews } = await supabase
-          .from('reviews')
-          .select('*');
-
-        if (dbReviews) {
+        // 4. Reviews
+        if (reviewsResult.status === 'fulfilled' && reviewsResult.value.data) {
+          const dbReviews = reviewsResult.value.data;
           const mappedReviews: Review[] = dbReviews.map((r: any) => ({
             id: r.id,
             taskId: r.task_id,
@@ -820,12 +825,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           dispatch({ type: 'SET_REVIEWS', payload: [...mappedReviews, ...nonDuplicateMocks] });
         }
 
-        // 5. Fetch Conversations
-        const { data: dbConversations } = await supabase
-          .from('conversations')
-          .select('*');
-
-        if (dbConversations) {
+        // 5. Conversations
+        if (conversationsResult.status === 'fulfilled' && conversationsResult.value.data) {
+          const dbConversations = conversationsResult.value.data;
           const mappedConversations: Conversation[] = dbConversations.map((c: any) => ({
             id: c.id,
             participantIds: Array.isArray(c.participant_ids)
@@ -844,12 +846,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // 6. Fetch Chat Requests
-        const { data: dbChatRequests } = await supabase
-          .from('chat_requests')
-          .select('*');
-
-        if (dbChatRequests) {
+        // 6. Chat Requests
+        if (chatRequestsResult.status === 'fulfilled' && chatRequestsResult.value.data) {
+          const dbChatRequests = chatRequestsResult.value.data;
           const mappedChatRequests: ChatRequest[] = dbChatRequests.map((cr: any) => ({
             id: cr.id,
             taskId: cr.task_id,
@@ -867,12 +866,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // 7. Fetch Chat Messages
-        const { data: dbChatMessages } = await supabase
-          .from('chat_messages')
-          .select('*');
-
-        if (dbChatMessages) {
+        // 7. Chat Messages
+        if (chatMessagesResult.status === 'fulfilled' && chatMessagesResult.value.data) {
+          const dbChatMessages = chatMessagesResult.value.data;
           const mappedChatMessages: ChatMessage[] = dbChatMessages.map((m: any) => ({
             id: m.id,
             conversationId: m.conversation_id,
@@ -892,8 +888,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    fetchTasks();
-    fetchUsers();
+    // Fire public data fetches in parallel
+    Promise.all([fetchTasks(), fetchUsers()]);
 
     // Listen to Supabase auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -917,6 +913,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         fetchUserScopedData(session.user.id);
       }
     });
+
 
     // Setup Realtime Postgres subscriptions
     const realtimeChannel = supabase

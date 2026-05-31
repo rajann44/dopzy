@@ -4,10 +4,162 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dopzy — Connect with vetted, trusted service providers in your area. Post tasks, get offers, get things done." />
+    <meta name="theme-color" content="#002E3C" />
     <title>Dopzy — Your Tasks, Done</title>
+
+    <!-- Preconnect to critical origins -->
+    <link rel="preconnect" href="https://ggjdbiojqtlcparrphfp.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Font: loaded as <link> with display=swap instead of CSS @import to avoid render-blocking -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" /></noscript>
+
+    <!-- Inline critical CSS for loading shell -->
+    <style>
+      /* Loading shell — shown before React hydrates */
+      .loading-shell {
+        display: flex;
+        min-height: 100vh;
+        background: #fbf9f7;
+        font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+      }
+      .loading-shell-sidebar {
+        width: 270px;
+        background: #002E3C;
+        padding: 24px;
+        flex-shrink: 0;
+      }
+      .loading-shell-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 40px;
+      }
+      .loading-shell-logo-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #003d50;
+      }
+      .loading-shell-logo-text {
+        width: 80px;
+        height: 14px;
+        border-radius: 4px;
+        background: rgba(255,255,255,0.15);
+      }
+      .loading-shell-nav-item {
+        height: 40px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.06);
+        margin-bottom: 8px;
+      }
+      .loading-shell-nav-item.active {
+        background: rgba(255,215,0,0.12);
+      }
+      .loading-shell-main {
+        flex: 1;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .loading-shell-topbar {
+        height: 56px;
+        background: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e4e2e0;
+      }
+      .loading-shell-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .loading-shell-card {
+        height: 180px;
+        background: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e4e2e0;
+        overflow: hidden;
+        position: relative;
+      }
+      .loading-shell-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+        animation: shimmer 1.5s ease-in-out infinite;
+      }
+      .loading-shell-stat-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .loading-shell-stat {
+        height: 90px;
+        background: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e4e2e0;
+        position: relative;
+        overflow: hidden;
+      }
+      .loading-shell-stat::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+        animation: shimmer 1.5s ease-in-out infinite;
+        animation-delay: 0.3s;
+      }
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+      /* Hide sidebar on mobile */
+      @media (max-width: 767px) {
+        .loading-shell-sidebar { display: none; }
+        .loading-shell-cards { grid-template-columns: 1fr; }
+        .loading-shell-stat-row { grid-template-columns: repeat(2, 1fr); }
+        .loading-shell-main { padding: 16px; }
+      }
+      @media (max-width: 1024px) and (min-width: 768px) {
+        .loading-shell-cards { grid-template-columns: repeat(2, 1fr); }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline loading shell — visible until React hydrates -->
+      <div class="loading-shell" aria-hidden="true">
+        <div class="loading-shell-sidebar">
+          <div class="loading-shell-logo">
+            <div class="loading-shell-logo-icon"></div>
+            <div class="loading-shell-logo-text"></div>
+          </div>
+          <div class="loading-shell-nav-item active"></div>
+          <div class="loading-shell-nav-item"></div>
+          <div class="loading-shell-nav-item"></div>
+          <div class="loading-shell-nav-item"></div>
+        </div>
+        <div class="loading-shell-main">
+          <div class="loading-shell-topbar"></div>
+          <div class="loading-shell-stat-row">
+            <div class="loading-shell-stat"></div>
+            <div class="loading-shell-stat"></div>
+            <div class="loading-shell-stat"></div>
+            <div class="loading-shell-stat"></div>
+          </div>
+          <div class="loading-shell-cards">
+            <div class="loading-shell-card"></div>
+            <div class="loading-shell-card"></div>
+            <div class="loading-shell-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
