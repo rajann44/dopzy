@@ -235,6 +235,7 @@ export interface AppState {
 }
 
 export type AppAction =
+  | { type: 'SET_TASKS'; payload: Task[] }
   | { type: 'CREATE_TASK'; payload: Task }
   | { type: 'UPDATE_TASK'; payload: Partial<Task> & { id: string } }
   | { type: 'CANCEL_TASK'; payload: { taskId: string } }

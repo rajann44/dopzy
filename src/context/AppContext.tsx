@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { AppState, AppAction, Task, Offer, Review, Notification, ChatRequest, ChatMessage, Conversation } from '../types';
 import { MOCK_TASKS } from '../data/tasks';
 import { MOCK_OFFERS } from '../data/offers';
@@ -12,6 +12,7 @@ import {
   MOCK_CHAT_MESSAGES,
 } from '../data/notifications';
 import { generateId } from '../utils/formatters';
+import { supabase } from '../utils/supabaseClient';
 
 const initialState: AppState = {
   users: MOCK_USERS,
@@ -27,6 +28,12 @@ const initialState: AppState = {
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case 'SET_TASKS':
+      return {
+        ...state,
+        tasks: action.payload,
+      };
+
     case 'CREATE_TASK':
       return {
         ...state,
@@ -317,6 +324,54 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  useEffect(() => {
+    async function fetchTasks() {
+      try {
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (data) {
+          const mappedTasks: Task[] = data.map((t: any) => ({
+            id: t.id,
+            title: t.title,
+            description: t.description,
+            category: t.category,
+            taskType: t.location === 'Remote' ? 'remote' : 'in_person',
+            location: t.location,
+            address: t.address,
+            date: t.date,
+            time: t.time || undefined,
+            budgetType: t.budget_type,
+            budget: t.budget || undefined,
+            images: t.images || [],
+            mustHaves: t.must_haves || [],
+            clientId: t.client_id,
+            assignedCoTaskerId: t.assigned_cotasker_id || undefined,
+            status: t.status,
+            createdAt: t.created_at,
+            offersCount: 0,
+            moderationStatus: t.moderation_status,
+          }));
+
+          // Merge db tasks and non-conflicting mock tasks
+          const existingIds = new Set(mappedTasks.map((t) => t.id));
+          const nonDuplicateMocks = MOCK_TASKS.filter((t) => !existingIds.has(t.id));
+
+          dispatch({ type: 'SET_TASKS', payload: [...mappedTasks, ...nonDuplicateMocks] });
+        }
+      } catch (err) {
+        console.error('Error loading tasks from Supabase:', err);
+      }
+    }
+
+    fetchTasks();
+  }, []);
+
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       {children}
