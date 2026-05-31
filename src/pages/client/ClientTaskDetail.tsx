@@ -772,6 +772,29 @@ export function ClientTaskDetail() {
                 </div>
               </div>
             )}
+
+            {/* Posted by card */}
+            {currentUser && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
+                    Posted by
+                  </h3>
+                </div>
+                <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
+                  <Avatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size="md" />
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--color-on-surface)' }}>
+                      {currentUser.name} <span style={{ color: 'var(--color-primary)', fontWeight: 500, fontSize: '11px' }}>(You)</span>
+                    </div>
+                    <Link to={`/profile/${currentUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600, display: 'inline-block', marginTop: '2px' }}>
+                      View Profile →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
