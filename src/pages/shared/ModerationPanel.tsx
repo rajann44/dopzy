@@ -346,7 +346,7 @@ export function ModerationPanel() {
                 const isTasker = user.role === 'tasker';
                 const isUserAdmin = user.role === 'admin';
                 return (
-                  <div key={user.id} className="transaction-row-item" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', cursor: 'default' }}>
+                  <div key={user.id} className="transaction-row-item" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', cursor: 'default' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 700, color: user.isDisabled ? 'var(--color-on-surface-variant)' : 'var(--color-secondary)' }}>
                         {user.name} {user.isDisabled && <span style={{ color: 'var(--color-status-error)', fontSize: '11px', fontWeight: 600 }}>(DISABLED)</span>}
@@ -433,7 +433,7 @@ export function ModerationPanel() {
               </div>
               
               {filteredTasks.map((task) => (
-                <div key={task.id} className="transaction-row-item" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1.2fr', cursor: 'default' }}>
+                <div key={task.id} className="transaction-row-item" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1.2fr', cursor: 'default' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
                     <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
