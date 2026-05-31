@@ -182,28 +182,25 @@ export function ModerationPanel() {
       </div>
 
       <div className="page-inner">
-        {/* Tab switcher */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-surface-container-highest)', paddingBottom: 'var(--space-2)' }}>
+        {/* Tab switcher: iOS Segmented Control */}
+        <div className="segmented-control" style={{ marginBottom: 'var(--space-6)' }}>
           <button
             onClick={() => setActiveTab('pending')}
-            className={`chip ${activeTab === 'pending' ? 'chip-active' : ''}`}
-            style={{ padding: '8px var(--space-4)', fontSize: 'var(--text-body-sm)', borderRadius: 'var(--radius)' }}
+            className={`segmented-control-btn ${activeTab === 'pending' ? 'active' : ''}`}
           >
-            Pending Approvals ({pendingUsers.length + pendingTasks.length})
+            Pending ({pendingUsers.length + pendingTasks.length})
           </button>
           <button
             onClick={() => setActiveTab('users')}
-            className={`chip ${activeTab === 'users' ? 'chip-active' : ''}`}
-            style={{ padding: '8px var(--space-4)', fontSize: 'var(--text-body-sm)', borderRadius: 'var(--radius)' }}
+            className={`segmented-control-btn ${activeTab === 'users' ? 'active' : ''}`}
           >
-            All Users ({state.users.length})
+            Users ({state.users.length})
           </button>
           <button
             onClick={() => setActiveTab('tasks')}
-            className={`chip ${activeTab === 'tasks' ? 'chip-active' : ''}`}
-            style={{ padding: '8px var(--space-4)', fontSize: 'var(--text-body-sm)', borderRadius: 'var(--radius)' }}
+            className={`segmented-control-btn ${activeTab === 'tasks' ? 'active' : ''}`}
           >
-            All Tasks ({state.tasks.length})
+            Tasks ({state.tasks.length})
           </button>
         </div>
 

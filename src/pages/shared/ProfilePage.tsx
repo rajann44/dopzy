@@ -294,6 +294,21 @@ export function ProfilePage() {
               <ArrowLeft size={20} />
             </button>
           )}
+          {isEditing && (
+            <button 
+              onClick={handleCancel} 
+              className="btn btn-ghost btn-back mobile-only" 
+              style={{ 
+                fontSize: '14px', 
+                color: 'var(--color-on-surface-variant)', 
+                padding: '0 var(--space-2)',
+                height: '36px',
+                fontWeight: 600
+              }}
+            >
+              Cancel
+            </button>
+          )}
           <div>
             <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>
               {isEditing ? 'Edit Profile' : user.name}
@@ -308,11 +323,21 @@ export function ProfilePage() {
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             {isEditing ? (
               <>
-                <button onClick={handleCancel} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button 
+                  onClick={handleCancel} 
+                  className="btn btn-outline desktop-only" 
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
                   <X size={15} /> Cancel
                 </button>
-                <button onClick={handleSave} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Save size={15} /> Save Changes
+                <button 
+                  onClick={handleSave} 
+                  className="btn btn-primary" 
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Save size={15} className="desktop-only" /> 
+                  <span className="desktop-only">Save Changes</span>
+                  <span className="mobile-only" style={{ fontWeight: 600 }}>Save</span>
                 </button>
               </>
             ) : (

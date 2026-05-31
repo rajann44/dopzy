@@ -157,6 +157,17 @@ export function MobileNav() {
           </div>
           <span>{t('nav.more')}</span>
         </button>
+        
+        {/* iOS safe area fill for elastic scroll bounce */}
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          height: '100px',
+          background: 'var(--color-surface-white)',
+          zIndex: 199,
+        }} />
       </nav>
 
       {/* Drawer Overlay Backdrop */}

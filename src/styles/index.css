@@ -217,11 +217,22 @@ input, textarea, select { font-family: inherit; }
 }
 
 @media (max-width: 767px) {
+  html, body {
+    overscroll-behavior-y: none;
+  }
   .page-topbar {
     padding-left: 72px;
+    padding-right: var(--space-4) !important;
   }
   .page-topbar p {
     display: none !important;
+  }
+  .page-topbar h1 {
+    font-size: 18px !important;
+    line-height: 1.2 !important;
+  }
+  .page-inner {
+    padding: var(--space-4) var(--space-4) !important;
   }
 }
 
@@ -1152,6 +1163,48 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
   font-size: 10.5px;
 }
 
+/* ── iOS Segmented Control ── */
+.segmented-control {
+  display: flex;
+  background: var(--color-surface-container-high);
+  border-radius: 10px;
+  padding: 2px;
+  border: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.segmented-control-btn {
+  flex: 1;
+  text-align: center;
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.segmented-control-btn.active {
+  background: var(--color-surface-white);
+  color: var(--color-secondary);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.08), 0px 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.segmented-control-btn:hover:not(.active) {
+  color: var(--color-secondary);
+}
+
 /* ── Messages Page Responsive Layout ── */
 .messages-container {
   display: flex;
@@ -1171,6 +1224,10 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
 }
 
 .messages-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-surface-white);
   padding: 0 var(--space-8);
   height: 88px;
   border-bottom: 1px solid var(--color-outline-variant);
@@ -1189,6 +1246,9 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
 }
 
 .messages-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   padding: 0 var(--space-8);
   height: 88px;
   border-bottom: 1px solid var(--color-outline-variant);
@@ -1395,9 +1455,10 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
     box-shadow: var(--shadow-sm);
   }
 
-  /* Reset spacing and padding-left on mobile when page has a back button */
+  /* Reset spacing and padding on mobile when page has a back button */
   body:has(.btn-back) .page-topbar {
     padding-left: var(--space-4) !important;
+    padding-right: var(--space-4) !important;
   }
 
   /* ── Offer Card Mobile Layout (iOS HIG compliant) ── */
@@ -1539,6 +1600,48 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
   .transaction-row-item:not(.offer-card) .transaction-amount-green {
     font-size: 15px !important;
   }
+
+  .mobile-only {
+    display: inline-block !important;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Optimize card internal spacing to match the new 16px page margins on mobile */
+  .card-body {
+    padding: var(--space-4) !important;
+  }
+  .card-header {
+    padding: var(--space-3) var(--space-4) !important;
+  }
+  .bento-card {
+    padding: var(--space-4) !important;
+  }
+  .bento-grid {
+    gap: var(--space-3) !important;
+  }
+
+  /* Prevent scroll overflow on messages page due to padding-bottom */
+  body:has(.messages-container) .page-content {
+    padding-bottom: 0 !important;
+  }
+
+  /* Lock body scrolling on mobile when on the messages page */
+  body:has(.messages-container) {
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+}
+
+.mobile-only {
+  display: none !important;
+}
+.desktop-only {
+  display: inline-block !important;
 }
 
 /* Hide global mobile menu toggle drawer button when in sub-pages with back buttons or inside active messages detail view */
