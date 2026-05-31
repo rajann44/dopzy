@@ -353,10 +353,11 @@ export function TaskerTaskDetail() {
       {/* Header */}
       <div className="page-topbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', minWidth: 0 }}>
-          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon" style={{ flexShrink: 0 }}>
+          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back" style={{ flexShrink: 0 }}>
             <ArrowLeft size={20} />
           </button>
-          <div style={{ minWidth: 0 }}>
+          <h1 className="mobile-only-header-title">Task Details</h1>
+          <div className="desktop-only-header-content" style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
               <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span>{emoji}</span> {task.category}
@@ -375,6 +376,25 @@ export function TaskerTaskDetail() {
       </div>
 
       <div className="page-inner">
+        {/* Mobile Hero Block (only visible on mobile layout) */}
+        <div className="mobile-only-hero-content">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+            <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>{emoji}</span> {task.category}
+            </span>
+            <StatusBadge status={task.status} />
+            {task.taskType === 'remote' ? (
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+            ) : (
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+            )}
+            {isAssignedToMe && <span className="badge badge-gold">Your Job</span>}
+          </div>
+          
+          <h1 className="text-headline-md" style={{ margin: '8px 0 0 0', fontWeight: 700, color: 'var(--color-secondary)', fontSize: '20px', lineHeight: 1.3 }}>
+            {task.title}
+          </h1>
+        </div>
         <div className="bento-grid">
           {/* Main Column */}
           <div className="bento-col-8 flex flex-col gap-6">

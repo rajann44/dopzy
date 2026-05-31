@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Search, Briefcase, ListTodo, Bell, LogOut, 
+  LayoutDashboard, Briefcase, ListTodo, Bell, LogOut, 
   MoreHorizontal, MessageSquare, Settings, User, Shield, X 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -11,11 +11,8 @@ import { prefetchRoute } from '../../utils/prefetch';
 import { Avatar } from '../ui/Avatar';
 
 const mobilePrefetchMap: Record<string, 'marketplace' | 'myTasks' | 'notifications' | 'messages' | 'settings' | 'moderation' | 'profile'> = {
-  '/client/dashboard': 'marketplace',
-  '/client/tasks': 'myTasks',
-  '/tasker/dashboard': 'marketplace',
-  '/tasker/tasks': 'marketplace',
-  '/tasker/jobs': 'myTasks',
+  '/browse': 'marketplace',
+  '/my-tasks': 'myTasks',
   '/notifications': 'notifications',
   '/messages': 'messages',
   '/settings': 'settings',
@@ -43,15 +40,14 @@ export function MobileNav() {
 
   const navItems = isClient
     ? [
-        { to: '/client/dashboard', label: 'Home', icon: LayoutDashboard },
-        { to: '/client/tasks', label: 'Tasks', icon: ListTodo },
-        { to: '/notifications', label: 'Alerts', icon: Bell },
+        { to: '/browse', label: t('nav.home') || 'Home', icon: LayoutDashboard },
+        { to: '/my-tasks?tab=client', label: t('nav.my_tasks') || 'My Tasks', icon: ListTodo },
+        { to: '/messages', label: t('nav.messages') || 'Messages', icon: MessageSquare },
       ]
     : [
-        { to: '/tasker/dashboard', label: 'Home', icon: LayoutDashboard },
-        { to: '/tasker/tasks', label: 'Browse', icon: Search },
-        { to: '/tasker/jobs', label: 'Jobs', icon: Briefcase },
-        { to: '/notifications', label: 'Alerts', icon: Bell },
+        { to: '/browse', label: t('nav.home') || 'Home', icon: LayoutDashboard },
+        { to: '/my-tasks?tab=tasker', label: t('nav.my_tasks') || 'My Tasks', icon: ListTodo },
+        { to: '/messages', label: t('nav.messages') || 'Messages', icon: MessageSquare },
       ];
 
   const handleLogout = async () => {
@@ -75,7 +71,8 @@ export function MobileNav() {
         height: 64,
       }}>
         {navItems.map(({ to, label, icon: Icon }) => {
-          const showBadge = to === '/notifications' && unreadNotifications > 0;
+          const badgeCount = to === '/messages' ? unreadMessages : 0;
+          const showBadge = badgeCount > 0;
           return (
             <NavLink
               key={to}
@@ -95,7 +92,8 @@ export function MobileNav() {
                 position: 'relative',
               })}
               onMouseEnter={() => {
-                const key = mobilePrefetchMap[to];
+                const path = to.split('?')[0];
+                const key = mobilePrefetchMap[path];
                 if (key) prefetchRoute(key);
               }}
             >
@@ -115,7 +113,7 @@ export function MobileNav() {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                    {badgeCount > 9 ? '9+' : badgeCount}
                   </span>
                 )}
               </div>
@@ -147,7 +145,7 @@ export function MobileNav() {
         >
           <div style={{ position: 'relative' }}>
             <MoreHorizontal size={20} />
-            {unreadMessages > 0 && (
+            {unreadNotifications > 0 && (
               <span style={{
                 position: 'absolute',
                 top: -4, right: -4,
@@ -225,14 +223,24 @@ export function MobileNav() {
 
         {/* Drawer Menu List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {/* Messages Link */}
+          {/* Alerts Link */}
           <DrawerLink 
-            to="/messages" 
-            label={t('nav.messages')} 
-            icon={<MessageSquare size={18} />} 
+            to="/notifications" 
+            label={t('nav.notifications') || 'Notifications'} 
+            icon={<Bell size={18} />} 
             onClick={() => setIsMoreOpen(false)}
-            badge={unreadMessages > 0 ? unreadMessages : undefined}
+            badge={unreadNotifications > 0 ? unreadNotifications : undefined}
           />
+
+          {/* Role-specific NavLinks (My Jobs) moved to drawer */}
+          {!isClient && (
+            <DrawerLink 
+              to="/tasker/jobs" 
+              label={t('nav.my_jobs') || 'My Jobs'} 
+              icon={<Briefcase size={18} />} 
+              onClick={() => setIsMoreOpen(false)}
+            />
+          )}
 
           {/* Profile Link */}
           <DrawerLink 
@@ -245,7 +253,7 @@ export function MobileNav() {
           {/* Settings Link */}
           <DrawerLink 
             to="/settings" 
-            label={t('nav.settings')} 
+            label={t('nav.settings') || 'Settings'} 
             icon={<Settings size={18} />} 
             onClick={() => setIsMoreOpen(false)}
           />

@@ -220,6 +220,9 @@ input, textarea, select { font-family: inherit; }
   .page-topbar {
     padding-left: 72px;
   }
+  .page-topbar p {
+    display: none !important;
+  }
 }
 
 .page-inner {
@@ -914,6 +917,7 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
   background: var(--color-surface-white);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-outline-variant);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 .transaction-row-header {
@@ -928,10 +932,10 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
   color: var(--color-on-surface-variant);
 }
 .transaction-row-item {
-  display: grid;
-  grid-template-columns: 56px 1.5fr 1.2fr 120px 120px;
+  display: flex;
   align-items: center;
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background: var(--color-surface-white);
   border-bottom: 1px solid var(--color-surface-container-highest);
   transition: background var(--transition-fast), transform var(--transition-fast);
@@ -946,28 +950,307 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
 .transaction-row-item:active {
   transform: scale(0.995);
 }
+.transaction-badge-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 .transaction-initials-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-container-highest);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-surface-container-low);
   color: var(--color-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--text-body-sm);
+  font-size: 20px;
   font-weight: 700;
-  border: 1px solid var(--color-outline-variant);
+  border: none;
+}
+.transaction-info-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+  gap: 4px;
+}
+.transaction-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-secondary);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.transaction-subtitle {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.transaction-amount-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  flex-shrink: 0;
+  text-align: right;
+  gap: 2px;
 }
 .transaction-amount-green {
   color: var(--color-status-success);
   font-weight: 700;
+  font-size: 16px;
   font-family: var(--font-headline);
 }
 .transaction-amount-red {
   color: var(--color-error);
   font-weight: 700;
+  font-size: 16px;
   font-family: var(--font-headline);
+}
+.transaction-budget-type {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+  text-transform: capitalize;
+}
+
+/* ── Offer Card Desktop Layout ── */
+.offer-card {
+  grid-template-columns: 2fr 2fr 130px 100px 160px !important;
+  padding: 16px var(--space-4) !important;
+  align-items: center;
+}
+.offer-profile-col {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding-right: 12px;
+}
+.offer-avatar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.offer-avatar-wrapper .status-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-container);
+  border: 2px solid var(--color-surface-white);
+}
+.offer-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.offer-user-name {
+  font-weight: 700;
+  color: var(--color-secondary);
+  font-size: var(--text-body-sm);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.offer-profile-col[style*="pointer"]:hover .offer-user-name {
+  text-decoration: underline;
+  color: var(--color-primary);
+}
+.offer-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.offer-rating-badge {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+  font-weight: 600;
+}
+.offer-jobs-count {
+  font-size: 10px;
+  color: var(--color-on-surface-variant);
+}
+.offer-message-col {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-right: 12px;
+}
+.offer-message-text {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  margin: 0;
+  font-style: italic;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.offer-timeline-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.offer-duration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-body-sm);
+  color: var(--color-secondary-mid);
+  font-weight: 500;
+}
+.offer-timeago {
+  font-size: 10px;
+  color: var(--color-on-surface-variant);
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+.offer-price-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: right;
+  padding-right: 8px;
+}
+.offer-price-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  margin-top: 1px;
+}
+.offer-actions-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.offer-actions-btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn-icon-round {
+  padding: 6px;
+  min-width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full) !important;
+}
+.btn-action-accept, .btn-action-withdraw {
+  padding: 6px 12px;
+  font-size: 10.5px;
+}
+
+/* ── Messages Page Responsive Layout ── */
+.messages-container {
+  display: flex;
+  height: calc(100vh - 1px);
+  background: var(--color-surface);
+  overflow: hidden;
+  width: 100%;
+}
+
+.messages-sidebar {
+  width: 340px;
+  border-right: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-white);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.messages-header {
+  padding: 0 var(--space-8);
+  height: 88px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.messages-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-white);
+  min-width: 0;
+}
+
+.messages-detail-header {
+  padding: 0 var(--space-8);
+  height: 88px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface-white);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.mobile-back-btn {
+  display: none !important;
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.chat-header-user-info-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.chat-header-regarding-link {
+  font-size: 11px;
+  color: var(--color-secondary-mid);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chat-header-task-title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-header-left .badge {
+  padding: 2px 7px !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em !important;
+  height: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  border-radius: var(--radius-full) !important;
+  border: none !important;
 }
 
 /* ── Category Selection UI ─────────────────────────────────────────────────── */
@@ -1079,6 +1362,189 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
 .content-visibility-auto {
   content-visibility: auto;
   contain-intrinsic-size: 350px;
+}
+
+/* ── Detail Page Responsive Mobile Header (iOS HIG compliant) ── */
+@media (min-width: 768px) {
+  .mobile-only-header-title { display: none !important; }
+  .mobile-only-hero-content { display: none !important; }
+}
+
+@media (max-width: 767px) {
+  .desktop-only-header-content { display: none !important; }
+  
+  .mobile-only-header-title {
+    font-size: var(--text-headline-sm) !important;
+    font-weight: 700 !important;
+    color: var(--color-secondary) !important;
+    margin: 0 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .mobile-only-hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    background: var(--color-surface-white);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Reset spacing and padding-left on mobile when page has a back button */
+  body:has(.btn-back) .page-topbar {
+    padding-left: var(--space-4) !important;
+  }
+
+  /* ── Offer Card Mobile Layout (iOS HIG compliant) ── */
+  .transaction-rows-container:has(.offer-card) {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .offer-card {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto auto !important;
+    grid-template-areas:
+      "profile price"
+      "message message"
+      "timeline actions" !important;
+    gap: var(--space-3) !important;
+    padding: var(--space-4) !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid var(--color-outline-variant) !important;
+    background: var(--color-surface-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin-bottom: var(--space-1);
+    align-items: center !important;
+  }
+  
+  .offer-card:hover {
+    background: var(--color-surface-white) !important;
+  }
+
+  .offer-profile-col {
+    grid-area: profile;
+    padding-right: 0 !important;
+  }
+
+  .offer-price-col {
+    grid-area: price;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start !important;
+    text-align: right;
+    padding-right: 0 !important;
+  }
+
+  .offer-message-col {
+    grid-area: message;
+    padding-right: 0 !important;
+    background: var(--color-surface-container-lowest);
+    padding: var(--space-2) var(--space-3) !important;
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--color-primary-container);
+    margin: var(--space-1) 0;
+  }
+
+  .offer-message-text {
+    white-space: normal !important;
+    font-size: var(--text-body-sm) !important;
+    line-height: 1.4 !important;
+  }
+
+  .offer-timeline-col {
+    grid-area: timeline;
+  }
+
+  .offer-actions-col {
+    grid-area: actions;
+    justify-content: flex-end !important;
+  }
+  
+  .offer-actions-btn-group {
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  /* ── Messages Page Mobile Layout ── */
+  .messages-container {
+    height: calc(100dvh - 64px - 1px) !important; /* Account for bottom navigation bar height */
+  }
+
+  /* When a chat thread is selected, hide the sidebar list */
+  .messages-container.messages-detail-active .messages-sidebar {
+    display: none !important;
+  }
+  
+  /* When NO chat thread is selected, hide the empty detail panel */
+  .messages-container:not(.messages-detail-active) .messages-detail {
+    display: none !important;
+  }
+
+  .messages-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+  }
+
+  .messages-header {
+    padding-left: 72px !important; /* Account for floating drawer button */
+  }
+
+  .messages-header p {
+    display: none !important; /* Hide subtitle to match standard iOS headers */
+  }
+
+  .messages-detail {
+    width: 100% !important;
+  }
+
+  .messages-detail-header {
+    padding: 0 var(--space-4) !important;
+  }
+
+  .mobile-back-btn {
+    display: flex !important;
+  }
+
+  /* ── Transaction Rows Mobile Layout (iOS HIG compliant) ── */
+  .transaction-row-header {
+    display: none !important;
+  }
+
+  .transaction-row-item:not(.offer-card) {
+    padding: var(--space-4) var(--space-4) !important;
+    gap: var(--space-3) !important;
+  }
+
+  .transaction-row-item:not(.offer-card) .transaction-title {
+    font-size: 14px !important;
+  }
+
+  .transaction-row-item:not(.offer-card) .transaction-subtitle {
+    font-size: 11px !important;
+  }
+
+  .transaction-row-item:not(.offer-card) .transaction-amount-red,
+  .transaction-row-item:not(.offer-card) .transaction-amount-green {
+    font-size: 15px !important;
+  }
+}
+
+/* Hide global mobile menu toggle drawer button when in sub-pages with back buttons or inside active messages detail view */
+body:has(.btn-back) .mobile-sidebar-toggle,
+body:has(.messages-detail-active) .mobile-sidebar-toggle {
+  display: none !important;
 }
 
 

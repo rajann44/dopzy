@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { 
-  MessageSquare, Send, AlertCircle, ChevronRight, AlertTriangle 
+  MessageSquare, Send, AlertCircle, ChevronRight, AlertTriangle, ChevronLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -30,11 +30,20 @@ export function MessagesPage() {
   const [messageText, setMessageText] = useState('');
   const [selectedTaskerId, setSelectedTaskerId] = useState<string | null>(null);
   
-  const messageEndRef = useRef<HTMLDivElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const prevSelectedIdRef = useRef<string | null>(null);
 
-  // Auto-scroll messages to bottom
+  // Auto-scroll messages to bottom without shifting browser scroll viewport
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messageContainerRef.current) {
+      const isNewChat = prevSelectedIdRef.current !== selectedId;
+      prevSelectedIdRef.current = selectedId;
+
+      messageContainerRef.current.scrollTo({
+        top: messageContainerRef.current.scrollHeight,
+        behavior: isNewChat ? 'auto' : 'smooth'
+      });
+    }
   }, [selectedId, state.chatMessages]);
 
   // Sync selection from query params (e.g. ?conv=id or ?req=id)
@@ -361,18 +370,11 @@ export function MessagesPage() {
   };
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 1px)', background: 'var(--color-surface)', overflow: 'hidden' }}>
+    <div className={`messages-container ${selectedId ? 'messages-detail-active' : ''}`}>
       
       {/* LEFT SIDEBAR PANEL: Tabs & Thread Lists */}
-      <div style={{
-        width: '340px',
-        borderRight: '1px solid var(--color-outline-variant)',
-        background: 'var(--color-surface-white)',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0
-      }}>
-        <div style={{ padding: '0 var(--space-8)', height: '88px', borderBottom: '1px solid var(--color-outline-variant)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+      <div className="messages-sidebar">
+        <div className="messages-header">
           <div>
             <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700, fontSize: '16px', lineHeight: 1.2 }}>{t('messages.title')}</h1>
             <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '11px', margin: '2px 0 0 0' }}>
@@ -565,68 +567,66 @@ export function MessagesPage() {
       </div>
 
       {/* RIGHT DISPLAY PANEL: Detailed Inquiry Review or Chat stream */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--color-surface-white)' }}>
+      <div className="messages-detail">
         
         {/* Scenario 1: Select Active Chat Room */}
         {activeTab === 'chats' && activeConversation ? (
           <>
             {/* Chat header */}
-            <div style={{
-              padding: '0 var(--space-8)',
-              height: '88px',
-              borderBottom: '1px solid var(--color-outline-variant)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              background: 'var(--color-surface-white)',
-              flexShrink: 0
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+            <div className="messages-detail-header">
+              <div className="chat-header-left">
+                {/* Back button on mobile */}
+                <button
+                  onClick={() => { setSelectedId(null); setSearchParams({}); }}
+                  className="mobile-back-btn btn btn-ghost btn-sm"
+                  style={{
+                    padding: '8px',
+                    marginRight: '-4px',
+                    color: 'var(--color-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ChevronLeft size={20} />
+                </button>
                 <div 
                   onClick={() => {
                     if (activeChatParticipant?.role === 'tasker') {
                       setSelectedTaskerId(activeChatParticipant.id);
                     }
                   }}
-                  style={{ 
-                    cursor: activeChatParticipant?.role === 'tasker' ? 'pointer' : 'default',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    minWidth: 0
-                  }}
+                  className="chat-header-user-info-trigger"
                 >
                   <Avatar name={activeChatParticipant?.name || 'User'} avatarUrl={activeChatParticipant?.avatarUrl} size="md" />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ 
-                      fontWeight: 700, 
-                      color: 'var(--color-secondary)', 
-                      fontSize: '14px',
-                      lineHeight: 1.2,
-                      textDecoration: activeChatParticipant?.role === 'tasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
-                    }} className="hover-underline">
-                      {activeChatParticipant?.name}
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{ 
+                        fontWeight: 700, 
+                        color: 'var(--color-secondary)', 
+                        fontSize: '14.5px',
+                        lineHeight: 1.2,
+                        textDecoration: activeChatParticipant?.role === 'tasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
+                      }} className="hover-underline">
+                        {activeChatParticipant?.name}
+                      </span>
+                      {taskStatusForDisplay && (
+                        <StatusBadge status={taskStatusForDisplay} />
+                      )}
                     </div>
                     {activeTask && (
                       <Link 
                         to={`/tasks/${activeTask.id}`} 
                         onClick={(e) => e.stopPropagation()}
-                        style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                        className="chat-header-regarding-link"
+                        style={{ marginTop: '3px' }}
                       >
-                        <strong>{t('messages.regarding')}</strong> {activeTask.title} <ChevronRight size={12} />
+                        <span className="chat-header-task-title">{activeTask.title}</span>&nbsp;<ChevronRight size={11} style={{ flexShrink: 0, opacity: 0.7 }} />
                       </Link>
                     )}
                   </div>
                 </div>
               </div>
-              {taskStatusForDisplay && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
-                    {t('tasks.status')}
-                  </span>
-                  <StatusBadge status={taskStatusForDisplay} />
-                </div>
-              )}
             </div>
 
             {/* Contextual Offer Banner */}
@@ -661,7 +661,10 @@ export function MessagesPage() {
             )}
 
             {/* Chat message streams */}
-            <div style={{ flex: 1, padding: 'var(--space-6)', overflowY: 'auto', background: 'var(--color-surface)' }}>
+            <div 
+              ref={messageContainerRef}
+              style={{ flex: 1, padding: 'var(--space-6)', overflowY: 'auto', background: 'var(--color-surface)' }}
+            >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {activeMessages.map((m) => {
                   const isCurrentUser = m.senderId === currentUser.id;
@@ -701,7 +704,6 @@ export function MessagesPage() {
                     </div>
                   );
                 })}
-                <div ref={messageEndRef} />
               </div>
             </div>
 
@@ -747,77 +749,79 @@ export function MessagesPage() {
         ) : activeTab === 'requests' && activeRequest ? (
           
           /* Scenario 2: Preview Pending Chat Request */
-          <div style={{ padding: 'var(--space-8)', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', overflowY: 'auto' }}>
-            <div className="card" style={{ maxWidth: '520px', width: '100%', padding: 'var(--space-6)' }}>
-              <div 
-                onClick={() => {
-                  if (activeRequestSender?.role === 'tasker') {
-                    setSelectedTaskerId(activeRequestSender.id);
-                  }
-                }}
-                style={{ 
-                  display: 'flex', 
-                  gap: '12px', 
-                  alignItems: 'center', 
-                  borderBottom: '1px solid var(--color-outline-variant)', 
-                  paddingBottom: '16px', 
-                  marginBottom: '20px',
-                  cursor: activeRequestSender?.role === 'tasker' ? 'pointer' : 'default'
-                }}
-              >
-                <Avatar name={activeRequestSender?.name || 'User'} avatarUrl={activeRequestSender?.avatarUrl} size="lg" />
-                <div>
-                  <span className="chip" style={{ fontSize: '10px', background: 'var(--color-primary-container)', color: 'var(--color-secondary)', fontWeight: 700, marginBottom: '4px', display: 'inline-block' }}>
-                    {t('messages.clarification_request')}
-                  </span>
-                  <h2 className="text-headline-sm hover-underline" style={{ 
-                    margin: 0, 
-                    fontWeight: 700, 
-                    fontSize: '16px',
-                    textDecoration: activeRequestSender?.role === 'tasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
-                  }}>
-                    {t('messages.inquiry_from')} {activeRequestSender?.name}
-                  </h2>
-                </div>
-              </div>
-
-              {activeTask && (
-                <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-outline-variant)', padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', marginBottom: '20px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginBottom: '4px' }}>{t('messages.task_details')}</div>
-                  <h3 style={{ margin: '0 0 6px 0', fontSize: '14px', fontWeight: 700, color: 'var(--color-secondary)' }}>
-                    {activeTask.title}
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
-                    <span>📍 {activeTask.location}</span>
-                    <span>💶 {activeTask.budgetType === 'open_to_offers' ? t('messages.open_bids') : `${formatCurrency(activeTask.budget || 0)}`}</span>
-                  </div>
-                  {taskStatusForDisplay && (
-                    <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
-                        {t('tasks.status')}
-                      </span>
-                      <StatusBadge status={taskStatusForDisplay} />
+          <>
+            {/* Request Header */}
+            <div className="messages-detail-header">
+              <div className="chat-header-left">
+                {/* Back button on mobile */}
+                <button
+                  onClick={() => { setSelectedId(null); setSearchParams({}); }}
+                  className="mobile-back-btn btn btn-ghost btn-sm"
+                  style={{
+                    padding: '8px',
+                    marginRight: '-4px',
+                    color: 'var(--color-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
+                  <Avatar name={activeRequestSender?.name || 'User'} avatarUrl={activeRequestSender?.avatarUrl} size="md" />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--color-secondary)', lineHeight: 1.2 }}>
+                      {activeRequestSender?.name}
                     </div>
-                  )}
+                    <span style={{ fontSize: '10px', color: 'var(--color-secondary-mid)', fontWeight: 600 }}>
+                      {t('messages.clarification_request')}
+                    </span>
+                  </div>
                 </div>
-              )}
-
-              <div style={{ background: 'var(--color-surface-container-low)', padding: 'var(--space-4) var(--space-5)', borderRadius: 'var(--radius)', borderLeft: '3px solid var(--color-secondary-mid)', marginBottom: '24px' }}>
-                <p style={{ fontSize: 'var(--text-body-sm)', fontStyle: 'italic', margin: 0, color: 'var(--color-secondary)', lineHeight: 1.5 }}>
-                  "{activeRequest.question}"
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button className="btn btn-ghost" onClick={handleDeclineRequest}>
-                  {t('messages.decline_request')}
-                </button>
-                <button className="btn btn-primary" onClick={handleAcceptRequest}>
-                  {t('messages.accept_and_chat')}
-                </button>
               </div>
             </div>
-          </div>
+
+            <div style={{ flex: 1, padding: 'var(--space-6)', overflowY: 'auto', background: 'var(--color-surface)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div className="card" style={{ maxWidth: '520px', width: '100%', padding: 'var(--space-6)' }}>
+                {activeTask && (
+                  <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-outline-variant)', padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', marginBottom: '20px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginBottom: '4px' }}>{t('messages.task_details')}</div>
+                    <h3 style={{ margin: '0 0 6px 0', fontSize: '14px', fontWeight: 700, color: 'var(--color-secondary)' }}>
+                      {activeTask.title}
+                    </h3>
+                    <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
+                      <span>📍 {activeTask.location}</span>
+                      <span>💶 {activeTask.budgetType === 'open_to_offers' ? t('messages.open_bids') : `${formatCurrency(activeTask.budget || 0)}`}</span>
+                    </div>
+                    {taskStatusForDisplay && (
+                      <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
+                          {t('tasks.status')}
+                        </span>
+                        <StatusBadge status={taskStatusForDisplay} />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ background: 'var(--color-surface-container-low)', padding: 'var(--space-4) var(--space-5)', borderRadius: 'var(--radius)', borderLeft: '3px solid var(--color-secondary-mid)', marginBottom: '24px' }}>
+                  <p style={{ fontSize: 'var(--text-body-sm)', fontStyle: 'italic', margin: 0, color: 'var(--color-secondary)', lineHeight: 1.5 }}>
+                    "{activeRequest.question}"
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button className="btn btn-ghost" onClick={handleDeclineRequest}>
+                    {t('messages.decline_request')}
+                  </button>
+                  <button className="btn btn-primary" onClick={handleAcceptRequest}>
+                    {t('messages.accept_and_chat')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         ) : (
           
           /* Scenario 3: No Thread Selected (Default Empty State) */

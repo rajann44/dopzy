@@ -1,7 +1,9 @@
 {
   "nav": {
+    "home": "Startseite",
     "my_tasks": "Meine Aufgaben",
     "browse_tasks": "Aufgaben durchsuchen",
+    "my_jobs": "Meine Aufträge",
     "notifications": "Benachrichtigungen",
     "messages": "Nachrichten",
     "settings": "Einstellungen",

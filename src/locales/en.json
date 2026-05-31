@@ -1,7 +1,9 @@
 {
   "nav": {
+    "home": "Home",
     "my_tasks": "My Tasks",
     "browse_tasks": "Browse Tasks",
+    "my_jobs": "My Jobs",
     "notifications": "Notifications",
     "messages": "Messages",
     "settings": "Settings",

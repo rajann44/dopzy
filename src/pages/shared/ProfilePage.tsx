@@ -222,7 +222,7 @@ export function ProfilePage() {
       {/* Header */}
       <div className="page-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon">
+          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back">
             <ArrowLeft size={20} />
           </button>
           <div>

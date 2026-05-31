@@ -452,30 +452,22 @@ export function MyTasksPage() {
                       <div key={task.id} className="content-visibility-auto">
                         <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                           <div className="transaction-row-item">
-                            <div>
-                              <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
+                            <div className="transaction-badge-wrapper">
+                              <div className="transaction-initials-badge">{categoryIcon}</div>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
-                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-                                Category: {task.category}
+                            <div className="transaction-info-wrapper">
+                              <span className="transaction-title">{task.title}</span>
+                              <span className="transaction-subtitle">
+                                Completed {formatDate(task.date)} • {task.category}
                               </span>
                             </div>
-                            <div>
-                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
-                                Completed {formatDate(task.date)}
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '16px' }}>
+                            <div className="transaction-amount-wrapper">
                               <span className="transaction-amount-red">
                                 {task.budget ? `- ${formatCurrency(task.budget)}` : 'Open'}
                               </span>
-                              <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                              <span className="transaction-budget-type">
                                 {task.budgetType === 'fixed' ? 'Fixed price' : task.budgetType === 'hourly' ? 'Hourly rate' : 'Open budget'}
                               </span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                              <StatusBadge status={task.status} />
                             </div>
                           </div>
                         </Link>
@@ -747,30 +739,22 @@ export function MyTasksPage() {
                       <div key={task.id} className="content-visibility-auto">
                         <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                           <div className="transaction-row-item">
-                            <div>
-                              <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
+                            <div className="transaction-badge-wrapper">
+                              <div className="transaction-initials-badge">{categoryIcon}</div>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
-                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-                                Category: {task.category}
+                            <div className="transaction-info-wrapper">
+                              <span className="transaction-title">{task.title}</span>
+                              <span className="transaction-subtitle">
+                                Completed {formatDate(task.date)} • {task.category}
                               </span>
                             </div>
-                            <div>
-                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
-                                Completed {formatDate(task.date)}
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '16px' }}>
+                            <div className="transaction-amount-wrapper">
                               <span className="transaction-amount-green">
                                 {tx ? `+ ${formatCurrency(tx.amount)}` : '—'}
                               </span>
-                              <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                              <span className="transaction-budget-type">
                                 {tx ? 'Released' : 'Processing'}
                               </span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                              <StatusBadge status={task.status} />
                             </div>
                           </div>
                         </Link>

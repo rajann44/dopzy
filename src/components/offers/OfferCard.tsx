@@ -27,132 +27,100 @@ export function OfferCard({ offer, onAccept, onWithdraw, onMessage, onViewProfil
   }, [offer.taskerId]);
 
   return (
-    <div className="transaction-row-item" style={{ gridTemplateColumns: '56px 1.5fr 2fr 130px 160px', padding: '16px var(--space-4)' }}>
-      {/* 1. Initials / Avatar Column */}
+    <div className="transaction-row-item offer-card">
+      {/* 1. Profile Column (Avatar + Info) */}
       <div 
+        className="offer-profile-col"
         onClick={() => onViewProfile && onViewProfile(offer.taskerId)}
-        style={{ display: 'flex', alignItems: 'center', cursor: onViewProfile ? 'pointer' : 'default' }}
+        style={{ cursor: onViewProfile ? 'pointer' : 'default' }}
       >
-        <div style={{ position: 'relative' }}>
+        <div className="offer-avatar-wrapper">
           <Avatar name={user?.name ?? '?'} avatarUrl={user?.avatarUrl} size="md" />
-          <span style={{
-            position: 'absolute',
-            top: -2,
-            right: -2,
-            width: 10,
-            height: 10,
-            borderRadius: '50%',
-            background: 'var(--color-primary-container)',
-            border: '2px solid var(--color-surface-white)'
-          }}></span>
+          <span className="status-dot"></span>
+        </div>
+
+        <div className="offer-user-info">
+          <span className="offer-user-name">
+            {user?.name ?? 'Loading...'}
+          </span>
+          {profile && (
+            <div className="offer-rating-row">
+              <span className="offer-rating-badge">
+                <Star size={11} fill="var(--color-primary-container)" color="var(--color-primary)" />
+                {profile.rating}
+              </span>
+              <span className="offer-jobs-count">
+                ({profile.completedJobs} jobs done)
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 2. Provider Info & Rating */}
-      <div 
-        onClick={() => onViewProfile && onViewProfile(offer.taskerId)}
-        style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          minWidth: 0, 
-          paddingRight: '12px',
-          cursor: onViewProfile ? 'pointer' : 'default'
-        }}
-      >
-        <span 
-          style={{ 
-            fontWeight: 700, 
-            color: 'var(--color-secondary)', 
-            fontSize: 'var(--text-body-sm)', 
-            textOverflow: 'ellipsis', 
-            overflow: 'hidden', 
-            whiteSpace: 'nowrap',
-            textDecoration: onViewProfile ? 'underline decoration-transparent hover:decoration-primary' : 'none'
-          }}
-          className={onViewProfile ? "hover-underline" : ""}
-        >
-          {user?.name ?? 'Loading...'}
-        </span>
-        {profile && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '11px', color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-              <Star size={11} fill="var(--color-primary-container)" color="var(--color-primary)" />
-              {profile.rating}
-            </span>
-            <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)' }}>
-              ({profile.completedJobs} jobs done)
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 3. Bid Proposal Message */}
-      <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, paddingRight: '12px' }}>
-        <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', margin: 0, fontStyle: 'italic', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      {/* 2. Bid Proposal Message Column */}
+      <div className="offer-message-col">
+        <p className="offer-message-text">
           "{offer.message}"
         </p>
       </div>
 
-      {/* 4. Timeline / Effort */}
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary-mid)', fontWeight: 500 }}>
+      {/* 3. Timeline / Effort Column */}
+      <div className="offer-timeline-col">
+        <span className="offer-duration">
           <Clock size={13} /> ~{offer.estimatedHours} hours
         </span>
-        <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', marginTop: '2px', textTransform: 'uppercase' }}>
+        <span className="offer-timeago">
           {formatRelativeTime(offer.createdAt)}
         </span>
       </div>
 
-      {/* 5. Pricing & Action */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px' }}>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div className="transaction-amount-green" style={{ fontSize: '16px' }}>
-            {formatCurrency(offer.price)}
-          </div>
-          <div style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '1px' }}>
-            Bid Price
-          </div>
+      {/* 4. Price Column */}
+      <div className="offer-price-col">
+        <div className="transaction-amount-green">
+          {formatCurrency(offer.price)}
         </div>
+        <div className="offer-price-label">
+          Bid Price
+        </div>
+      </div>
 
+      {/* 5. Actions Column */}
+      <div className="offer-actions-col">
         {showActions && offer.status === 'pending' ? (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className="offer-actions-btn-group">
             {viewerRole === 'client' && onMessage && (
               <button
-                className="btn btn-outlined btn-sm"
+                className="btn btn-outlined btn-sm btn-icon-round"
                 onClick={() => onMessage(offer.taskerId)}
                 title="Message Tasker"
-                style={{ padding: '6px', minWidth: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
               >
                 <MessageSquare size={14} />
               </button>
             )}
             {viewerRole === 'client' && onAccept && (
               <button
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm btn-action-accept"
                 onClick={() => onAccept(offer.id)}
-                style={{ padding: '6px 12px', fontSize: '10.5px' }}
               >
                 Accept
               </button>
             )}
             {viewerRole === 'tasker' && onWithdraw && (
               <button
-                className="btn btn-danger btn-sm"
+                className="btn btn-danger btn-sm btn-action-withdraw"
                 onClick={() => onWithdraw(offer.id)}
-                style={{ padding: '6px 12px', fontSize: '10.5px' }}
               >
                 Withdraw
               </button>
             )}
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+          <div className="offer-actions-btn-group">
             {viewerRole === 'client' && onMessage && (
               <button
-                className="btn btn-outlined btn-sm"
+                className="btn btn-outlined btn-sm btn-icon-round"
                 onClick={() => onMessage(offer.taskerId)}
                 title="Message Tasker"
-                style={{ padding: '6px', minWidth: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
               >
                 <MessageSquare size={14} />
               </button>

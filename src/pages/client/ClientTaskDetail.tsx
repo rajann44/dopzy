@@ -346,10 +346,11 @@ export function ClientTaskDetail() {
       {/* Header */}
       <div className="page-topbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', minWidth: 0 }}>
-          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon" style={{ flexShrink: 0 }}>
+          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back" style={{ flexShrink: 0 }}>
             <ArrowLeft size={20} />
           </button>
-          <div style={{ minWidth: 0 }}>
+          <h1 className="mobile-only-header-title">Task Details</h1>
+          <div className="desktop-only-header-content" style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
               <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span>{emoji}</span> {task.category}
@@ -379,7 +380,7 @@ export function ClientTaskDetail() {
           </div>
         </div>
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
+        <div className="desktop-only-header-content" style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
           {canCancel && (
             <>
               <button className="btn btn-outlined btn-sm" onClick={() => {
@@ -405,6 +406,62 @@ export function ClientTaskDetail() {
       </div>
 
       <div className="page-inner">
+        {/* Mobile Hero Block (only visible on mobile layout) */}
+        <div className="mobile-only-hero-content">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+            <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>{emoji}</span> {task.category}
+            </span>
+            <StatusBadge status={task.status} />
+            {task.taskType === 'remote' ? (
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+            ) : (
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+            )}
+            <span className="badge" style={{ 
+              fontSize: '10px', 
+              fontWeight: 600, 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '4px',
+              background: 'rgba(98, 0, 238, 0.08)', 
+              color: 'var(--color-primary)', 
+              border: '1px solid rgba(98, 0, 238, 0.2)',
+              padding: '2px 8px',
+              borderRadius: '100px'
+            }}>
+              ✨ Posted by You
+            </span>
+          </div>
+          
+          <h1 className="text-headline-md" style={{ margin: '8px 0', fontWeight: 700, color: 'var(--color-secondary)', fontSize: '20px', lineHeight: 1.3 }}>
+            {task.title}
+          </h1>
+
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: '4px' }}>
+            {canCancel && (
+              <>
+                <button className="btn btn-outlined btn-sm" onClick={() => {
+                  setEditTitle(task.title);
+                  setEditDescription(task.description);
+                  setEditBudget(task.budget || 0);
+                  setEditDate(task.date);
+                  setShowEditModal(true);
+                }} style={{ flex: 1, borderColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
+                  Edit Task
+                </button>
+                <button className="btn btn-danger btn-sm" onClick={() => setCancelConfirm(true)} style={{ flex: 1 }}>
+                  <X size={14} /> Cancel
+                </button>
+              </>
+            )}
+            {canComplete && (
+              <button className="btn btn-primary btn-sm" onClick={() => setCompleteConfirm(true)} style={{ flex: 1 }}>
+                <CheckCircle size={14} /> Mark Complete
+              </button>
+            )}
+          </div>
+        </div>
         {/* Author Notice Banner */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(98, 0, 238, 0.05) 0%, rgba(98, 0, 238, 0.01) 100%)',
