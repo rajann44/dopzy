@@ -117,25 +117,26 @@ export function MessagesPage() {
     e.preventDefault();
     if (!messageText.trim() || !activeConversation) return;
 
-    const newMessage = {
-      id: generateId('msg'),
-      conversationId: activeConversation.id,
-      senderId: currentUser.id,
-      text: messageText.trim(),
-      createdAt: new Date().toISOString()
-    };
-
     try {
-      const { error: msgErr } = await supabase
+      const { data: dbMsg, error: msgErr } = await supabase
         .from('chat_messages')
         .insert({
-          id: newMessage.id,
-          conversation_id: newMessage.conversationId,
-          sender_id: newMessage.senderId,
-          text: newMessage.text,
-          created_at: newMessage.createdAt
-        });
+          conversation_id: activeConversation.id,
+          sender_id: currentUser.id,
+          text: messageText.trim(),
+          created_at: new Date().toISOString()
+        })
+        .select('id, created_at')
+        .single();
       if (msgErr) throw msgErr;
+
+      const newMessage = {
+        id: dbMsg.id,
+        conversationId: activeConversation.id,
+        senderId: currentUser.id,
+        text: messageText.trim(),
+        createdAt: dbMsg.created_at
+      };
 
       const { error: convErr } = await supabase
         .from('conversations')
@@ -157,47 +158,50 @@ export function MessagesPage() {
   const handleAcceptRequest = async () => {
     if (!activeRequest || !activeTask) return;
 
-    const convId = generateId('conv');
-    const conversation = {
-      id: convId,
-      participantIds: [activeRequest.senderId, activeRequest.receiverId],
-      lastMessage: activeRequest.question,
-      lastMessageAt: new Date().toISOString(),
-      unreadCount: 0,
-      taskId: activeRequest.taskId
-    };
-
-    const systemMessage = {
-      id: generateId('msg'),
-      conversationId: convId,
-      senderId: activeRequest.senderId,
-      text: `${t('messages.inquiry_req_prefix')}"${activeRequest.question}"`,
-      createdAt: activeRequest.createdAt
-    };
-
     try {
-      const { error: convErr } = await supabase
+      const { data: dbConv, error: convErr } = await supabase
         .from('conversations')
         .insert({
-          id: conversation.id,
-          participant_ids: conversation.participantIds,
-          last_message: conversation.lastMessage,
-          last_message_at: conversation.lastMessageAt,
-          unread_count: conversation.unreadCount,
-          task_id: conversation.taskId
-        });
+          participant_ids: [activeRequest.senderId, activeRequest.receiverId],
+          last_message: activeRequest.question,
+          last_message_at: new Date().toISOString(),
+          unread_count: 0,
+          task_id: activeRequest.taskId
+        })
+        .select('id')
+        .single();
       if (convErr) throw convErr;
+      const convId = dbConv.id;
 
-      const { error: msgErr } = await supabase
+      const { data: dbMsg, error: msgErr } = await supabase
         .from('chat_messages')
         .insert({
-          id: systemMessage.id,
-          conversation_id: systemMessage.conversationId,
-          sender_id: systemMessage.senderId,
-          text: systemMessage.text,
-          created_at: systemMessage.createdAt
-        });
+          conversation_id: convId,
+          sender_id: activeRequest.senderId,
+          text: `${t('messages.inquiry_req_prefix')}"${activeRequest.question}"`,
+          created_at: activeRequest.createdAt
+        })
+        .select('id')
+        .single();
       if (msgErr) throw msgErr;
+      const msgId = dbMsg.id;
+
+      const conversation = {
+        id: convId,
+        participantIds: [activeRequest.senderId, activeRequest.receiverId],
+        lastMessage: activeRequest.question,
+        lastMessageAt: new Date().toISOString(),
+        unreadCount: 0,
+        taskId: activeRequest.taskId
+      };
+
+      const systemMessage = {
+        id: msgId,
+        conversationId: convId,
+        senderId: activeRequest.senderId,
+        text: `${t('messages.inquiry_req_prefix')}"${activeRequest.question}"`,
+        createdAt: activeRequest.createdAt
+      };
 
       const { error: reqErr } = await supabase
         .from('chat_requests')
