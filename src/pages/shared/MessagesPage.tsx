@@ -629,7 +629,7 @@ export function MessagesPage() {
                         borderRadius: '12px',
                         borderTopRightRadius: isCurrentUser ? '2px' : '12px',
                         borderTopLeftRadius: !isCurrentUser ? '2px' : '12px',
-                        background: isCurrentUser ? 'var(--color-secondary)' : 'var(--color-on-surface)',
+                        background: isCurrentUser ? 'var(--color-secondary)' : 'var(--color-surface-container-high)',
                         color: isCurrentUser ? '#ffffff' : 'var(--color-on-surface)',
                         border: isCurrentUser ? 'none' : '1px solid var(--color-outline-variant)',
                         fontSize: 'var(--text-body-sm)',
