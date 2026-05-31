@@ -268,5 +268,20 @@ export type AppAction =
   | { type: 'DISABLE_USER'; payload: { userId: string } }
   | { type: 'ENABLE_USER'; payload: { userId: string } }
   | { type: 'TOGGLE_USER_COTASKER'; payload: { userId: string; shouldBeCoTasker: boolean } }
-  | { type: 'DELETE_TASK'; payload: { taskId: string } };
+  | { type: 'DELETE_TASK'; payload: { taskId: string } }
+  | { type: 'UPSERT_TASK'; payload: Task }
+  | { type: 'UPSERT_USER'; payload: User }
+  | { type: 'UPSERT_OFFER'; payload: Offer }
+  | { type: 'UPSERT_NOTIFICATION'; payload: Notification }
+  | { type: 'UPSERT_CONVERSATION'; payload: Conversation }
+  | { type: 'UPSERT_CHAT_REQUEST'; payload: ChatRequest }
+  | { type: 'UPSERT_CHAT_MESSAGE'; payload: ChatMessage }
+  | { type: 'UPSERT_WALLET_TRANSACTION'; payload: WalletTransaction }
+  | { type: 'UPSERT_REVIEW'; payload: Review }
+  | { type: 'REMOVE_OFFER'; payload: { offerId: string } }
+  | { type: 'REMOVE_CHAT_REQUEST'; payload: { requestId: string } }
+  | { type: 'REMOVE_CONVERSATION'; payload: { conversationId: string } }
+  | { type: 'REMOVE_CHAT_MESSAGE'; payload: { messageId: string } }
+  | { type: 'REMOVE_WALLET_TRANSACTION'; payload: { transactionId: string } }
+  | { type: 'REMOVE_REVIEW'; payload: { reviewId: string } };
 

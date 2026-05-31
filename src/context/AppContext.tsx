@@ -358,6 +358,141 @@ function appReducer(state: AppState, action: AppAction): AppState {
         tasks: state.tasks.filter((t) => t.id !== action.payload.taskId),
       };
 
+    case 'UPSERT_TASK': {
+      const task = action.payload;
+      const exists = state.tasks.some((t) => t.id === task.id);
+      return {
+        ...state,
+        tasks: exists
+          ? state.tasks.map((t) => (t.id === task.id ? { ...t, ...task } : t))
+          : [task, ...state.tasks],
+      };
+    }
+
+    case 'UPSERT_USER': {
+      const user = action.payload;
+      const exists = state.users.some((u) => u.id === user.id);
+      return {
+        ...state,
+        users: exists
+          ? state.users.map((u) => (u.id === user.id ? { ...u, ...user } : u))
+          : [user, ...state.users],
+      };
+    }
+
+    case 'UPSERT_OFFER': {
+      const offer = action.payload;
+      const exists = state.offers.some((o) => o.id === offer.id);
+      return {
+        ...state,
+        offers: exists
+          ? state.offers.map((o) => (o.id === offer.id ? { ...o, ...offer } : o))
+          : [...state.offers, offer],
+      };
+    }
+
+    case 'UPSERT_NOTIFICATION': {
+      const notif = action.payload;
+      const exists = state.notifications.some((n) => n.id === notif.id);
+      return {
+        ...state,
+        notifications: exists
+          ? state.notifications.map((n) => (n.id === notif.id ? { ...n, ...notif } : n))
+          : [notif, ...state.notifications],
+      };
+    }
+
+    case 'UPSERT_CONVERSATION': {
+      const conv = action.payload;
+      const exists = state.conversations.some((c) => c.id === conv.id);
+      return {
+        ...state,
+        conversations: exists
+          ? state.conversations.map((c) => (c.id === conv.id ? { ...c, ...conv } : c))
+          : [conv, ...state.conversations],
+      };
+    }
+
+    case 'UPSERT_CHAT_REQUEST': {
+      const req = action.payload;
+      const exists = state.chatRequests.some((r) => r.id === req.id);
+      return {
+        ...state,
+        chatRequests: exists
+          ? state.chatRequests.map((r) => (r.id === req.id ? { ...r, ...req } : r))
+          : [req, ...state.chatRequests],
+      };
+    }
+
+    case 'UPSERT_CHAT_MESSAGE': {
+      const msg = action.payload;
+      const exists = state.chatMessages.some((m) => m.id === msg.id);
+      return {
+        ...state,
+        chatMessages: exists
+          ? state.chatMessages.map((m) => (m.id === msg.id ? { ...m, ...msg } : m))
+          : [...state.chatMessages, msg],
+      };
+    }
+
+    case 'UPSERT_WALLET_TRANSACTION': {
+      const tx = action.payload;
+      const exists = state.walletTransactions.some((t) => t.id === tx.id);
+      return {
+        ...state,
+        walletTransactions: exists
+          ? state.walletTransactions.map((t) => (t.id === tx.id ? { ...t, ...tx } : t))
+          : [...state.walletTransactions, tx],
+      };
+    }
+
+    case 'UPSERT_REVIEW': {
+      const rev = action.payload;
+      const exists = state.reviews.some((r) => r.id === rev.id);
+      return {
+        ...state,
+        reviews: exists
+          ? state.reviews.map((r) => (r.id === rev.id ? { ...r, ...rev } : r))
+          : [...state.reviews, rev],
+      };
+    }
+
+    case 'REMOVE_OFFER':
+      return {
+        ...state,
+        offers: state.offers.filter((o) => o.id !== action.payload.offerId),
+      };
+
+    case 'REMOVE_CHAT_REQUEST':
+      return {
+        ...state,
+        chatRequests: state.chatRequests.filter((r) => r.id !== action.payload.requestId),
+      };
+
+    case 'REMOVE_CONVERSATION':
+      return {
+        ...state,
+        conversations: state.conversations.filter((c) => c.id !== action.payload.conversationId),
+      };
+
+    case 'REMOVE_CHAT_MESSAGE':
+      return {
+        ...state,
+        chatMessages: state.chatMessages.filter((m) => m.id !== action.payload.messageId),
+      };
+
+    case 'REMOVE_WALLET_TRANSACTION':
+      return {
+        ...state,
+        walletTransactions: state.walletTransactions.filter((t) => t.id !== action.payload.transactionId),
+      };
+
+    case 'REMOVE_REVIEW':
+      return {
+        ...state,
+        reviews: state.reviews.filter((r) => r.id !== action.payload.reviewId),
+      };
+
     default:
       return state;
   }
@@ -369,6 +504,111 @@ interface AppContextValue {
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
+
+const mapTask = (t: any): Task => ({
+  id: t.id,
+  title: t.title,
+  description: t.description,
+  category: t.category,
+  taskType: t.location === 'Remote' ? 'remote' : 'in_person',
+  location: t.location,
+  address: t.address,
+  date: t.date,
+  time: t.time || undefined,
+  budgetType: t.budget_type,
+  budget: t.budget || undefined,
+  images: t.images || [],
+  mustHaves: t.must_haves || [],
+  clientId: t.client_id,
+  assignedCoTaskerId: t.assigned_cotasker_id || undefined,
+  status: t.status,
+  createdAt: t.created_at,
+  offersCount: 0,
+  moderationStatus: t.moderation_status,
+});
+
+const mapUser = (u: any): User => ({
+  id: u.id,
+  email: u.email,
+  role: u.role as UserRole,
+  name: u.name,
+  avatarUrl: u.avatar_url || undefined,
+  coTaskerStatus: u.co_tasker_status || 'none',
+  isDisabled: u.is_disabled,
+  createdAt: u.created_at,
+  password: '',
+});
+
+const mapOffer = (o: any): Offer => ({
+  id: o.id,
+  taskId: o.task_id,
+  coTaskerId: o.cotasker_id,
+  price: Number(o.price),
+  message: o.message,
+  estimatedHours: o.estimated_hours,
+  status: o.status,
+  createdAt: o.created_at,
+});
+
+const mapNotification = (n: any): Notification => ({
+  id: n.id,
+  userId: n.user_id,
+  type: n.type,
+  title: n.title,
+  message: n.message,
+  isRead: n.is_read,
+  linkTo: n.link_to || undefined,
+  createdAt: n.created_at,
+});
+
+const mapWalletTransaction = (w: any): WalletTransaction => ({
+  id: w.id,
+  taskId: w.task_id,
+  clientId: w.client_id,
+  coTaskerId: w.cotasker_id || undefined,
+  amount: Number(w.amount),
+  status: w.status,
+  createdAt: w.created_at,
+});
+
+const mapReview = (r: any): Review => ({
+  id: r.id,
+  taskId: r.task_id,
+  fromUserId: r.from_user_id,
+  toUserId: r.to_user_id,
+  rating: r.rating,
+  comment: r.comment,
+  createdAt: r.created_at,
+});
+
+const mapConversation = (c: any): Conversation => ({
+  id: c.id,
+  participantIds: Array.isArray(c.participant_ids)
+    ? c.participant_ids
+    : JSON.parse(c.participant_ids || '[]'),
+  lastMessage: c.last_message || undefined,
+  lastMessageAt: c.last_message_at,
+  unreadCount: c.unread_count,
+  taskId: c.task_id || undefined,
+});
+
+const mapChatRequest = (cr: any): ChatRequest => ({
+  id: cr.id,
+  taskId: cr.task_id,
+  senderId: cr.sender_id,
+  receiverId: cr.receiver_id,
+  question: cr.question,
+  status: cr.status,
+  createdAt: cr.created_at,
+});
+
+const mapChatMessage = (m: any): ChatMessage => ({
+  id: m.id,
+  conversationId: m.conversation_id,
+  senderId: m.sender_id,
+  text: m.text,
+  createdAt: m.created_at,
+});
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
@@ -642,8 +882,75 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
+    // Setup Realtime Postgres subscriptions
+    const realtimeChannel = supabase
+      .channel('schema-db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'DELETE_TASK', payload: { taskId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_TASK', payload: mapTask(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, (payload) => {
+        if (payload.eventType !== 'DELETE') {
+          dispatch({ type: 'UPSERT_USER', payload: mapUser(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'REMOVE_OFFER', payload: { offerId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_OFFER', payload: mapOffer(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          // No remove notification action needed
+        } else {
+          dispatch({ type: 'UPSERT_NOTIFICATION', payload: mapNotification(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'REMOVE_CONVERSATION', payload: { conversationId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_CONVERSATION', payload: mapConversation(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_requests' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'REMOVE_CHAT_REQUEST', payload: { requestId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_CHAT_REQUEST', payload: mapChatRequest(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'REMOVE_CHAT_MESSAGE', payload: { messageId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_CHAT_MESSAGE', payload: mapChatMessage(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wallet_transactions' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'REMOVE_WALLET_TRANSACTION', payload: { transactionId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_WALLET_TRANSACTION', payload: mapWalletTransaction(payload.new) });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          dispatch({ type: 'REMOVE_REVIEW', payload: { reviewId: payload.old.id } });
+        } else {
+          dispatch({ type: 'UPSERT_REVIEW', payload: mapReview(payload.new) });
+        }
+      })
+      .subscribe();
+
     return () => {
       subscription.unsubscribe();
+      realtimeChannel.unsubscribe();
     };
   }, []);
 
