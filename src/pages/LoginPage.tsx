@@ -2,23 +2,20 @@ import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Eye, EyeOff, ChevronRight } from 'lucide-react';
-
-const DEMO_ACCOUNTS = [
-  { label: 'Sarah Mitchell (Client Focus)', email: 'client@demo.com', password: '123456', color: 'var(--color-secondary)' },
-  { label: 'Marcus Weber (Tasker Focus)', email: 'cotasker@demo.com', password: '123456', color: 'var(--color-primary-container)' },
-  { label: 'Admin Account', email: 'admin@demo.com', password: '123456', color: 'var(--color-tertiary)' },
-];
-
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { supabase } from '../utils/supabaseClient';
 import { useTranslation } from '../context/LanguageContext';
 
 export function LoginPage() {
-  const { currentUser, login } = useAuth();
+  const { currentUser, login, signUp } = useAuth();
   const { showToast } = useToast();
   const { t, language } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,21 +29,40 @@ export function LoginPage() {
     setError('');
     setIsLoading(true);
     try {
-      await login(email, password);
-      showToast('Welcome back!', 'success');
-      // Navigate handled by the redirect above on next render
+      if (isSignUp) {
+        await signUp(email, password, name || 'New Member');
+        showToast('Account created successfully! Welcome to Dopzy.', 'success');
+      } else {
+        await login(email, password);
+        showToast('Welcome back!', 'success');
+      }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Login failed';
+      const msg = err instanceof Error ? err.message : 'Authentication failed';
       setError(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fillCredentials = (acc: typeof DEMO_ACCOUNTS[0]) => {
-    setEmail(acc.email);
-    setPassword(acc.password);
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password',
+      });
+      if (error) {
+        throw new Error(error.message);
+      }
+      showToast('Password reset link sent! Check your inbox.', 'success');
+      setIsForgotPassword(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to send reset link';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -132,134 +148,240 @@ export function LoginPage() {
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: 'var(--space-8)' }}>
             <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: 'var(--text-headline-lg)', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: 'var(--space-2)' }}>
-              {t('login.login_btn')}
+              {isForgotPassword ? 'Reset Password' : (isSignUp ? 'Create an Account' : t('login.login_btn'))}
             </h2>
             <p style={{ fontSize: 'var(--text-body-md)', color: 'var(--color-on-surface-variant)' }}>
-              {t('login.select_profile')}
+              {isForgotPassword 
+                ? 'Enter your email address and we will send you a link to reset your password.'
+                : (isSignUp ? 'Sign up to post tasks or offer your services on Dopzy.' : 'Sign in to access your dashboard and manage tasks.')
+              }
             </p>
           </div>
 
-          {/* Demo Account Cards */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
-            <p style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-3)' }}>
-              Demo Accounts — Click to fill
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.email}
-                  onClick={() => fillCredentials(acc)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 'var(--space-3) var(--space-4)',
-                    background: 'var(--color-surface-container-low)',
-                    border: `1px solid var(--color-outline-variant)`,
-                    borderLeft: `4px solid ${acc.color}`,
-                    borderRadius: 'var(--radius)',
-                    cursor: 'pointer',
-                    transition: 'all var(--transition-fast)',
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-container)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--color-surface-container-low)'; }}
-                >
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>{acc.label}</div>
-                    <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>{acc.email}</div>
-                  </div>
-                  <ChevronRight size={16} style={{ color: 'var(--color-on-surface-variant)' }} />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-            <div style={{ flex: 1, height: '1px', background: 'var(--color-surface-container-highest)' }} />
-            <span style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>or sign in manually</span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--color-surface-container-highest)' }} />
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">{t('login.email')}</label>
-              <input
-                id="email"
-                type="email"
-                className="form-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                autoComplete="email"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">{t('login.password')}</label>
-              <div style={{ position: 'relative' }}>
+          {isForgotPassword ? (
+            /* Forgot Password Form */
+            <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div className="form-group">
+                <label htmlFor="reset-email" className="form-label">{t('login.email')}</label>
                 <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  id="reset-email"
+                  type="email"
                   className="form-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
                   required
-                  autoComplete="current-password"
-                  style={{ paddingRight: '44px' }}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute', right: '12px', top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none', border: 'none',
-                    color: 'var(--color-on-surface-variant)',
-                    cursor: 'pointer', padding: '4px',
-                  }}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
               </div>
-            </div>
 
-            {error && (
-              <div style={{
-                padding: 'var(--space-3) var(--space-4)',
-                background: 'var(--color-error-container)',
-                color: 'var(--color-on-error-container)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-body-sm)',
-                fontWeight: 500,
-              }}>
-                {error}
+              {error && (
+                <div style={{
+                  padding: 'var(--space-3) var(--space-4)',
+                  background: 'var(--color-error-container)',
+                  color: 'var(--color-on-error-container)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-body-sm)',
+                  fontWeight: 500,
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  marginTop: 'var(--space-2)',
+                  borderRadius: '999px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px',
+                  height: '48px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                }}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="spinner" style={{ width: '18px', height: '18px', borderColor: 'rgba(0,48,59,0.3)', borderTopColor: '#00303b' }} />
+                    Sending Link...
+                  </>
+                ) : (
+                  <>
+                    <span>Send Reset Link</span>
+                    <ArrowRight size={18} strokeWidth={2.5} />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outlined btn-lg"
+                onClick={() => {
+                  setIsForgotPassword(false);
+                  setError('');
+                }}
+                style={{ width: '100%' }}
+              >
+                Back to Sign In
+              </button>
+            </form>
+          ) : (
+            /* Login / Signup Form */
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {isSignUp && (
+                <div className="form-group">
+                  <label htmlFor="name" className="form-label">Full Name</label>
+                  <input
+                    id="name"
+                    type="text"
+                    className="form-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">{t('login.email')}</label>
+                <input
+                  id="email"
+                  type="email"
+                  className="form-input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  autoComplete="email"
+                />
               </div>
-            )}
 
-            <button
-              type="submit"
-              className="btn btn-secondary btn-lg"
-              disabled={isLoading}
-              style={{ width: '100%', marginTop: 'var(--space-2)' }}
-            >
-              {isLoading ? (
-                <>
-                  <span className="spinner" style={{ width: '18px', height: '18px', borderColor: 'rgba(255,255,255,0.5)', borderTopColor: '#fff' }} />
-                  {language === 'de' ? 'Anmeldung...' : 'Signing in...'}
-                </>
-              ) : t('login.login_btn')}
-            </button>
-          </form>
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label htmlFor="password" className="form-label" style={{ marginBottom: 0 }}>{t('login.password')}</label>
+                  {!isSignUp && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsForgotPassword(true);
+                        setError('');
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-secondary)',
+                        fontSize: 'var(--text-body-sm)',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="form-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••"
+                    required
+                    autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                    style={{ paddingRight: '44px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute', right: '12px', top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none', border: 'none',
+                      color: 'var(--color-on-surface-variant)',
+                      cursor: 'pointer', padding: '4px',
+                    }}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
 
-          <p style={{ marginTop: 'var(--space-6)', fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)', textAlign: 'center' }}>
-            This is a demo application. All data is simulated.
-          </p>
+              {error && (
+                <div style={{
+                  padding: 'var(--space-3) var(--space-4)',
+                  background: 'var(--color-error-container)',
+                  color: 'var(--color-on-error-container)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-body-sm)',
+                  fontWeight: 500,
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  marginTop: 'var(--space-2)',
+                  borderRadius: '999px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px',
+                  height: '48px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                }}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="spinner" style={{ width: '18px', height: '18px', borderColor: 'rgba(0,48,59,0.3)', borderTopColor: '#00303b' }} />
+                    {isSignUp ? 'Registering...' : (language === 'de' ? 'Anmeldung...' : 'Signing in...')}
+                  </>
+                ) : (
+                  <>
+                    <span>{isSignUp ? 'Create Account' : t('login.login_btn')}</span>
+                    <ArrowRight size={18} strokeWidth={2.5} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {!isForgotPassword && (
+            <p style={{ marginTop: 'var(--space-6)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', textAlign: 'center' }}>
+              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError('');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-secondary)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0,
+                }}
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </button>
+            </p>
+          )}
         </div>
       </div>
 

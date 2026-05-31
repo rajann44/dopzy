@@ -250,3 +250,17 @@ create policy "Allow message access to conversation participants" on public.chat
       and participant_ids @> jsonb_build_array(auth.uid()::text)
     )
   );
+
+-- ─── 6. SCHEMA PRIVILEGES GRANTS ─────────────────────────────────────────────
+-- Grant schema usage and basic permissions to API roles (anon and authenticated)
+grant usage on schema public to postgres, anon, authenticated, service_role;
+
+grant select, insert, update, delete on all tables in schema public to postgres, anon, authenticated, service_role;
+grant usage, select on all sequences in schema public to postgres, anon, authenticated, service_role;
+grant execute on all functions in schema public to postgres, anon, authenticated, service_role;
+
+-- Ensure default privileges apply to future tables/sequences/functions as well
+alter default privileges in schema public grant select, insert, update, delete on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant usage, select on sequences to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant execute on functions to postgres, anon, authenticated, service_role;
+
