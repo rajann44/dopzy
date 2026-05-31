@@ -754,7 +754,7 @@ export function ProfilePage() {
                             <Languages size={12} style={{ color: 'var(--color-secondary-mid)' }} />
                             Languages Spoken
                           </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                             {taskerProfile.languages.map((l) => (
                               <span key={l} className="chip" style={{ fontSize: '10px', textTransform: 'none', letterSpacing: 'normal', padding: '3px 8px' }}>
                                 {l}
@@ -777,7 +777,7 @@ export function ProfilePage() {
                     <div className="card-body" style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                       <div>
                         <div className="section-label" style={{ fontSize: '10px', marginBottom: '6px' }}>Core Categories</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1.5)' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                           {taskerProfile.categories.map((cat) => (
                             <span key={cat} className="chip chip-active" style={{ fontSize: '10px' }}>{cat}</span>
                           ))}
@@ -786,7 +786,7 @@ export function ProfilePage() {
                       {taskerProfile.skills && taskerProfile.skills.length > 0 && (
                         <div>
                           <div className="section-label" style={{ fontSize: '10px', marginBottom: '6px' }}>Specialist Skills</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1.5)' }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                             {taskerProfile.skills.map((skill) => (
                               <span key={skill} className="chip" style={{ fontSize: '10px', background: 'var(--color-surface-container-low)' }}>{skill}</span>
                             ))}

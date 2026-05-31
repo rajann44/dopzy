@@ -1,6 +1,6 @@
-import { NavLink, useNavigate, Link } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  ListTodo, Bell, MessageSquare, LogOut, Search, Settings, Shield
+  ListTodo, Bell, MessageSquare, LogOut, Search, Settings, Shield, User
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
@@ -52,14 +52,15 @@ export function Sidebar() {
 
       {/* ── Logo ── */}
       <div style={{
-        padding: '20px 20px 18px',
+        padding: '0 20px',
+        height: '64px',
         borderBottom: '1px solid var(--sidebar-border)',
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
         flexShrink: 0,
       }}>
-        <svg width="38" height="38" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius)', flexShrink: 0 }}>
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius)', flexShrink: 0 }}>
           <rect width="100" height="100" rx="16" fill="#004352"/>
           <path d="M30 50L45 65L75 35" stroke="#FFE600" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
           <path d="M25 25L40 25" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
@@ -119,19 +120,6 @@ export function Sidebar() {
           }}>
             {currentUser.role === 'admin' ? 'Admin' : 'Member'}
           </div>
-          <Link
-            to={`/profile/${currentUser.id}`}
-            style={{
-              fontSize: '11px',
-              color: 'var(--color-primary)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              display: 'inline-block',
-              marginTop: '1px'
-            }}
-          >
-            {t('nav.profile_view') || 'View Profile'}
-          </Link>
         </div>
       </div>
 
@@ -186,6 +174,11 @@ export function Sidebar() {
         }}>
           Account
         </div>
+        <SidebarLink
+          to={`/profile/${currentUser.id}`}
+          label={t('nav.profile') || 'Profile'}
+          icon={<User size={17} />}
+        />
         <SidebarLink
           to="/notifications"
           label={t('nav.notifications')}

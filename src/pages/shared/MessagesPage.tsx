@@ -372,11 +372,13 @@ export function MessagesPage() {
         flexDirection: 'column',
         flexShrink: 0
       }}>
-        <div style={{ padding: 'var(--space-5) var(--space-6)', borderBottom: '1px solid var(--color-outline-variant)' }}>
-          <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>{t('messages.title')}</h1>
-          <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '11px', margin: '4px 0 0 0' }}>
-            {t('messages.subtitle')}
-          </p>
+        <div style={{ padding: '0 var(--space-6)', height: '64px', borderBottom: '1px solid var(--color-outline-variant)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <div>
+            <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700, fontSize: '16px', lineHeight: 1.2 }}>{t('messages.title')}</h1>
+            <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '11px', margin: '2px 0 0 0' }}>
+              {t('messages.subtitle')}
+            </p>
+          </div>
         </div>
 
         {/* Tab Selection */}
@@ -570,14 +572,16 @@ export function MessagesPage() {
           <>
             {/* Chat header */}
             <div style={{
-              padding: 'var(--space-4) var(--space-6)',
+              padding: '0 var(--space-6)',
+              height: '64px',
               borderBottom: '1px solid var(--color-outline-variant)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              background: 'var(--color-surface-white)'
+              background: 'var(--color-surface-white)',
+              flexShrink: 0
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                 <div 
                   onClick={() => {
                     if (activeChatParticipant?.role === 'tasker') {
@@ -588,41 +592,41 @@ export function MessagesPage() {
                     cursor: activeChatParticipant?.role === 'tasker' ? 'pointer' : 'default',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px'
+                    gap: '12px',
+                    minWidth: 0
                   }}
                 >
                   <Avatar name={activeChatParticipant?.name || 'User'} avatarUrl={activeChatParticipant?.avatarUrl} size="md" />
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <div style={{ 
                       fontWeight: 700, 
                       color: 'var(--color-secondary)', 
                       fontSize: '14px',
+                      lineHeight: 1.2,
                       textDecoration: activeChatParticipant?.role === 'tasker' ? 'underline decoration-transparent hover:decoration-primary' : 'none'
                     }} className="hover-underline">
                       {activeChatParticipant?.name}
                     </div>
                     {activeTask && (
-                      <>
-                        <Link 
-                          to={`/tasks/${activeTask.id}`} 
-                          onClick={(e) => e.stopPropagation()} // prevent opening profile drawer
-                          style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
-                        >
-                          <strong>{t('messages.regarding')}</strong> {activeTask.title} <ChevronRight size={12} />
-                        </Link>
-                        {taskStatusForDisplay && (
-                          <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
-                              {t('tasks.status')}
-                            </span>
-                            <StatusBadge status={taskStatusForDisplay} />
-                          </div>
-                        )}
-                      </>
+                      <Link 
+                        to={`/tasks/${activeTask.id}`} 
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ fontSize: '11px', color: 'var(--color-secondary-mid)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                      >
+                        <strong>{t('messages.regarding')}</strong> {activeTask.title} <ChevronRight size={12} />
+                      </Link>
                     )}
                   </div>
                 </div>
               </div>
+              {taskStatusForDisplay && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                  <span style={{ fontSize: '10px', color: 'var(--color-on-surface-variant)', fontWeight: 700, textTransform: 'uppercase' }}>
+                    {t('tasks.status')}
+                  </span>
+                  <StatusBadge status={taskStatusForDisplay} />
+                </div>
+              )}
             </div>
 
             {/* Contextual Offer Banner */}
