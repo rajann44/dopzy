@@ -435,6 +435,25 @@ input, textarea, select { font-family: inherit; }
   transition: border-color var(--transition-fast), border-width var(--transition-fast);
   outline: none;
   font-family: var(--font-body);
+  margin: 0;
+  box-sizing: border-box;
+}
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23004352' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0 center;
+  background-repeat: no-repeat;
+  background-size: 1.25em 1.25em;
+  padding: 8px 24px 8px 0;
+  cursor: pointer;
+  height: 41px;
+  line-height: var(--lh-body-md);
+  vertical-align: middle;
+}
+.form-select::-ms-expand {
+  display: none;
 }
 .form-input::placeholder, .form-textarea::placeholder { color: var(--color-on-surface-variant); opacity: 0.8; }
 

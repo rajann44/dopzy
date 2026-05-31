@@ -6,6 +6,7 @@ import posthog from '../utils/posthogClient';
 
 interface AuthContextValue {
   currentUser: User | null;
+  isEmailVerified: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
   const { showToast } = useToast();
 
@@ -62,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!active) return;
       if (session) {
+        setIsEmailVerified(!!session.user.email_confirmed_at);
         fetchUserProfile(session.user.id).then((profile) => {
           if (!active) return;
           if (profile) {
@@ -76,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
         });
       } else {
+        setIsEmailVerified(true);
         setIsLoading(false);
       }
     });
@@ -83,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!active) return;
       if (session) {
+        setIsEmailVerified(!!session.user.email_confirmed_at);
         const profile = await fetchUserProfile(session.user.id);
         if (!active) return;
         if (profile) {
@@ -95,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } else {
+        setIsEmailVerified(true);
         setCurrentUser(null);
       }
       setIsLoading(false);
@@ -206,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, isLoading, login, signUp, logout, updateCurrentUser }}>
+    <AuthContext.Provider value={{ currentUser, isEmailVerified, isLoading, login, signUp, logout, updateCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

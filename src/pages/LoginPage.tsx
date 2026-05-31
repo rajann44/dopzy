@@ -9,7 +9,7 @@ import { useTranslation } from '../context/LanguageContext';
 export function LoginPage() {
   const { currentUser, login, signUp } = useAuth();
   const { showToast } = useToast();
-  const { t, language } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -144,7 +144,53 @@ export function LoginPage() {
         padding: 'var(--space-12) var(--space-16)',
         background: 'var(--color-surface-white)',
         overflowY: 'auto',
+        position: 'relative'
       }} className="login-form-panel">
+        {/* Language selector */}
+        <div style={{
+          position: 'absolute',
+          top: 'var(--space-6)',
+          right: 'var(--space-6)',
+          display: 'flex',
+          gap: 'var(--space-2)',
+          zIndex: 10
+        }}>
+          <button
+            type="button"
+            onClick={() => setLanguage('en')}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              border: language === 'en' ? '1.5px solid var(--color-secondary)' : '1.5px solid transparent',
+              background: language === 'en' ? 'var(--color-primary-container)' : 'transparent',
+              color: 'var(--color-secondary)',
+              fontWeight: 700,
+              fontSize: '11px',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)'
+            }}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            onClick={() => setLanguage('de')}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              border: language === 'de' ? '1.5px solid var(--color-secondary)' : '1.5px solid transparent',
+              background: language === 'de' ? 'var(--color-primary-container)' : 'transparent',
+              color: 'var(--color-secondary)',
+              fontWeight: 700,
+              fontSize: '11px',
+              cursor: 'pointer',
+              transition: 'all var(--transition-fast)'
+            }}
+          >
+            DE
+          </button>
+        </div>
+
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: 'var(--space-8)' }}>
             <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: 'var(--text-headline-lg)', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: 'var(--space-2)' }}>
