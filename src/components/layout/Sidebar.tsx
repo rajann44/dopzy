@@ -6,6 +6,22 @@ import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
 import { Avatar } from '../ui/Avatar';
 import { useTranslation } from '../../context/LanguageContext';
+import { prefetchRoute } from '../../utils/prefetch';
+
+const routeKeyMap: Record<string, 'marketplace' | 'myTasks' | 'messages' | 'notifications' | 'settings' | 'moderation'> = {
+  '/browse': 'marketplace',
+  '/my-tasks': 'myTasks',
+  '/messages': 'messages',
+  '/notifications': 'notifications',
+  '/settings': 'settings',
+  '/admin/moderation': 'moderation',
+};
+
+function getPrefetchKey(to: string): 'marketplace' | 'myTasks' | 'messages' | 'notifications' | 'settings' | 'moderation' | 'profile' | undefined {
+  if (to.startsWith('/profile/')) return 'profile';
+  return routeKeyMap[to];
+}
+
 
 interface NavItem {
   to: string;
@@ -249,6 +265,8 @@ function SidebarLink({ to, label, icon, badge }: NavItem & { badge?: number }) {
         if (!(e.currentTarget as HTMLElement).getAttribute('aria-current')) {
           (e.currentTarget as HTMLElement).style.background = 'var(--sidebar-bg-hover)';
         }
+        const key = getPrefetchKey(to);
+        if (key) prefetchRoute(key);
       }}
       onMouseLeave={(e) => {
         const isActive = (e.currentTarget as HTMLElement).getAttribute('aria-current') === 'page';

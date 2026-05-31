@@ -9,7 +9,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useAppContext, createTaskAction } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { Input, Textarea, Select } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
 import { FloatingStepActions } from '../../components/ui/FloatingStepActions';
 import { TASK_CATEGORIES, AUSTRALIAN_CITIES, CATEGORY_LUCIDE_ICONS } from '../../utils/constants';
 import { Modal } from '../../components/ui/Modal';
@@ -247,44 +246,11 @@ export function NewTaskPage() {
       : form.date;
     const taskTime = form.scheduleType === 'asap' ? 'ASAP' : form.time;
 
-    // 1. Insert the task into Supabase
-    let dbTaskId = '';
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert({
-          title: form.title.trim(),
-          description: form.description.trim(),
-          category: form.category,
-          location: form.taskType === 'remote' ? 'Remote' : form.location,
-          address: form.taskType === 'remote' ? 'Remote Task' : form.address.trim(),
-          date: taskDate,
-          time: taskTime || null,
-          budget_type: form.budgetType,
-          budget: form.budgetType !== 'open_to_offers' ? Number(form.budget) : null,
-          images: form.imageUrl ? [form.imageUrl] : [],
-          must_haves: form.mustHaves,
-          client_id: currentUser!.id,
-          status: 'open',
-          moderation_status: 'pending',
-        })
-        .select('id')
-        .single();
+    const tempId = crypto.randomUUID();
 
-      if (error) {
-        throw error;
-      }
-      dbTaskId = data.id;
-    } catch (dbErr: any) {
-      console.error('Error saving task to Supabase:', dbErr);
-      showToast(dbErr.message || 'Failed to save task to database.', 'error');
-      setIsLoading(false);
-      return;
-    }
-
-    // 2. Construct the frontend Task object using the generated DB UUID
+    // 1. Construct the frontend Task object using the client-generated UUID
     const newTask: Task = {
-      id: dbTaskId,
+      id: tempId,
       title: form.title.trim(),
       description: form.description.trim(),
       category: form.category as TaskCategory,
@@ -304,44 +270,77 @@ export function NewTaskPage() {
       moderationStatus: 'pending',
     };
 
+    // 2. Dispatch createTaskAction immediately and navigate (Optimistic UI)
     dispatch(createTaskAction(newTask));
-
-    // 3. Schedule a reminder via QStash
-    try {
-      // For ASAP tasks, schedule in 10 seconds for demo/test purposes.
-      // Otherwise, schedule for the set date/time if in the future, or default to 30 seconds.
-      let delaySeconds = 10;
-      if (form.scheduleType !== 'asap' && form.date) {
-        const taskDateTime = new Date(`${form.date}T${form.time || '12:00'}`);
-        const now = new Date();
-        const diffMs = taskDateTime.getTime() - now.getTime();
-        if (diffMs > 0) {
-          delaySeconds = Math.floor(diffMs / 1000);
-        }
-      }
-
-      await scheduleTaskReminder({
-        userId: currentUser!.id,
-        taskId: dbTaskId,
-        taskTitle: newTask.title,
-        delaySeconds,
-      });
-    } catch (e) {
-      console.error('Failed to schedule task reminder via QStash:', e);
-    }
-
-    posthog.capture('task_posted', {
-      task_id: newTask.id,
-      category: newTask.category,
-      task_type: newTask.taskType,
-      budget_type: newTask.budgetType,
-      budget: newTask.budget,
-      location: newTask.location,
-      schedule_type: form.scheduleType,
-    });
     showToast(t('new_task.post_success') || 'Task posted successfully! It will be visible in the marketplace once approved by moderation.', 'success');
     setIsLoading(false);
-    navigate(`/tasks/${newTask.id}`);
+    navigate(`/tasks/${tempId}`);
+
+    // 3. Save task to Supabase in the background
+    (async () => {
+      try {
+        const { error } = await supabase
+          .from('tasks')
+          .insert({
+            id: tempId,
+            title: form.title.trim(),
+            description: form.description.trim(),
+            category: form.category,
+            location: form.taskType === 'remote' ? 'Remote' : form.location,
+            address: form.taskType === 'remote' ? 'Remote Task' : form.address.trim(),
+            date: taskDate,
+            time: taskTime || null,
+            budget_type: form.budgetType,
+            budget: form.budgetType !== 'open_to_offers' ? Number(form.budget) : null,
+            images: form.imageUrl ? [form.imageUrl] : [],
+            must_haves: form.mustHaves,
+            client_id: currentUser!.id,
+            status: 'open',
+            moderation_status: 'pending',
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        // 4. Schedule a reminder via QStash
+        try {
+          let delaySeconds = 10;
+          if (form.scheduleType !== 'asap' && form.date) {
+            const taskDateTime = new Date(`${form.date}T${form.time || '12:00'}`);
+            const now = new Date();
+            const diffMs = taskDateTime.getTime() - now.getTime();
+            if (diffMs > 0) {
+              delaySeconds = Math.floor(diffMs / 1000);
+            }
+          }
+
+          await scheduleTaskReminder({
+            userId: currentUser!.id,
+            taskId: tempId,
+            taskTitle: newTask.title,
+            delaySeconds,
+          });
+        } catch (e) {
+          console.error('Failed to schedule task reminder via QStash:', e);
+        }
+
+        posthog.capture('task_posted', {
+          task_id: tempId,
+          category: newTask.category,
+          task_type: newTask.taskType,
+          budget_type: newTask.budgetType,
+          budget: newTask.budget,
+          location: newTask.location,
+          schedule_type: form.scheduleType,
+        });
+      } catch (dbErr: any) {
+        console.error('Error saving task to Supabase:', dbErr);
+        showToast(dbErr.message || 'Failed to save task to database.', 'error');
+        // Rollback optimistic task
+        dispatch({ type: 'DELETE_TASK', payload: { taskId: tempId } });
+      }
+    })();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

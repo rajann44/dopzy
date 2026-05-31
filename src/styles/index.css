@@ -1067,4 +1067,11 @@ tbody tr:hover td                 { background: var(--color-surface-container-lo
   color: var(--color-on-surface);
 }
 
+/* Rendering containment for long lists */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 350px;
+}
+
+
 

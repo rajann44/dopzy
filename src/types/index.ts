@@ -301,4 +301,6 @@ export type AppAction =
   | { type: 'REMOVE_CONVERSATION'; payload: { conversationId: string } }
   | { type: 'REMOVE_CHAT_MESSAGE'; payload: { messageId: string } }
   | { type: 'REMOVE_WALLET_TRANSACTION'; payload: { transactionId: string } }
-  | { type: 'REMOVE_REVIEW'; payload: { reviewId: string } };
+  | { type: 'REMOVE_REVIEW'; payload: { reviewId: string } }
+  | { type: 'HYDRATE_STATE'; payload: AppState };
+

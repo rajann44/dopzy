@@ -13,6 +13,7 @@ import {
 } from '../data/notifications';
 import { generateId } from '../utils/formatters';
 import { supabase } from '../utils/supabaseClient';
+import { getItem, setItem } from '../utils/db';
 
 const initialState: AppState = {
   users: MOCK_USERS,
@@ -28,6 +29,12 @@ const initialState: AppState = {
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case 'HYDRATE_STATE':
+      return {
+        ...state,
+        ...action.payload,
+      };
+
     case 'SET_USERS':
       return {
         ...state,
@@ -630,6 +637,24 @@ const mapChatMessage = (m: any): ChatMessage => ({
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  // 1. Hydrate state from IndexedDB on mount
+  useEffect(() => {
+    async function initHydration() {
+      const cached = await getItem<AppState>('dopzy-app-state');
+      if (cached) {
+        dispatch({ type: 'HYDRATE_STATE', payload: cached });
+      }
+    }
+    initHydration();
+  }, []);
+
+  // 2. Persist state to IndexedDB when it updates
+  useEffect(() => {
+    if (state.tasks.length > 0) {
+      setItem('dopzy-app-state', state);
+    }
+  }, [state]);
 
   useEffect(() => {
     async function fetchTasks() {

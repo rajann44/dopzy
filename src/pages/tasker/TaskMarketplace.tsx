@@ -79,7 +79,9 @@ export function TaskMarketplace() {
         ) : tasks.length > 0 ? (
           <div className="grid-tasks">
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} linkPrefix="" />
+              <div key={task.id} className="content-visibility-auto">
+                <TaskCard task={task} linkPrefix="" />
+              </div>
             ))}
           </div>
         ) : (

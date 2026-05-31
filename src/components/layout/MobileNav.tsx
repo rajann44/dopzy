@@ -2,6 +2,17 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Search, Briefcase, ListTodo, Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
+import { prefetchRoute } from '../../utils/prefetch';
+
+const mobilePrefetchMap: Record<string, 'marketplace' | 'myTasks' | 'notifications'> = {
+  '/client/dashboard': 'marketplace',
+  '/client/tasks': 'myTasks',
+  '/tasker/dashboard': 'marketplace',
+  '/tasker/tasks': 'marketplace',
+  '/tasker/jobs': 'myTasks',
+  '/notifications': 'notifications',
+};
+
 
 export function MobileNav() {
   const { currentUser, logout } = useAuth();
@@ -67,6 +78,10 @@ export function MobileNav() {
               padding: '8px 0',
               position: 'relative',
             })}
+            onMouseEnter={() => {
+              const key = mobilePrefetchMap[to];
+              if (key) prefetchRoute(key);
+            }}
           >
             <div style={{ position: 'relative' }}>
               <Icon size={20} />

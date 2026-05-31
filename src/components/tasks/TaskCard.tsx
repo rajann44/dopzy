@@ -5,6 +5,7 @@ import { StatusBadge } from '../ui/Badge';
 import { CATEGORY_ICONS } from '../../utils/constants';
 import { formatDate, formatCurrency, truncate } from '../../utils/formatters';
 import { TaskPlaceholderImage } from './TaskPlaceholderImage';
+import { getOptimizedImageUrl } from '../../utils/image';
 
 interface TaskCardProps {
   task: Task;
@@ -56,7 +57,7 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
         }}>
           {hasImage ? (
             <img 
-              src={task.images[0]} 
+              src={getOptimizedImageUrl(task.images[0], 500)} 
               alt={task.title} 
               style={{ 
                 width: '100%', 
@@ -65,6 +66,7 @@ export function TaskCard({ task, linkPrefix = '/client', }: TaskCardProps) {
                 transition: 'transform var(--transition-medium)'
               }} 
               className="task-card-image"
+              loading="lazy"
             />
           ) : (
             <div style={{ width: '100%', height: '100%', transition: 'transform var(--transition-medium)' }} className="task-card-image">

@@ -284,96 +284,98 @@ export function MyTasksPage() {
               {postedAds.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                   {postedAds.map((task) => (
-                    <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
-                      <div className="card card-hover">
-                        <div className="card-body" style={{ padding: 'var(--space-4)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
-                                <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
-                                </span>
-                                <StatusBadge status={task.status === 'open' && task.offersCount > 0 ? 'receiving_offers' : task.status} />
-                                {task.moderationStatus === 'pending' && (
-                                  <span className="badge badge-pending" style={{ fontSize: '10px' }}>⏳ {t('tasks.moderation_pending_badge')}</span>
-                                )}
+                    <div key={task.id} className="content-visibility-auto">
+                      <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
+                        <div className="card card-hover">
+                          <div className="card-body" style={{ padding: 'var(--space-4)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
+                                  <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
+                                  </span>
+                                  <StatusBadge status={task.status === 'open' && task.offersCount > 0 ? 'receiving_offers' : task.status} />
+                                  {task.moderationStatus === 'pending' && (
+                                    <span className="badge badge-pending" style={{ fontSize: '10px' }}>⏳ {t('tasks.moderation_pending_badge')}</span>
+                                  )}
+                                  {task.moderationStatus === 'rejected' && (
+                                    <span className="badge badge-rejected" style={{ fontSize: '10px' }}>⚠️ {t('tasks.moderation_rejected_badge')}</span>
+                                  )}
+                                </div>
+                                <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
+                                <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
+                                  {task.location} · Posted {formatDate(task.createdAt)}
+                                </div>
                                 {task.moderationStatus === 'rejected' && (
-                                  <span className="badge badge-rejected" style={{ fontSize: '10px' }}>⚠️ {t('tasks.moderation_rejected_badge')}</span>
-                                )}
-                              </div>
-                              <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
-                              <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
-                                {task.location} · Posted {formatDate(task.createdAt)}
-                              </div>
-                              {task.moderationStatus === 'rejected' && (
-                                <div style={{ 
-                                  marginTop: '8px', 
-                                  padding: '6px 12px', 
-                                  background: 'rgba(211, 47, 47, 0.06)', 
-                                  borderLeft: '3px solid var(--color-status-error)', 
-                                  fontSize: '12px', 
-                                  color: 'var(--color-status-error)',
-                                  borderRadius: '0 4px 4px 0',
-                                  fontWeight: 500
-                                }}>
-                                  {t('tasks.moderation_rejected_desc')}
-                                </div>
-                              )}
-                              {task.moderationStatus === 'pending' && (
-                                <div style={{ 
-                                  marginTop: '8px', 
-                                  padding: '6px 12px', 
-                                  background: 'rgba(245, 127, 23, 0.06)', 
-                                  borderLeft: '3px solid #F57F17', 
-                                  fontSize: '12px', 
-                                  color: '#F57F17',
-                                  borderRadius: '0 4px 4px 0',
-                                  fontWeight: 500
-                                }}>
-                                  {t('tasks.moderation_pending_desc')}
-                                </div>
-                              )}
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                              <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
-                                  {task.budget ? formatCurrency(task.budget) : 'Open Budget'}
-                                </div>
-                                {task.offersCount > 0 ? (
                                   <div style={{ 
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    background: 'rgba(255, 215, 0, 0.12)', 
-                                    color: 'var(--color-secondary)', 
-                                    padding: '4px 8px', 
-                                    borderRadius: 'var(--radius)', 
-                                    fontSize: '11px', 
-                                    fontWeight: 600,
-                                    marginTop: '4px',
-                                    border: '1px solid rgba(230, 194, 0, 0.3)'
+                                    marginTop: '8px', 
+                                    padding: '6px 12px', 
+                                    background: 'rgba(211, 47, 47, 0.06)', 
+                                    borderLeft: '3px solid var(--color-status-error)', 
+                                    fontSize: '12px', 
+                                    color: 'var(--color-status-error)',
+                                    borderRadius: '0 4px 4px 0',
+                                    fontWeight: 500
                                   }}>
-                                    <span style={{ 
-                                      width: '6px', 
-                                      height: '6px', 
-                                      borderRadius: '50%', 
-                                      background: 'var(--color-primary-container)', 
-                                      display: 'inline-block' 
-                                    }} />
-                                    <span>{task.offersCount} Offer{task.offersCount !== 1 ? 's' : ''} to review</span>
+                                    {t('tasks.moderation_rejected_desc')}
                                   </div>
-                                ) : (
-                                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginTop: '4px' }}>
-                                    No offers yet
+                                )}
+                                {task.moderationStatus === 'pending' && (
+                                  <div style={{ 
+                                    marginTop: '8px', 
+                                    padding: '6px 12px', 
+                                    background: 'rgba(245, 127, 23, 0.06)', 
+                                    borderLeft: '3px solid #F57F17', 
+                                    fontSize: '12px', 
+                                    color: '#F57F17',
+                                    borderRadius: '0 4px 4px 0',
+                                    fontWeight: 500
+                                  }}>
+                                    {t('tasks.moderation_pending_desc')}
                                   </div>
                                 )}
                               </div>
-                              <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                                <div style={{ textAlign: 'right' }}>
+                                  <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
+                                    {task.budget ? formatCurrency(task.budget) : 'Open Budget'}
+                                  </div>
+                                  {task.offersCount > 0 ? (
+                                    <div style={{ 
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      background: 'rgba(255, 215, 0, 0.12)', 
+                                      color: 'var(--color-secondary)', 
+                                      padding: '4px 8px', 
+                                      borderRadius: 'var(--radius)', 
+                                      fontSize: '11px', 
+                                      fontWeight: 600,
+                                      marginTop: '4px',
+                                      border: '1px solid rgba(230, 194, 0, 0.3)'
+                                    }}>
+                                      <span style={{ 
+                                        width: '6px', 
+                                        height: '6px', 
+                                        borderRadius: '50%', 
+                                        background: 'var(--color-primary-container)', 
+                                        display: 'inline-block' 
+                                      }} />
+                                      <span>{task.offersCount} Offer{task.offersCount !== 1 ? 's' : ''} to review</span>
+                                    </div>
+                                  ) : (
+                                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginTop: '4px' }}>
+                                      No offers yet
+                                    </div>
+                                  )}
+                                </div>
+                                <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -395,37 +397,39 @@ export function MyTasksPage() {
                 <div className="section-label">Booked / In Progress ({bookedTasks.length})</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                   {bookedTasks.map((task) => (
-                    <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
-                      <div className="card card-hover">
-                        <div className="card-body" style={{ padding: 'var(--space-4)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px' }}>
-                                <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
-                                </span>
-                                <StatusBadge status={task.status} />
-                              </div>
-                              <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
-                              <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
-                                Assigned to provider · Scheduled: {formatDate(task.date)}
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                              <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
-                                  {task.budget ? formatCurrency(task.budget) : 'Open Budget'}
+                    <div key={task.id} className="content-visibility-auto">
+                      <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
+                        <div className="card card-hover">
+                          <div className="card-body" style={{ padding: 'var(--space-4)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px' }}>
+                                  <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
+                                  </span>
+                                  <StatusBadge status={task.status} />
                                 </div>
-                                <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-status-success)', textTransform: 'uppercase', marginTop: '4px' }}>
-                                  Booked Price
+                                <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
+                                <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
+                                  Assigned to provider · Scheduled: {formatDate(task.date)}
                                 </div>
                               </div>
-                              <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                                <div style={{ textAlign: 'right' }}>
+                                  <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
+                                    {task.budget ? formatCurrency(task.budget) : 'Open Budget'}
+                                  </div>
+                                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-status-success)', textTransform: 'uppercase', marginTop: '4px' }}>
+                                    Booked Price
+                                  </div>
+                                </div>
+                                <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -445,35 +449,37 @@ export function MyTasksPage() {
                   {completedTasks.map((task) => {
                     const categoryIcon = CATEGORY_ICONS[task.category] || '📋';
                     return (
-                      <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <div className="transaction-row-item">
-                          <div>
-                            <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
+                      <div key={task.id} className="content-visibility-auto">
+                        <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                          <div className="transaction-row-item">
+                            <div>
+                              <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
+                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                                Category: {task.category}
+                              </span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
+                                Completed {formatDate(task.date)}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '16px' }}>
+                              <span className="transaction-amount-red">
+                                {task.budget ? `- ${formatCurrency(task.budget)}` : 'Open'}
+                              </span>
+                              <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                                {task.budgetType === 'fixed' ? 'Fixed price' : task.budgetType === 'hourly' ? 'Hourly rate' : 'Open budget'}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <StatusBadge status={task.status} />
+                            </div>
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
-                            <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-                              Category: {task.category}
-                            </span>
-                          </div>
-                          <div>
-                            <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
-                              Completed {formatDate(task.date)}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '16px' }}>
-                            <span className="transaction-amount-red">
-                              {task.budget ? `- ${formatCurrency(task.budget)}` : 'Open'}
-                            </span>
-                            <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-                              {task.budgetType === 'fixed' ? 'Fixed price' : task.budgetType === 'hourly' ? 'Hourly rate' : 'Open budget'}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <StatusBadge status={task.status} />
-                          </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                     );
                   })}
                 </div>
@@ -601,39 +607,41 @@ export function MyTasksPage() {
                       (o) => o.taskId === task.id && o.taskerId === currentUser?.id && o.status === 'accepted'
                     );
                     return (
-                      <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
-                        <div className="card card-hover">
-                          <div className="card-body" style={{ padding: 'var(--space-4)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                  <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
-                                  </span>
-                                  <StatusBadge status={task.status} />
-                                </div>
-                                <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
-                                <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
-                                  Location: {task.location} · Due Date: {formatDate(task.date)}
-                                </div>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                                {acceptedOffer && (
-                                  <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
-                                      {formatCurrency(acceptedOffer.price)}
-                                    </div>
-                                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase' }}>
-                                      Agreed price
-                                    </div>
+                      <div key={task.id} className="content-visibility-auto">
+                        <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
+                          <div className="card card-hover">
+                            <div className="card-body" style={{ padding: 'var(--space-4)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
+                                    </span>
+                                    <StatusBadge status={task.status} />
                                   </div>
-                                )}
-                                <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                                  <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)' }}>{task.title}</div>
+                                  <div style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>
+                                    Location: {task.location} · Due Date: {formatDate(task.date)}
+                                  </div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                                  {acceptedOffer && (
+                                    <div style={{ textAlign: 'right' }}>
+                                      <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
+                                        {formatCurrency(acceptedOffer.price)}
+                                      </div>
+                                      <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase' }}>
+                                        Agreed price
+                                      </div>
+                                    </div>
+                                  )}
+                                  <ArrowRight size={20} style={{ color: 'var(--color-on-surface-variant)' }} />
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                     );
                   })}
                 </div>
@@ -669,39 +677,41 @@ export function MyTasksPage() {
                             ? 'accepted'
                             : 'rejected';
                     return (
-                      <div key={offer.id} className="card">
-                        <div className="card-body" style={{ padding: 'var(--space-4)' }}>
-                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '8px', flexWrap: 'wrap' }}>
-                                <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
-                                </span>
-                                <StatusBadge status={offerStatusForDisplay} />
+                      <div key={offer.id} className="content-visibility-auto">
+                        <div className="card">
+                          <div className="card-body" style={{ padding: 'var(--space-4)' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                  <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span>{CATEGORY_ICONS[task.category]}</span> {task.category}
+                                  </span>
+                                  <StatusBadge status={offerStatusForDisplay} />
+                                </div>
+                                <Link to={`/tasks/${task.id}`} style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)', textDecoration: 'none', display: 'block' }}>
+                                  {task.title}
+                                </Link>
+                                <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', margin: '6px 0 0 0', fontStyle: 'italic' }}>
+                                  "{offer.message}"
+                                </p>
                               </div>
-                              <Link to={`/tasks/${task.id}`} style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-secondary)', textDecoration: 'none', display: 'block' }}>
-                                {task.title}
+                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
+                                  {formatCurrency(offer.price)}
+                                </div>
+                                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginTop: '2px' }}>
+                                  Effort: ~{offer.estimatedHours}h
+                                </div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-4)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-3)' }}>
+                              <span style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>
+                                SUBMITTED {formatRelativeTime(offer.createdAt)}
+                              </span>
+                              <Link to={`/tasks/${task.id}`}>
+                                <button className="btn btn-outlined btn-sm">View Task Details</button>
                               </Link>
-                              <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', margin: '6px 0 0 0', fontStyle: 'italic' }}>
-                                "{offer.message}"
-                              </p>
                             </div>
-                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '18px', color: 'var(--color-secondary)' }}>
-                                {formatCurrency(offer.price)}
-                              </div>
-                              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', marginTop: '2px' }}>
-                                Effort: ~{offer.estimatedHours}h
-                              </div>
-                            </div>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-4)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-3)' }}>
-                            <span style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>
-                              SUBMITTED {formatRelativeTime(offer.createdAt)}
-                            </span>
-                            <Link to={`/tasks/${task.id}`}>
-                              <button className="btn btn-outlined btn-sm">View Task Details</button>
-                            </Link>
                           </div>
                         </div>
                       </div>
@@ -734,35 +744,37 @@ export function MyTasksPage() {
                     );
                     const categoryIcon = CATEGORY_ICONS[task.category] || '📋';
                     return (
-                      <Link key={task.id} to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <div className="transaction-row-item">
-                          <div>
-                            <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
+                      <div key={task.id} className="content-visibility-auto">
+                        <Link to={`/tasks/${task.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                          <div className="transaction-row-item">
+                            <div>
+                              <div className="transaction-initials-badge" style={{ fontSize: '18px' }}>{categoryIcon}</div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
+                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                                Category: {task.category}
+                              </span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
+                                Completed {formatDate(task.date)}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '16px' }}>
+                              <span className="transaction-amount-green">
+                                {tx ? `+ ${formatCurrency(tx.amount)}` : '—'}
+                              </span>
+                              <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                                {tx ? 'Released' : 'Processing'}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <StatusBadge status={task.status} />
+                            </div>
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
-                            <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-                              Category: {task.category}
-                            </span>
-                          </div>
-                          <div>
-                            <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
-                              Completed {formatDate(task.date)}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '16px' }}>
-                            <span className="transaction-amount-green">
-                              {tx ? `+ ${formatCurrency(tx.amount)}` : '—'}
-                            </span>
-                            <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-                              {tx ? 'Released' : 'Processing'}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <StatusBadge status={task.status} />
-                          </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                     );
                   })}
                 </div>
