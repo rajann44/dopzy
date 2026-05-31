@@ -82,6 +82,14 @@ export function MyTasksPage() {
     .filter((o) => o.taskerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+  const visibleOffers = myOffers.filter((offer) => {
+    const task = state.tasks.find((t) => t.id === offer.taskId);
+    if (!task) return true;
+    const isWinningOffer = task.assignedTaskerId === currentUser?.id;
+    const isTrackedInJobs = task.status === 'assigned' || task.status === 'in_progress' || task.status === 'completed';
+    return !(isWinningOffer && isTrackedInJobs);
+  });
+
   const myAssignedTasks = state.tasks
     .filter((t) => t.assignedTaskerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -130,7 +138,7 @@ export function MyTasksPage() {
             className={`chip ${activeTab === 'tasker' ? 'chip-active' : ''}`}
             style={{ padding: '8px var(--space-4)', fontSize: 'var(--text-body-sm)', borderRadius: 'var(--radius)' }}
           >
-            I am a Tasker ({myOffers.length + myAssignedTasks.length})
+            I am a Tasker ({visibleOffers.length + myAssignedTasks.length})
           </button>
         </div>
 
@@ -585,7 +593,7 @@ export function MyTasksPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {/* Active Jobs */}
             <div>
-              <div className="section-label">Active Jobs ({activeJobs.length})</div>
+              <div className="section-label">My Active Tasks ({activeJobs.length})</div>
               {activeJobs.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                   {activeJobs.map((task) => {
@@ -632,7 +640,7 @@ export function MyTasksPage() {
               ) : (
                 <div className="card">
                   <div className="empty-state">
-                    <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No active assigned jobs</h3>
+                    <h3 className="text-headline-sm" style={{ marginBottom: 'var(--space-2)' }}>No active assigned tasks</h3>
                     <p style={{ marginBottom: 'var(--space-4)' }}>Browse tasks posted by others and make an offer to start earning.</p>
                     <Link to="/browse">
                       <button className="btn btn-primary">Browse Tasks</button>
@@ -644,10 +652,10 @@ export function MyTasksPage() {
 
             {/* My Offers */}
             <div>
-              <div className="section-label">My Offers / Bids ({myOffers.length})</div>
-              {myOffers.length > 0 ? (
+              <div className="section-label">My Offers / Bids for Tasks ({visibleOffers.length})</div>
+              {visibleOffers.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                  {myOffers.map((offer) => {
+                  {visibleOffers.map((offer) => {
                     const task = state.tasks.find((t) => t.id === offer.taskId);
                     if (!task) return null;
                     const isBiddingOpen = task.status === 'open' || task.status === 'receiving_offers';

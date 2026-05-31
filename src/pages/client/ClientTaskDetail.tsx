@@ -744,7 +744,7 @@ export function ClientTaskDetail() {
                 <div className="card-header">
                   <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Assigned Provider
+                    Assigned Tasker
                   </h3>
                 </div>
                 <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-4)' }}>
@@ -779,7 +779,7 @@ export function ClientTaskDetail() {
                 <div className="card-header">
                   <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Posted by
+                    Posted by You
                   </h3>
                 </div>
                 <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
