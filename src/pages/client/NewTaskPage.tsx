@@ -12,12 +12,13 @@ import { Input, Textarea, Select } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { TASK_CATEGORIES, AUSTRALIAN_CITIES, CATEGORY_LUCIDE_ICONS } from '../../utils/constants';
 import { Modal } from '../../components/ui/Modal';
-import { generateId, formatCurrency, formatDate } from '../../utils/formatters';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 import { useTranslation } from '../../context/LanguageContext';
 import type { Task, TaskCategory } from '../../types';
 import posthog from '../../utils/posthogClient';
 
 import { scheduleTaskReminder } from '../../utils/qstashClient';
+import { supabase } from '../../utils/supabaseClient';
 
 const PRESET_IMAGES = [
   { label: 'Cleaning', url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600' },
@@ -157,16 +158,50 @@ export function NewTaskPage() {
     if (!validateStep(3)) return;
     setIsLoading(true);
 
-    await new Promise((r) => setTimeout(r, 600)); // Simulate API
-
     // Default values based on choices
     const taskDate = form.scheduleType === 'asap' 
       ? new Date().toISOString().split('T')[0] 
       : form.date;
     const taskTime = form.scheduleType === 'asap' ? 'ASAP' : form.time;
 
+    // 1. Insert the task into Supabase
+    let dbTaskId = '';
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert({
+          title: form.title.trim(),
+          description: form.description.trim(),
+          category: form.category,
+          location: form.taskType === 'remote' ? 'Remote' : form.location,
+          address: form.taskType === 'remote' ? 'Remote Task' : form.address.trim(),
+          date: taskDate,
+          time: taskTime || null,
+          budget_type: form.budgetType,
+          budget: form.budgetType !== 'open_to_offers' ? Number(form.budget) : null,
+          images: form.imageUrl ? [form.imageUrl] : [],
+          must_haves: form.mustHaves,
+          client_id: currentUser!.id,
+          status: 'open',
+          moderation_status: 'pending',
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      dbTaskId = data.id;
+    } catch (dbErr: any) {
+      console.error('Error saving task to Supabase:', dbErr);
+      showToast(dbErr.message || 'Failed to save task to database.', 'error');
+      setIsLoading(false);
+      return;
+    }
+
+    // 2. Construct the frontend Task object using the generated DB UUID
     const newTask: Task = {
-      id: generateId('task'),
+      id: dbTaskId,
       title: form.title.trim(),
       description: form.description.trim(),
       category: form.category as TaskCategory,
@@ -188,7 +223,7 @@ export function NewTaskPage() {
 
     dispatch(createTaskAction(newTask));
 
-    // Schedule a reminder via QStash
+    // 3. Schedule a reminder via QStash
     try {
       // For ASAP tasks, schedule in 10 seconds for demo/test purposes.
       // Otherwise, schedule for the set date/time if in the future, or default to 30 seconds.
@@ -202,9 +237,9 @@ export function NewTaskPage() {
         }
       }
 
-      scheduleTaskReminder({
+      await scheduleTaskReminder({
         userId: currentUser!.id,
-        taskId: newTask.id,
+        taskId: dbTaskId,
         taskTitle: newTask.title,
         delaySeconds,
       });
