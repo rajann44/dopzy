@@ -101,26 +101,38 @@ export function ClientOffers() {
                       </tr>
                     </thead>
                     <tbody>
-                      {taskOffers.map((offer) => (
-                        <tr key={offer.id}>
-                          <td style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>
-                            <ProviderName id={offer.coTaskerId} />
-                          </td>
-                          <td style={{ fontWeight: 700, fontFamily: 'var(--font-headline)', color: 'var(--color-secondary)' }}>
-                            {formatCurrency(offer.price)}
-                          </td>
-                          <td>{offer.estimatedHours}h</td>
-                          <td><StatusBadge status={offer.status} /></td>
-                          <td style={{ color: 'var(--color-on-surface-variant)' }}>{formatRelativeTime(offer.createdAt)}</td>
-                          <td>
-                            {offer.status === 'pending' && task.status === 'receiving_offers' && (
-                              <Link to={`/client/tasks/${task.id}`}>
-                                <button className="btn btn-primary btn-sm">Review</button>
-                              </Link>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                      {taskOffers.map((offer) => {
+                        const biddingOpen = task.status === 'open' || task.status === 'receiving_offers';
+                        const isAcceptedOffer = task.assignedCoTaskerId === offer.coTaskerId;
+                        const displayStatus: typeof offer.status =
+                          offer.status !== 'pending'
+                            ? offer.status
+                            : biddingOpen
+                              ? 'pending'
+                              : isAcceptedOffer
+                                ? 'accepted'
+                                : 'rejected';
+                        return (
+                          <tr key={offer.id}>
+                            <td style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>
+                              <ProviderName id={offer.coTaskerId} />
+                            </td>
+                            <td style={{ fontWeight: 700, fontFamily: 'var(--font-headline)', color: 'var(--color-secondary)' }}>
+                              {formatCurrency(offer.price)}
+                            </td>
+                            <td>{offer.estimatedHours}h</td>
+                            <td><StatusBadge status={displayStatus} /></td>
+                            <td style={{ color: 'var(--color-on-surface-variant)' }}>{formatRelativeTime(offer.createdAt)}</td>
+                            <td>
+                              {displayStatus === 'pending' && biddingOpen && (
+                                <Link to={`/client/tasks/${task.id}`}>
+                                  <button className="btn btn-primary btn-sm">Review</button>
+                                </Link>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
