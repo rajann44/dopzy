@@ -203,8 +203,14 @@ alter table public.chat_messages enable row level security;
 -- Users policies
 create policy "Allow public profiles read access" on public.users 
   for select using (true);
-create policy "Allow users to update own profiles" on public.users 
-  for update using (auth.uid() = id);
+create policy "Allow users to update own profile or admins to manage" on public.users 
+  for update using (
+    auth.uid() = id
+    or exists (
+      select 1 from public.users 
+      where id = auth.uid() and role = 'admin'
+    )
+  );
 
 -- Client Profiles policies
 create policy "Allow read access to client profiles" on public.client_profiles 
@@ -219,12 +225,33 @@ create policy "Allow co-taskers to manage own profile" on public.cotasker_profil
   for all using (auth.uid() = user_id);
 
 -- Tasks policies
-create policy "Allow read access to approved tasks only" on public.tasks 
-  for select using (moderation_status = 'approved' or auth.uid() = client_id);
+create policy "Allow read access to approved tasks, owners, and admins" on public.tasks 
+  for select using (
+    moderation_status = 'approved' 
+    or auth.uid() = client_id
+    or exists (
+      select 1 from public.users 
+      where id = auth.uid() and role = 'admin'
+    )
+  );
 create policy "Allow authenticated users to create tasks" on public.tasks 
   for insert with check (auth.uid() = client_id);
-create policy "Allow clients to edit/delete own tasks" on public.tasks 
-  for update using (auth.uid() = client_id);
+create policy "Allow clients and admins to update tasks" on public.tasks 
+  for update using (
+    auth.uid() = client_id
+    or exists (
+      select 1 from public.users 
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+create policy "Allow clients and admins to delete tasks" on public.tasks 
+  for delete using (
+    auth.uid() = client_id
+    or exists (
+      select 1 from public.users 
+      where id = auth.uid() and role = 'admin'
+    )
+  );
 
 -- Offers policies
 create policy "Allow read access to offers for clients and applicants" on public.offers 
