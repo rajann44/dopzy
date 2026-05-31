@@ -502,7 +502,7 @@ export function CoTaskerTaskDetail() {
                   <HelpCircle size={28} style={{ color: 'var(--color-secondary-mid)', marginBottom: '8px', opacity: 0.8 }} />
                   <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '6px' }}>Want to provide this service?</h3>
                   <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0, maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: '1.4' }}>
-                    You are currently logged in as a Client. To submit offers or ask questions on other clients' tasks, you must register as a Co-Tasker (Service Provider).
+                    You are currently logged in as a Client. To submit offers or ask questions, please upgrade to a Co-Tasker profile.
                   </p>
                 </div>
               </div>
