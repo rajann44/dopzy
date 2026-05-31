@@ -216,6 +216,12 @@ input, textarea, select { font-family: inherit; }
   box-sizing: border-box;
 }
 
+@media (max-width: 767px) {
+  .page-topbar {
+    padding-left: 72px;
+  }
+}
+
 .page-inner {
   padding: var(--space-8) var(--space-8);
   max-width: 100%;

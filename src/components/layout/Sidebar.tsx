@@ -35,7 +35,7 @@ const mainNav: NavItem[] = [
   { to: '/messages',  label: 'Messages',     icon: <MessageSquare size={17} /> },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onClose }: { onClose?: () => void }) {
   const { currentUser, logout } = useAuth();
   const { state } = useAppContext();
   const navigate = useNavigate();
@@ -157,7 +157,7 @@ export function Sidebar() {
           if (item.to === '/my-tasks') labelKey = 'my_tasks';
           if (item.to === '/messages') labelKey = 'messages';
           return (
-            <SidebarLink key={item.to} to={item.to} label={t(`nav.${labelKey}`)} icon={item.icon} />
+            <SidebarLink key={item.to} to={item.to} label={t(`nav.${labelKey}`)} icon={item.icon} onClick={onClose} />
           );
         })}
 
@@ -176,6 +176,7 @@ export function Sidebar() {
               to="/admin/moderation"
               label={t('nav.moderation') || 'Moderation Panel'}
               icon={<Shield size={17} />}
+              onClick={onClose}
             />
           </>
         )}
@@ -195,14 +196,16 @@ export function Sidebar() {
           to={`/profile/${currentUser.id}`}
           label={t('nav.profile') || 'Profile'}
           icon={<User size={17} />}
+          onClick={onClose}
         />
         <SidebarLink
           to="/notifications"
           label={t('nav.notifications')}
           icon={<Bell size={17} />}
           badge={unreadCount > 0 ? unreadCount : undefined}
+          onClick={onClose}
         />
-        <SidebarLink to="/settings" label={t('nav.settings')} icon={<Settings size={17} />} />
+        <SidebarLink to="/settings" label={t('nav.settings')} icon={<Settings size={17} />} onClick={onClose} />
       </nav>
 
       {/* ── Sign out ── */}
@@ -212,7 +215,10 @@ export function Sidebar() {
         flexShrink: 0,
       }}>
         <button
-          onClick={handleLogout}
+          onClick={async () => {
+            if (onClose) onClose();
+            await handleLogout();
+          }}
           style={{
             width: '100%',
             display: 'flex', alignItems: 'center', gap: '10px',
@@ -242,10 +248,11 @@ export function Sidebar() {
   );
 }
 
-function SidebarLink({ to, label, icon, badge }: NavItem & { badge?: number }) {
+function SidebarLink({ to, label, icon, badge, onClick }: NavItem & { badge?: number; onClick?: () => void }) {
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       style={({ isActive }) => ({
         display: 'flex',
         alignItems: 'center',

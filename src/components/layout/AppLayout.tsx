@@ -8,6 +8,7 @@ import { useTranslation } from '../../context/LanguageContext';
 import { supabase } from '../../utils/supabaseClient';
 import { useToast } from '../../context/ToastContext';
 import { PageSkeleton } from '../ui/PageSkeleton';
+import { Menu } from 'lucide-react';
 
 export function AppLayout() {
   const { currentUser, isEmailVerified } = useAuth();
@@ -15,6 +16,7 @@ export function AppLayout() {
   const { showToast } = useToast();
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleResend = async () => {
     if (!currentUser?.email) return;
@@ -45,10 +47,55 @@ export function AppLayout() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-surface)' }}>
-      {/* Desktop Sidebar */}
-      <div style={{ display: 'none' }} className="sidebar-desktop">
-        <Sidebar />
+      
+      {/* Mobile Sidebar Drawer Overlay */}
+      {isMobileSidebarOpen && (
+        <div 
+          onClick={() => setIsMobileSidebarOpen(false)}
+          className="sidebar-mobile-backdrop"
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 999,
+          }}
+        />
+      )}
+
+      {/* Sidebar Container (mobile slide-out drawer or desktop fixed) */}
+      <div 
+        className={`sidebar-container ${isMobileSidebarOpen ? 'mobile-open' : ''}`}
+      >
+        <Sidebar onClose={() => setIsMobileSidebarOpen(false)} />
       </div>
+
+      {/* Floating Hamburger Menu button for mobile sidebar */}
+      {currentUser && (
+        <button
+          onClick={() => setIsMobileSidebarOpen(true)}
+          className="mobile-sidebar-toggle"
+          style={{
+            position: 'fixed',
+            top: '24px',
+            left: '16px',
+            zIndex: 80,
+            background: 'var(--color-surface-white)',
+            border: '1px solid var(--color-outline-variant)',
+            borderRadius: '8px',
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: 'var(--color-secondary)',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <Menu size={20} />
+        </button>
+      )}
 
       {/* Main Content */}
       <main
@@ -127,11 +174,31 @@ export function AppLayout() {
       <ToastContainer />
 
       <style>{`
+        .sidebar-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          z-index: 1000;
+          transform: translateX(-100%);
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          width: var(--sidebar-width);
+          flex-shrink: 0;
+        }
+        .sidebar-container.mobile-open {
+          transform: translateX(0);
+        }
         @media (min-width: 768px) {
-          .sidebar-desktop {
+          .sidebar-container {
+            position: static !important;
+            transform: none !important;
             display: block !important;
-            width: var(--sidebar-width);
-            flex-shrink: 0;
+          }
+          .sidebar-mobile-backdrop {
+            display: none !important;
+          }
+          .mobile-sidebar-toggle {
+            display: none !important;
           }
           .mobile-nav-container {
             display: none;
