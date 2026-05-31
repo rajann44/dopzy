@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import type { AppState, AppAction, Task, Offer, Review, Notification, ChatRequest, ChatMessage, Conversation, User, UserRole } from '../types';
+import type { AppState, AppAction, Task, Offer, Review, Notification, ChatRequest, ChatMessage, Conversation, User, UserRole, WalletTransaction } from '../types';
 import { MOCK_TASKS } from '../data/tasks';
 import { MOCK_OFFERS } from '../data/offers';
 import { MOCK_REVIEWS } from '../data/reviews';
@@ -38,6 +38,48 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         tasks: action.payload,
+      };
+
+    case 'SET_OFFERS':
+      return {
+        ...state,
+        offers: action.payload,
+      };
+
+    case 'SET_REVIEWS':
+      return {
+        ...state,
+        reviews: action.payload,
+      };
+
+    case 'SET_NOTIFICATIONS':
+      return {
+        ...state,
+        notifications: action.payload,
+      };
+
+    case 'SET_WALLET_TRANSACTIONS':
+      return {
+        ...state,
+        walletTransactions: action.payload,
+      };
+
+    case 'SET_CONVERSATIONS':
+      return {
+        ...state,
+        conversations: action.payload,
+      };
+
+    case 'SET_CHAT_REQUESTS':
+      return {
+        ...state,
+        chatRequests: action.payload,
+      };
+
+    case 'SET_CHAT_MESSAGES':
+      return {
+        ...state,
+        chatMessages: action.payload,
       };
 
     case 'CREATE_TASK':
@@ -408,8 +450,201 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    async function fetchUserScopedData(userId: string) {
+      try {
+        // 1. Fetch Offers
+        const { data: dbOffers } = await supabase
+          .from('offers')
+          .select('*');
+
+        if (dbOffers) {
+          const mappedOffers: Offer[] = dbOffers.map((o: any) => ({
+            id: o.id,
+            taskId: o.task_id,
+            coTaskerId: o.cotasker_id,
+            price: Number(o.price),
+            message: o.message,
+            estimatedHours: o.estimated_hours,
+            status: o.status,
+            createdAt: o.created_at,
+          }));
+          const existingIds = new Set(mappedOffers.map((o) => o.id));
+          const nonDuplicateMocks = MOCK_OFFERS.filter((o) => !existingIds.has(o.id));
+          dispatch({ type: 'SET_OFFERS', payload: [...mappedOffers, ...nonDuplicateMocks] });
+        }
+
+        // 2. Fetch Notifications
+        const { data: dbNotifications } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (dbNotifications) {
+          const mappedNotifications: Notification[] = dbNotifications.map((n: any) => ({
+            id: n.id,
+            userId: n.user_id,
+            type: n.type,
+            title: n.title,
+            message: n.message,
+            isRead: n.is_read,
+            linkTo: n.link_to || undefined,
+            createdAt: n.created_at,
+          }));
+          const existingIds = new Set(mappedNotifications.map((n) => n.id));
+          const nonDuplicateMocks = MOCK_NOTIFICATIONS.filter(
+            (n) => n.userId === userId && !existingIds.has(n.id)
+          );
+          dispatch({
+            type: 'SET_NOTIFICATIONS',
+            payload: [...mappedNotifications, ...nonDuplicateMocks],
+          });
+        }
+
+        // 3. Fetch Wallet Transactions
+        const { data: dbTransactions } = await supabase
+          .from('wallet_transactions')
+          .select('*');
+
+        if (dbTransactions) {
+          const mappedTransactions: WalletTransaction[] = dbTransactions.map((t: any) => ({
+            id: t.id,
+            taskId: t.task_id,
+            clientId: t.client_id,
+            coTaskerId: t.cotasker_id || undefined,
+            amount: Number(t.amount),
+            status: t.status,
+            createdAt: t.created_at,
+          }));
+          const existingIds = new Set(mappedTransactions.map((t) => t.id));
+          const nonDuplicateMocks = MOCK_WALLET_TRANSACTIONS.filter((t) => !existingIds.has(t.id));
+          dispatch({
+            type: 'SET_WALLET_TRANSACTIONS',
+            payload: [...mappedTransactions, ...nonDuplicateMocks],
+          });
+        }
+
+        // 4. Fetch Reviews
+        const { data: dbReviews } = await supabase
+          .from('reviews')
+          .select('*');
+
+        if (dbReviews) {
+          const mappedReviews: Review[] = dbReviews.map((r: any) => ({
+            id: r.id,
+            taskId: r.task_id,
+            fromUserId: r.from_user_id,
+            toUserId: r.to_user_id,
+            rating: r.rating,
+            comment: r.comment,
+            createdAt: r.created_at,
+          }));
+          const existingIds = new Set(mappedReviews.map((r) => r.id));
+          const nonDuplicateMocks = MOCK_REVIEWS.filter((r) => !existingIds.has(r.id));
+          dispatch({ type: 'SET_REVIEWS', payload: [...mappedReviews, ...nonDuplicateMocks] });
+        }
+
+        // 5. Fetch Conversations
+        const { data: dbConversations } = await supabase
+          .from('conversations')
+          .select('*');
+
+        if (dbConversations) {
+          const mappedConversations: Conversation[] = dbConversations.map((c: any) => ({
+            id: c.id,
+            participantIds: Array.isArray(c.participant_ids)
+              ? c.participant_ids
+              : JSON.parse(c.participant_ids || '[]'),
+            lastMessage: c.last_message || undefined,
+            lastMessageAt: c.last_message_at,
+            unreadCount: c.unread_count,
+            taskId: c.task_id || undefined,
+          }));
+          const existingIds = new Set(mappedConversations.map((c) => c.id));
+          const nonDuplicateMocks = MOCK_CONVERSATIONS.filter((c) => !existingIds.has(c.id));
+          dispatch({
+            type: 'SET_CONVERSATIONS',
+            payload: [...mappedConversations, ...nonDuplicateMocks],
+          });
+        }
+
+        // 6. Fetch Chat Requests
+        const { data: dbChatRequests } = await supabase
+          .from('chat_requests')
+          .select('*');
+
+        if (dbChatRequests) {
+          const mappedChatRequests: ChatRequest[] = dbChatRequests.map((cr: any) => ({
+            id: cr.id,
+            taskId: cr.task_id,
+            senderId: cr.sender_id,
+            receiverId: cr.receiver_id,
+            question: cr.question,
+            status: cr.status,
+            createdAt: cr.created_at,
+          }));
+          const existingIds = new Set(mappedChatRequests.map((cr) => cr.id));
+          const nonDuplicateMocks = MOCK_CHAT_REQUESTS.filter((cr) => !existingIds.has(cr.id));
+          dispatch({
+            type: 'SET_CHAT_REQUESTS',
+            payload: [...mappedChatRequests, ...nonDuplicateMocks],
+          });
+        }
+
+        // 7. Fetch Chat Messages
+        const { data: dbChatMessages } = await supabase
+          .from('chat_messages')
+          .select('*');
+
+        if (dbChatMessages) {
+          const mappedChatMessages: ChatMessage[] = dbChatMessages.map((m: any) => ({
+            id: m.id,
+            conversationId: m.conversation_id,
+            senderId: m.sender_id,
+            text: m.text,
+            createdAt: m.created_at,
+          }));
+          const existingIds = new Set(mappedChatMessages.map((m) => m.id));
+          const nonDuplicateMocks = MOCK_CHAT_MESSAGES.filter((m) => !existingIds.has(m.id));
+          dispatch({
+            type: 'SET_CHAT_MESSAGES',
+            payload: [...mappedChatMessages, ...nonDuplicateMocks],
+          });
+        }
+      } catch (err) {
+        console.error('Error loading session-scoped data from Supabase:', err);
+      }
+    }
+
     fetchTasks();
     fetchUsers();
+
+    // Listen to Supabase auth events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        fetchUserScopedData(session.user.id);
+      } else {
+        // Reset user-scoped lists when logged out
+        dispatch({ type: 'SET_OFFERS', payload: [] });
+        dispatch({ type: 'SET_REVIEWS', payload: [] });
+        dispatch({ type: 'SET_NOTIFICATIONS', payload: [] });
+        dispatch({ type: 'SET_WALLET_TRANSACTIONS', payload: [] });
+        dispatch({ type: 'SET_CONVERSATIONS', payload: [] });
+        dispatch({ type: 'SET_CHAT_REQUESTS', payload: [] });
+        dispatch({ type: 'SET_CHAT_MESSAGES', payload: [] });
+      }
+    });
+
+    // Run initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        fetchUserScopedData(session.user.id);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (

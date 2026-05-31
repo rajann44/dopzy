@@ -237,6 +237,13 @@ export interface AppState {
 export type AppAction =
   | { type: 'SET_USERS'; payload: User[] }
   | { type: 'SET_TASKS'; payload: Task[] }
+  | { type: 'SET_OFFERS'; payload: Offer[] }
+  | { type: 'SET_REVIEWS'; payload: Review[] }
+  | { type: 'SET_NOTIFICATIONS'; payload: Notification[] }
+  | { type: 'SET_WALLET_TRANSACTIONS'; payload: WalletTransaction[] }
+  | { type: 'SET_CONVERSATIONS'; payload: Conversation[] }
+  | { type: 'SET_CHAT_REQUESTS'; payload: ChatRequest[] }
+  | { type: 'SET_CHAT_MESSAGES'; payload: ChatMessage[] }
   | { type: 'CREATE_TASK'; payload: Task }
   | { type: 'UPDATE_TASK'; payload: Partial<Task> & { id: string } }
   | { type: 'CANCEL_TASK'; payload: { taskId: string } }
