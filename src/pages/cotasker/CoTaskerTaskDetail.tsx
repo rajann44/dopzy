@@ -504,6 +504,11 @@ export function CoTaskerTaskDetail() {
                   <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0, maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: '1.4' }}>
                     You are currently logged in as a Client. To submit offers or ask questions, please upgrade to a Co-Tasker profile.
                   </p>
+                  <div style={{ marginTop: '16px' }}>
+                    <Link to="/my-tasks?tab=tasker" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+                      Apply to Become a Co-Tasker
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
