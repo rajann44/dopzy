@@ -67,15 +67,22 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
     }}>
 
       {/* ── Logo ── */}
-      <div style={{
-        padding: '0 20px',
-        height: '88px',
-        borderBottom: '1px solid var(--sidebar-border)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        flexShrink: 0,
-      }}>
+      <div
+        onClick={() => {
+          if (onClose) onClose();
+          navigate('/');
+        }}
+        style={{
+          padding: '0 20px',
+          height: '88px',
+          borderBottom: '1px solid var(--sidebar-border)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          flexShrink: 0,
+          cursor: 'pointer',
+        }}
+      >
         <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius-lg)', flexShrink: 0 }}>
           <rect width="100" height="100" rx="16" fill="#004352"/>
           <path d="M30 50L45 65L75 35" stroke="#FFE600" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
