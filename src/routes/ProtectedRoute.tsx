@@ -12,7 +12,10 @@ export function ProtectedRoute({ redirectTo = '/login' }: ProtectedRouteProps) {
   const { currentUser, isLoading } = useAuth();
 
   if (isLoading) {
-    return <PageSkeleton />;
+    const hasSessionHint = Object.keys(localStorage).some(
+      (key) => key.startsWith('sb-') && key.endsWith('-auth-token')
+    );
+    return <PageSkeleton showSidebar={hasSessionHint} />;
   }
 
   if (!currentUser) {

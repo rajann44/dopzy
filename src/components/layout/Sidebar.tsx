@@ -69,35 +69,36 @@ export function Sidebar() {
       {/* ── Logo ── */}
       <div style={{
         padding: '0 20px',
-        height: '64px',
+        height: '88px',
         borderBottom: '1px solid var(--sidebar-border)',
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
         flexShrink: 0,
       }}>
-        <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius)', flexShrink: 0 }}>
+        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: 'var(--radius-lg)', flexShrink: 0 }}>
           <rect width="100" height="100" rx="16" fill="#004352"/>
           <path d="M30 50L45 65L75 35" stroke="#FFE600" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
           <path d="M25 25L40 25" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
           <path d="M25 75L40 75" stroke="#FFE600" strokeWidth="4" strokeLinecap="round"/>
         </svg>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
           <div style={{
             fontFamily: 'var(--font-headline)',
-            fontWeight: 700, fontSize: '16px',
+            fontWeight: 700, fontSize: '18px',
             color: '#ffffff',
-            lineHeight: 1.1,
+            lineHeight: '1.2',
             letterSpacing: '-0.01em',
           }}>
             Dopzy
           </div>
           <div style={{
-            fontSize: 'var(--text-label-md)',
+            fontSize: '11px',
             color: 'var(--sidebar-text-muted)',
-            marginTop: 2,
+            marginTop: '3px',
             textTransform: 'uppercase',
             letterSpacing: '0.07em',
+            lineHeight: '1.2',
           }}>
             One Tap, Task Done
           </div>

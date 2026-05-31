@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../context/LanguageContext';
 import { supabase } from '../../utils/supabaseClient';
 import { useToast } from '../../context/ToastContext';
+import { PageSkeleton } from '../ui/PageSkeleton';
 
 export function AppLayout() {
   const { currentUser, isEmailVerified } = useAuth();
@@ -112,7 +113,9 @@ export function AppLayout() {
             maxWidth: '100%',
           }}
         >
-          <Outlet />
+          <Suspense fallback={<PageSkeleton />}>
+            <Outlet />
+          </Suspense>
         </div>
       </main>
 

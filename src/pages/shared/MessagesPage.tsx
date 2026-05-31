@@ -372,7 +372,7 @@ export function MessagesPage() {
         flexDirection: 'column',
         flexShrink: 0
       }}>
-        <div style={{ padding: '0 var(--space-6)', height: '64px', borderBottom: '1px solid var(--color-outline-variant)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ padding: '0 var(--space-8)', height: '88px', borderBottom: '1px solid var(--color-outline-variant)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <div>
             <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700, fontSize: '16px', lineHeight: 1.2 }}>{t('messages.title')}</h1>
             <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '11px', margin: '2px 0 0 0' }}>
@@ -572,8 +572,8 @@ export function MessagesPage() {
           <>
             {/* Chat header */}
             <div style={{
-              padding: '0 var(--space-6)',
-              height: '64px',
+              padding: '0 var(--space-8)',
+              height: '88px',
               borderBottom: '1px solid var(--color-outline-variant)',
               display: 'flex',
               justifyContent: 'space-between',
