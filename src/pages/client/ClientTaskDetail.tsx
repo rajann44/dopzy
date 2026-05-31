@@ -499,79 +499,28 @@ export function ClientTaskDetail() {
         <div className="bento-grid">
           {/* Main Column */}
           <div className="bento-col-8 flex flex-col gap-4">
-            {/* Tab Navigation Header */}
-            <div style={{ 
-              display: 'flex', 
-              borderBottom: '1px solid var(--color-outline-variant)',
-              marginBottom: 'var(--space-2)',
-              gap: 'var(--space-2)',
-              background: 'var(--color-surface-container-lowest)',
-              padding: '0 var(--space-4)',
-              borderRadius: 'var(--radius)'
-            }}>
+            {/* Tab Navigation Header: iOS Segmented Control */}
+            <div className="segmented-control" style={{ marginBottom: 'var(--space-4)' }}>
               <button
                 onClick={() => setActiveTab('details')}
-                style={{
-                  padding: '14px var(--space-4)',
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: activeTab === 'details' ? '3px solid var(--color-primary)' : '3px solid transparent',
-                  color: activeTab === 'details' ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
-                  fontWeight: 600,
-                  fontSize: 'var(--text-body-sm)',
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-fast)'
-                }}
+                className={`segmented-control-btn ${activeTab === 'details' ? 'active' : ''}`}
               >
-                Task Details
+                Details
               </button>
               {task.status !== 'cancelled' && (
                 <button
                   onClick={() => setActiveTab('offers')}
-                  style={{
-                    padding: '14px var(--space-4)',
-                    background: 'none',
-                    border: 'none',
-                    borderBottom: activeTab === 'offers' ? '3px solid var(--color-primary)' : '3px solid transparent',
-                    color: activeTab === 'offers' ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
-                    fontWeight: 600,
-                    fontSize: 'var(--text-body-sm)',
-                    cursor: 'pointer',
-                    transition: 'all var(--transition-fast)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
+                  className={`segmented-control-btn ${activeTab === 'offers' ? 'active' : ''}`}
                 >
-                  Offers Received
-                  <span style={{
-                    background: activeTab === 'offers' ? 'var(--color-primary)' : 'var(--color-surface-container-high)',
-                    color: activeTab === 'offers' ? 'var(--color-on-primary)' : 'var(--color-secondary)',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    padding: '1px 6px',
-                    borderRadius: 'var(--radius-full)'
-                  }}>
-                    {offers.filter(o => o.status !== 'withdrawn').length}
-                  </span>
+                  Offers ({offers.filter(o => o.status !== 'withdrawn').length})
                 </button>
               )}
               {task.status === 'completed' && task.assignedTaskerId && (
                 <button
                   onClick={() => setActiveTab('review')}
-                  style={{
-                    padding: '14px var(--space-4)',
-                    background: 'none',
-                    border: 'none',
-                    borderBottom: activeTab === 'review' ? '3px solid var(--color-primary)' : '3px solid transparent',
-                    color: activeTab === 'review' ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)',
-                    fontWeight: 600,
-                    fontSize: 'var(--text-body-sm)',
-                    cursor: 'pointer',
-                    transition: 'all var(--transition-fast)'
-                  }}
+                  className={`segmented-control-btn ${activeTab === 'review' ? 'active' : ''}`}
                 >
-                  Your Review
+                  Review
                 </button>
               )}
             </div>
@@ -723,8 +672,8 @@ export function ClientTaskDetail() {
           {/* Right Sidebar Column */}
           <div className="bento-col-4 flex flex-col gap-6">
             {/* GiroKonto styled Budget Card */}
-            <div className="card" style={{ padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '200px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <div className="card" style={{ padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '180px', borderRadius: '12px', border: '1px solid var(--color-outline-variant)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div style={{
                   width: '36px',
                   height: '36px',
@@ -738,25 +687,25 @@ export function ClientTaskDetail() {
                 }}>
                   <Wallet size={18} />
                 </div>
-                <span className="text-label" style={{ fontSize: '9px', color: 'var(--color-on-surface-variant)' }}>Contract Spec</span>
+                <span className="text-label" style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contract Spec</span>
               </div>
               <div>
-                <div className="section-label" style={{ fontSize: '10px', marginBottom: '4px' }}>Task Budget</div>
+                <div className="section-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Task Budget</div>
                 {task.budgetType === 'fixed' && task.budget ? (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
                     {formatCurrency(task.budget)}
                   </div>
                 ) : task.budgetType === 'hourly' && task.budget ? (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
-                    {formatCurrency(task.budget)}/hr
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
+                    {formatCurrency(task.budget)}<span style={{ fontSize: '18px', fontWeight: 500, color: 'var(--color-on-surface-variant)' }}>/hr</span>
                   </div>
                 ) : (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary-mid)', lineHeight: 1.1 }}>
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '28px', fontWeight: 700, color: 'var(--color-on-surface-variant)', letterSpacing: '-0.02em', lineHeight: 1.0 }}>
                     Open to offers
                   </div>
                 )}
               </div>
-              <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
+              <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontWeight: 500 }}>
                 {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
               </div>
             </div>

@@ -124,19 +124,17 @@ export function MyTasksPage() {
       </div>
 
       <div className="page-inner">
-        {/* Tab switcher */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-surface-container-highest)', paddingBottom: 'var(--space-2)' }}>
+        {/* Tab switcher: iOS Segmented Control */}
+        <div className="segmented-control" style={{ marginBottom: 'var(--space-6)' }}>
           <button
             onClick={() => setTab('client')}
-            className={`chip ${activeTab === 'client' ? 'chip-active' : ''}`}
-            style={{ padding: '8px var(--space-4)', fontSize: 'var(--text-body-sm)', borderRadius: 'var(--radius)' }}
+            className={`segmented-control-btn ${activeTab === 'client' ? 'active' : ''}`}
           >
             I am a Client ({clientTasks.length})
           </button>
           <button
             onClick={() => setTab('tasker')}
-            className={`chip ${activeTab === 'tasker' ? 'chip-active' : ''}`}
-            style={{ padding: '8px var(--space-4)', fontSize: 'var(--text-body-sm)', borderRadius: 'var(--radius)' }}
+            className={`segmented-control-btn ${activeTab === 'tasker' ? 'active' : ''}`}
           >
             I am a Tasker ({visibleOffers.length + myAssignedTasks.length})
           </button>

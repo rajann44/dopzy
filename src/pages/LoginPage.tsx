@@ -89,7 +89,7 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{
+    <div className="login-root-container" style={{
       minHeight: '100vh',
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
@@ -170,7 +170,7 @@ export function LoginPage() {
         position: 'relative'
       }} className="login-form-panel login-form-panel-animated">
         {/* Language selector */}
-        <div style={{
+        <div className="login-lang-selector" style={{
           position: 'absolute',
           top: 'var(--space-6)',
           right: 'var(--space-6)',
@@ -567,10 +567,14 @@ export function LoginPage() {
 
         @media (max-width: 767px) {
           .login-brand-panel { display: none !important; }
-          [style*="grid-template-columns: 1fr 1fr"] {
+          .login-root-container {
             grid-template-columns: 1fr !important;
           }
           .login-form-panel { padding: var(--space-8) var(--space-5) !important; }
+          .login-lang-selector {
+            top: max(16px, env(safe-area-inset-top)) !important;
+            right: 16px !important;
+          }
         }
       `}</style>
     </div>

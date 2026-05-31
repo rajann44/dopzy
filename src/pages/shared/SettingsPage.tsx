@@ -81,26 +81,24 @@ export function SettingsPage() {
               <label style={{ display: 'block', fontSize: 'var(--text-body-sm)', fontWeight: 600, color: 'var(--color-secondary)', marginBottom: '8px' }}>
                 {t('settings.lang_label')}
               </label>
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <div className="segmented-control" style={{ maxWidth: '400px' }}>
                 <button
-                  className={`chip ${language === 'en' ? 'chip-active' : ''}`}
+                  className={`segmented-control-btn ${language === 'en' ? 'active' : ''}`}
                   onClick={() => {
                     setLanguage('en');
                     localStorage.setItem('taskbuddy_lang', 'en');
                     handleSavePreferences('Language (English)');
                   }}
-                  style={{ padding: '8px var(--space-4)', borderRadius: 'var(--radius)' }}
                 >
                   English (UK/US)
                 </button>
                 <button
-                  className={`chip ${language === 'de' ? 'chip-active' : ''}`}
+                  className={`segmented-control-btn ${language === 'de' ? 'active' : ''}`}
                   onClick={() => {
                     setLanguage('de');
                     localStorage.setItem('taskbuddy_lang', 'de');
                     handleSavePreferences('Language (Deutsch)');
                   }}
-                  style={{ padding: '8px var(--space-4)', borderRadius: 'var(--radius)' }}
                 >
                   Deutsch (DE)
                 </button>
@@ -172,29 +170,35 @@ export function SettingsPage() {
             <Bell size={22} style={{ color: 'var(--color-secondary)' }} />
             <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>Notification Channels</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)' }}>
-              <input
-                type="checkbox"
-                checked={notifications.email}
-                onChange={(e) => {
-                  setNotifications({ ...notifications, email: e.target.checked });
-                  handleSavePreferences('Email notifications');
-                }}
-              />
-              <span>Receive updates and task status changes via email</span>
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)' }}>
-              <input
-                type="checkbox"
-                checked={notifications.push}
-                onChange={(e) => {
-                  setNotifications({ ...notifications, push: e.target.checked });
-                  handleSavePreferences('Push notifications');
-                }}
-              />
-              <span>Enable real-time browser push notifications</span>
-            </label>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="settings-row">
+              <span className="settings-row-label">Receive updates and task status changes via email</span>
+              <label className="ios-switch">
+                <input
+                  type="checkbox"
+                  checked={notifications.email}
+                  onChange={(e) => {
+                    setNotifications({ ...notifications, email: e.target.checked });
+                    handleSavePreferences('Email notifications');
+                  }}
+                />
+                <span className="ios-switch-slider"></span>
+              </label>
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">Enable real-time browser push notifications</span>
+              <label className="ios-switch">
+                <input
+                  type="checkbox"
+                  checked={notifications.push}
+                  onChange={(e) => {
+                    setNotifications({ ...notifications, push: e.target.checked });
+                    handleSavePreferences('Push notifications');
+                  }}
+                />
+                <span className="ios-switch-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -204,18 +208,21 @@ export function SettingsPage() {
             <Eye size={22} style={{ color: 'var(--color-secondary)' }} />
             <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>Profile Visibility & Privacy</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)' }}>
-              <input
-                type="checkbox"
-                checked={profilePublic}
-                onChange={(e) => {
-                  setProfilePublic(e.target.checked);
-                  handleSavePreferences('Profile visibility');
-                }}
-              />
-              <span>Allow public search engines and non-registered users to view my task marketplace feedback</span>
-            </label>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="settings-row">
+              <span className="settings-row-label">Allow public search engines and non-registered users to view my task marketplace feedback</span>
+              <label className="ios-switch">
+                <input
+                  type="checkbox"
+                  checked={profilePublic}
+                  onChange={(e) => {
+                    setProfilePublic(e.target.checked);
+                    handleSavePreferences('Profile visibility');
+                  }}
+                />
+                <span className="ios-switch-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
 

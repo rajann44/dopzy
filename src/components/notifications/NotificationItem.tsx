@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Bell, CheckCircle, XCircle, AlertCircle, TrendingUp, Star, Package } from 'lucide-react';
 import type { Notification } from '../../types';
 import { formatRelativeTime } from '../../utils/formatters';
@@ -20,29 +21,42 @@ interface NotificationItemProps {
 }
 
 export function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
+  const navigate = useNavigate();
   const icon = typeIcons[notification.type] ?? typeIcons.default;
+
+  const handleClick = () => {
+    if (!notification.isRead && onMarkRead) {
+      onMarkRead(notification.id);
+    }
+    if (notification.linkTo) {
+      navigate(notification.linkTo);
+    }
+  };
 
   return (
     <div
       className="activity-item"
-      onClick={() => !notification.isRead && onMarkRead?.(notification.id)}
+      onClick={handleClick}
       style={{
         background: notification.isRead ? 'transparent' : 'var(--color-surface-container-low)',
-        cursor: notification.isRead ? 'default' : 'pointer',
+        cursor: 'pointer',
         alignItems: 'center',
+        padding: '16px var(--space-4)',
+        gap: 'var(--space-3)',
+        display: 'flex',
       }}
     >
       {/* Unread dot */}
       {!notification.isRead ? (
-        <div className="unread-dot" style={{ marginTop: 0 }} />
+        <div className="unread-dot" style={{ marginTop: 0, backgroundColor: '#007AFF', width: '10px', height: '10px' }} />
       ) : (
-        <div style={{ width: 8, height: 8 }} />
+        <div style={{ width: 10, height: 10 }} />
       )}
 
       {/* Icon */}
       <div style={{
-        width: 36, height: 36,
-        borderRadius: 'var(--radius)',
+        width: 38, height: 38,
+        borderRadius: '50%',
         background: 'var(--color-surface-container-high)',
         display: 'flex',
         alignItems: 'center',
@@ -54,10 +68,10 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: notification.isRead ? 500 : 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>
+        <div style={{ fontWeight: notification.isRead ? 600 : 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface)' }}>
           {notification.title}
         </div>
-        <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', lineHeight: '16px', marginTop: '2px' }}>
+        <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', lineHeight: '16px', marginTop: '2px', marginBlockEnd: 0 }}>
           {notification.message}
         </p>
         <span style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)', marginTop: '4px', display: 'block' }}>

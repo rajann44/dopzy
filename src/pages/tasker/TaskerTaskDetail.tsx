@@ -569,8 +569,8 @@ export function TaskerTaskDetail() {
           {/* Right Sidebar Column */}
           <div className="bento-col-4 flex flex-col gap-6">
             {/* GiroKonto styled Budget Card */}
-            <div className="card" style={{ padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '200px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <div className="card" style={{ padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '180px', borderRadius: '12px', border: '1px solid var(--color-outline-variant)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div style={{
                   width: '36px',
                   height: '36px',
@@ -584,25 +584,25 @@ export function TaskerTaskDetail() {
                 }}>
                   <Wallet size={18} />
                 </div>
-                <span className="text-label" style={{ fontSize: '9px', color: 'var(--color-on-surface-variant)' }}>Contract Spec</span>
+                <span className="text-label" style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contract Spec</span>
               </div>
               <div>
-                <div className="section-label" style={{ fontSize: '10px', marginBottom: '4px' }}>Client Budget</div>
+                <div className="section-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client Budget</div>
                 {task.budgetType === 'fixed' && task.budget ? (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
                     {formatCurrency(task.budget)}
                   </div>
                 ) : task.budgetType === 'hourly' && task.budget ? (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '32px', fontWeight: 700, color: 'var(--color-secondary)', lineHeight: 1.1 }}>
-                    {formatCurrency(task.budget)}/hr
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
+                    {formatCurrency(task.budget)}<span style={{ fontSize: '18px', fontWeight: 500, color: 'var(--color-on-surface-variant)' }}>/hr</span>
                   </div>
                 ) : (
-                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '24px', fontWeight: 700, color: 'var(--color-secondary-mid)', lineHeight: 1.1 }}>
+                  <div style={{ fontFamily: 'var(--font-headline)', fontSize: '28px', fontWeight: 700, color: 'var(--color-on-surface-variant)', letterSpacing: '-0.02em', lineHeight: 1.0 }}>
                     Open to offers
                   </div>
                 )}
               </div>
-              <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)' }}>
+              <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontWeight: 500 }}>
                 {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
               </div>
             </div>

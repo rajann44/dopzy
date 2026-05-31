@@ -428,17 +428,8 @@ export function NewTaskPage() {
 
       <div className="page-inner new-task-page-inner">
         
-        {/* Stepper Progress bar */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 'var(--space-8)',
-          background: 'var(--color-surface-white)',
-          padding: 'var(--space-4) var(--space-6)',
-          border: '1px solid var(--color-outline-variant)',
-          borderRadius: 'var(--radius)',
-        }}>
+        {/* Stepper Progress bar: Desktop layout */}
+        <div className="wizard-stepper-desktop">
           {[
             { stepNum: 1, label: t('new_task.step_details'), icon: <FileText size={16} /> },
             { stepNum: 2, label: t('new_task.step_schedule'), icon: <Calendar size={16} /> },
@@ -494,6 +485,24 @@ export function NewTaskPage() {
           })}
         </div>
 
+        {/* Stepper Progress bar: Mobile layout (iOS inspired) */}
+        <div className="wizard-stepper-mobile">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-secondary)' }}>
+              {step === 1 && t('new_task.step1_title')}
+              {step === 2 && t('new_task.step2_title')}
+              {step === 3 && t('new_task.step3_title')}
+              {step === 4 && t('new_task.step4_title')}
+            </span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)' }}>
+              {step} / 4
+            </span>
+          </div>
+          <div className="ios-progress-track">
+            <div className="ios-progress-fill" style={{ width: `${(step / 4) * 100}%` }}></div>
+          </div>
+        </div>
+
         {/* STEP 1: TASK DETAILS */}
         {step === 1 && (
           <div className="flex flex-col gap-6">
@@ -530,35 +539,25 @@ export function NewTaskPage() {
 
                   <div className="form-group">
                     <label className="form-label">{t('new_task.type_of_task')}</label>
-                    <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-                      {[
-                        { value: 'in_person', label: t('new_task.in_person'), desc: t('new_task.in_person_desc') },
-                        { value: 'remote', label: t('new_task.remote'), desc: t('new_task.remote_desc') },
-                      ].map((tVal) => (
-                        <label
-                          key={tVal.value}
-                          style={{
-                            flex: 1,
-                            padding: 'var(--space-4)',
-                            border: `1.5px solid ${form.taskType === tVal.value ? 'var(--color-secondary)' : 'var(--color-outline-variant)'}`,
-                            borderRadius: 'var(--radius-lg)',
-                            cursor: 'pointer',
-                            background: form.taskType === tVal.value ? 'var(--color-surface-container-low)' : 'transparent',
-                            transition: 'all var(--transition-fast)',
-                          }}
-                        >
-                          <input
-                            type="radio"
-                            name="taskType"
-                            checked={form.taskType === tVal.value}
-                            onChange={() => setFormVal('taskType', tVal.value)}
-                            style={{ display: 'none' }}
-                          />
-                          <div style={{ fontWeight: 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', marginBottom: '2px' }}>{tVal.label}</div>
-                          <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{tVal.desc}</div>
-                        </label>
-                      ))}
+                    <div className="segmented-control" style={{ marginBottom: 'var(--space-2)' }}>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.taskType === 'in_person' ? 'active' : ''}`}
+                        onClick={() => setFormVal('taskType', 'in_person')}
+                      >
+                        {t('new_task.in_person')}
+                      </button>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.taskType === 'remote' ? 'active' : ''}`}
+                        onClick={() => setFormVal('taskType', 'remote')}
+                      >
+                        {t('new_task.remote')}
+                      </button>
                     </div>
+                    <span className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
+                      {form.taskType === 'in_person' ? t('new_task.in_person_desc') : t('new_task.remote_desc')}
+                    </span>
                   </div>
 
                   {/* Conditional Location details */}
@@ -931,34 +930,26 @@ export function NewTaskPage() {
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-                    {[
-                      { value: 'asap', label: t('new_task.schedule_asap'), desc: t('new_task.schedule_asap_desc') },
-                      { value: 'specific', label: t('new_task.schedule_specific'), desc: t('new_task.schedule_specific_desc') },
-                    ].map((s) => (
-                      <label
-                        key={s.value}
-                        style={{
-                          flex: 1,
-                          padding: 'var(--space-5)',
-                          border: `1.5px solid ${form.scheduleType === s.value ? 'var(--color-secondary)' : 'var(--color-outline-variant)'}`,
-                          borderRadius: 'var(--radius-lg)',
-                          cursor: 'pointer',
-                          background: form.scheduleType === s.value ? 'var(--color-surface-container-low)' : 'transparent',
-                          transition: 'all var(--transition-fast)',
-                        }}
+                  <div className="form-group">
+                    <div className="segmented-control" style={{ marginBottom: 'var(--space-2)' }}>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.scheduleType === 'asap' ? 'active' : ''}`}
+                        onClick={() => setFormVal('scheduleType', 'asap')}
                       >
-                        <input
-                          type="radio"
-                          name="scheduleType"
-                          checked={form.scheduleType === s.value}
-                          onChange={() => setFormVal('scheduleType', s.value)}
-                          style={{ display: 'none' }}
-                        />
-                        <div style={{ fontWeight: 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', marginBottom: '4px' }}>{s.label}</div>
-                        <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{s.desc}</div>
-                      </label>
-                    ))}
+                        {t('new_task.schedule_asap')}
+                      </button>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.scheduleType === 'specific' ? 'active' : ''}`}
+                        onClick={() => setFormVal('scheduleType', 'specific')}
+                      >
+                        {t('new_task.schedule_specific')}
+                      </button>
+                    </div>
+                    <span className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
+                      {form.scheduleType === 'asap' ? t('new_task.schedule_asap_desc') : t('new_task.schedule_specific_desc')}
+                    </span>
                   </div>
 
                   {form.scheduleType === 'specific' && (
@@ -1024,44 +1015,35 @@ export function NewTaskPage() {
                   </h2>
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {[
-                      { value: 'fixed', label: t('new_task.budget_fixed'), desc: t('new_task.budget_fixed_desc') },
-                      { value: 'hourly', label: t('new_task.budget_hourly'), desc: t('new_task.budget_hourly_desc') },
-                      { value: 'open_to_offers', label: t('new_task.budget_offers'), desc: t('new_task.budget_offers_desc') },
-                    ].map((b) => (
-                      <label
-                        key={b.value}
-                        style={{
-                          padding: 'var(--space-4) var(--space-5)',
-                          border: `1.5px solid ${form.budgetType === b.value ? 'var(--color-secondary)' : 'var(--color-outline-variant)'}`,
-                          borderRadius: 'var(--radius-lg)',
-                          cursor: 'pointer',
-                          background: form.budgetType === b.value ? 'var(--color-surface-container-low)' : 'transparent',
-                          transition: 'all var(--transition-fast)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between'
-                        }}
+                  <div className="form-group">
+                    <div className="segmented-control" style={{ marginBottom: 'var(--space-2)' }}>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.budgetType === 'fixed' ? 'active' : ''}`}
+                        onClick={() => setFormVal('budgetType', 'fixed')}
                       >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <input
-                            type="radio"
-                            name="budgetType"
-                            checked={form.budgetType === b.value}
-                            onChange={() => setFormVal('budgetType', b.value)}
-                            style={{ display: 'none' }}
-                          />
-                          <div style={{ fontWeight: 700, fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', marginBottom: '2px' }}>{b.label}</div>
-                          <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{b.desc}</div>
-                        </div>
-                        {form.budgetType === b.value && (
-                          <div style={{ background: 'var(--color-primary)', color: 'var(--color-on-primary)', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Check size={14} />
-                          </div>
-                        )}
-                      </label>
-                    ))}
+                        {t('new_task.budget_fixed')}
+                      </button>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.budgetType === 'hourly' ? 'active' : ''}`}
+                        onClick={() => setFormVal('budgetType', 'hourly')}
+                      >
+                        {t('new_task.budget_hourly')}
+                      </button>
+                      <button
+                        type="button"
+                        className={`segmented-control-btn ${form.budgetType === 'open_to_offers' ? 'active' : ''}`}
+                        onClick={() => setFormVal('budgetType', 'open_to_offers')}
+                      >
+                        {t('new_task.budget_offers')}
+                      </button>
+                    </div>
+                    <span className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
+                      {form.budgetType === 'fixed' && t('new_task.budget_fixed_desc')}
+                      {form.budgetType === 'hourly' && t('new_task.budget_hourly_desc')}
+                      {form.budgetType === 'open_to_offers' && t('new_task.budget_offers_desc')}
+                    </span>
                   </div>
 
                   {form.budgetType !== 'open_to_offers' && (
