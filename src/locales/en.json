@@ -8,7 +8,8 @@
     "profile": "Profile",
     "profile_view": "View Profile",
     "moderation": "Moderation Panel",
-    "logout": "Logout"
+    "logout": "Logout",
+    "more": "More"
   },
   "tasks": {
     "post_task": "Post a Task",

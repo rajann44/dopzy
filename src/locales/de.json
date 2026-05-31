@@ -8,7 +8,8 @@
     "profile": "Profil",
     "profile_view": "Profil anzeigen",
     "moderation": "Moderationsbereich",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "more": "Mehr"
   },
   "tasks": {
     "post_task": "Aufgabe erstellen",
