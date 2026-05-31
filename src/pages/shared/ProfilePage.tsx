@@ -50,19 +50,86 @@ export function ProfilePage() {
   useEffect(() => {
     const load = async () => {
       if (!id) return;
+
+      // SWR (Stale-While-Revalidate) Cache implementation: check global context users list first
+      const cachedUser = state.users.find((u) => u.id === id);
+      if (cachedUser) {
+        setUser(cachedUser);
+        if (cachedUser.taskerStatus && cachedUser.taskerStatus !== 'none') {
+          setTaskerProfile({
+            userId: cachedUser.id,
+            bio: cachedUser.bio || '',
+            skills: cachedUser.taskerSkills || [],
+            categories: cachedUser.taskerCategories || [],
+            location: cachedUser.location || 'Berlin',
+            rating: Number(cachedUser.taskerRating || 5),
+            reviewCount: cachedUser.taskerReviewCount || 0,
+            completedJobs: cachedUser.taskerCompletedJobs || 0,
+            responseTime: cachedUser.taskerResponseTime || '< 1 hour',
+            memberSince: new Date(cachedUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+            isVerified: cachedUser.isVerified || false,
+            isTopRated: cachedUser.taskerIsTopRated || false,
+            isFastResponder: cachedUser.taskerIsFastResponder || false,
+            totalEarnings: cachedUser.taskerTotalEarnings || 0,
+            availability: cachedUser.taskerAvailability || 'Flexible',
+            hourlyRate: Number(cachedUser.taskerHourlyRate || 0) || undefined,
+            qualifications: cachedUser.taskerQualifications || [],
+            languages: cachedUser.taskerLanguages || [],
+            transport: cachedUser.taskerTransport || '',
+            portfolio: cachedUser.taskerPortfolio || [],
+          });
+        } else {
+          setTaskerProfile(null);
+        }
+
+        setClientProfile({
+          userId: cachedUser.id,
+          bio: cachedUser.bio || '',
+          location: cachedUser.location || 'Berlin',
+          tasksPosted: 0,
+          completedTasks: 0,
+          memberSince: new Date(cachedUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          isVerified: cachedUser.isVerified || false,
+          createdAt: cachedUser.createdAt,
+        });
+
+        setIsLoading(false);
+
+        // Fetch fresh data in the background silently
+        try {
+          const [u, co, cl] = await Promise.all([
+            profileService.getUserById(id),
+            profileService.getTaskerProfile(id),
+            profileService.getClientProfile(id),
+          ]);
+          if (u) setUser(u);
+          if (co) setTaskerProfile(co);
+          if (cl) setClientProfile(cl);
+        } catch (err) {
+          console.error('Silent profile refresh failed:', err);
+        }
+        return;
+      }
+
+      // Fallback: Show loading spinner and fetch
       setIsLoading(true);
-      const [u, co, cl] = await Promise.all([
-        profileService.getUserById(id),
-        profileService.getTaskerProfile(id),
-        profileService.getClientProfile(id),
-      ]);
-      setUser(u);
-      setTaskerProfile(co);
-      setClientProfile(cl);
-      setIsLoading(false);
+      try {
+        const [u, co, cl] = await Promise.all([
+          profileService.getUserById(id),
+          profileService.getTaskerProfile(id),
+          profileService.getClientProfile(id),
+        ]);
+        setUser(u);
+        setTaskerProfile(co);
+        setClientProfile(cl);
+      } catch (err) {
+        console.error('Profile loading failed:', err);
+      } finally {
+        setIsLoading(false);
+      }
     };
     load();
-  }, [id]);
+  }, [id, state.users]);
 
   useEffect(() => {
     if (user) {
@@ -222,9 +289,11 @@ export function ProfilePage() {
       {/* Header */}
       <div className="page-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-          <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back">
-            <ArrowLeft size={20} />
-          </button>
+          {!isOwnProfile && (
+            <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back">
+              <ArrowLeft size={20} />
+            </button>
+          )}
           <div>
             <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>
               {isEditing ? 'Edit Profile' : user.name}
