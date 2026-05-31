@@ -265,8 +265,17 @@ create policy "Allow co-taskers to update own offers" on public.offers
   for update using (auth.uid() = cotasker_id);
 
 -- Notifications policies
-create policy "Allow private notifications read and update" on public.notifications 
-  for all using (auth.uid() = user_id);
+create policy "Allow private notifications read" on public.notifications 
+  for select using (auth.uid() = user_id);
+
+create policy "Allow private notifications update" on public.notifications 
+  for update using (auth.uid() = user_id);
+
+create policy "Allow private notifications delete" on public.notifications 
+  for delete using (auth.uid() = user_id);
+
+create policy "Allow authenticated users to insert notifications" on public.notifications 
+  for insert with check (auth.role() = 'authenticated');
 
 -- Chat messages policies
 create policy "Allow message access to conversation participants" on public.chat_messages 
