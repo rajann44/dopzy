@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Briefcase, Star, ArrowRight, Wallet, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAppContext, applyTaskerAction } from '../context/AppContext';
+import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { StatusBadge } from '../components/ui/Badge';
 import { formatCurrency, formatDate, formatRelativeTime } from '../utils/formatters';
 import { CATEGORY_ICONS } from '../utils/constants';
@@ -124,21 +125,15 @@ export function MyTasksPage() {
       </div>
 
       <div className="page-inner">
-        {/* Tab switcher: iOS Segmented Control */}
-        <div className="segmented-control" style={{ marginBottom: 'var(--space-6)' }}>
-          <button
-            onClick={() => setTab('client')}
-            className={`segmented-control-btn ${activeTab === 'client' ? 'active' : ''}`}
-          >
-            I am a Client ({clientTasks.length})
-          </button>
-          <button
-            onClick={() => setTab('tasker')}
-            className={`segmented-control-btn ${activeTab === 'tasker' ? 'active' : ''}`}
-          >
-            I am a Tasker ({visibleOffers.length + myAssignedTasks.length})
-          </button>
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'client', label: `I am a Client (${clientTasks.length})` },
+            { value: 'tasker', label: `I am a Tasker (${visibleOffers.length + myAssignedTasks.length})` }
+          ]}
+          value={activeTab}
+          onChange={(val) => setTab(val as 'client' | 'tasker')}
+          style={{ marginBottom: 'var(--space-6)' }}
+        />
 
         {/* Commerzbank Bento Grid (Startpage SPEC) */}
         <div className="bento-grid" style={{ marginBottom: 'var(--space-8)' }}>

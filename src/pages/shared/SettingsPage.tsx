@@ -3,6 +3,8 @@ import { Globe, Lock, Bell, Eye, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useTranslation } from '../../context/LanguageContext';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { ConfirmModal } from '../../components/ui/Modal';
 
 export function SettingsPage() {
   const { currentUser } = useAuth();
@@ -81,28 +83,19 @@ export function SettingsPage() {
               <label style={{ display: 'block', fontSize: 'var(--text-body-sm)', fontWeight: 600, color: 'var(--color-secondary)', marginBottom: '8px' }}>
                 {t('settings.lang_label')}
               </label>
-              <div className="segmented-control" style={{ maxWidth: '400px' }}>
-                <button
-                  className={`segmented-control-btn ${language === 'en' ? 'active' : ''}`}
-                  onClick={() => {
-                    setLanguage('en');
-                    localStorage.setItem('taskbuddy_lang', 'en');
-                    handleSavePreferences('Language (English)');
-                  }}
-                >
-                  English (UK/US)
-                </button>
-                <button
-                  className={`segmented-control-btn ${language === 'de' ? 'active' : ''}`}
-                  onClick={() => {
-                    setLanguage('de');
-                    localStorage.setItem('taskbuddy_lang', 'de');
-                    handleSavePreferences('Language (Deutsch)');
-                  }}
-                >
-                  Deutsch (DE)
-                </button>
-              </div>
+              <SegmentedControl
+                options={[
+                  { value: 'en', label: 'English (UK/US)' },
+                  { value: 'de', label: 'Deutsch (DE)' }
+                ]}
+                value={language}
+                onChange={(val) => {
+                  setLanguage(val as 'en' | 'de');
+                  localStorage.setItem('taskbuddy_lang', val);
+                  handleSavePreferences(`Language (${val === 'en' ? 'English' : 'Deutsch'})`);
+                }}
+                style={{ maxWidth: '400px' }}
+              />
             </div>
           </div>
         </div>
@@ -255,60 +248,15 @@ export function SettingsPage() {
 
       </div>
 
-      {/* Delete Account Modal Dialog */}
-      {showDeleteModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div className="card" style={{
-            width: '100%',
-            maxWidth: '500px',
-            padding: 'var(--space-6)',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
-            border: '1px solid var(--color-outline-variant)'
-          }}>
-            <h3 className="text-headline-sm" style={{ color: 'var(--color-secondary)', margin: '0 0 12px 0', fontSize: '20px', fontWeight: 700 }}>
-              Confirm Account Deletion
-            </h3>
-            <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', lineHeight: 1.5, margin: '0 0 20px 0' }}>
-              Are you absolutely sure you want to delete your profile <strong>{currentUser?.name}</strong>? All pending offers, balance states, and message streams will be deleted forever.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-              <button
-                className="btn btn-outlined"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn"
-                style={{
-                  background: 'var(--color-status-error)',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  fontWeight: 700,
-                  padding: '8px 16px',
-                  cursor: 'pointer'
-                }}
-                onClick={handleDeleteAccount}
-              >
-                Delete Irreversibly
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAccount}
+        title="Confirm Account Deletion"
+        message={`Are you absolutely sure you want to delete your profile ${currentUser?.name}? All pending offers, balance states, and message streams will be deleted forever.`}
+        confirmLabel="Delete Irreversibly"
+        confirmVariant="danger"
+      />
     </div>
   );
 }

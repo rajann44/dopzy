@@ -11,6 +11,7 @@ import {
   deleteTaskAction
 } from '../../context/AppContext';
 import { useTranslation } from '../../context/LanguageContext';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { Check, X, Shield, FileText, UserCheck, Trash2, Search } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
@@ -182,27 +183,16 @@ export function ModerationPanel() {
       </div>
 
       <div className="page-inner">
-        {/* Tab switcher: iOS Segmented Control */}
-        <div className="segmented-control" style={{ marginBottom: 'var(--space-6)' }}>
-          <button
-            onClick={() => setActiveTab('pending')}
-            className={`segmented-control-btn ${activeTab === 'pending' ? 'active' : ''}`}
-          >
-            Pending ({pendingUsers.length + pendingTasks.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`segmented-control-btn ${activeTab === 'users' ? 'active' : ''}`}
-          >
-            Users ({state.users.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('tasks')}
-            className={`segmented-control-btn ${activeTab === 'tasks' ? 'active' : ''}`}
-          >
-            Tasks ({state.tasks.length})
-          </button>
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'pending', label: `Pending (${pendingUsers.length + pendingTasks.length})` },
+            { value: 'users', label: `Users (${state.users.length})` },
+            { value: 'tasks', label: `Tasks (${state.tasks.length})` },
+          ]}
+          value={activeTab}
+          onChange={(val) => setActiveTab(val as 'pending' | 'users' | 'tasks')}
+          style={{ marginBottom: 'var(--space-6)' }}
+        />
 
         {/* Tab Content 1: Pending Approvals */}
         {activeTab === 'pending' && (

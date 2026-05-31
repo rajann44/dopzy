@@ -8,6 +8,7 @@ import { useToast } from '../../context/ToastContext';
 import { StatusBadge } from '../../components/ui/Badge';
 import { OfferCard } from '../../components/offers/OfferCard';
 import { ConfirmModal, Modal } from '../../components/ui/Modal';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { Avatar } from '../../components/ui/Avatar';
 import { profileService } from '../../services/profileService';
 import { formatDate, formatCurrency, generateId } from '../../utils/formatters';
@@ -499,31 +500,22 @@ export function ClientTaskDetail() {
         <div className="bento-grid">
           {/* Main Column */}
           <div className="bento-col-8 flex flex-col gap-4">
-            {/* Tab Navigation Header: iOS Segmented Control */}
-            <div className="segmented-control" style={{ marginBottom: 'var(--space-4)' }}>
-              <button
-                onClick={() => setActiveTab('details')}
-                className={`segmented-control-btn ${activeTab === 'details' ? 'active' : ''}`}
-              >
-                Details
-              </button>
-              {task.status !== 'cancelled' && (
-                <button
-                  onClick={() => setActiveTab('offers')}
-                  className={`segmented-control-btn ${activeTab === 'offers' ? 'active' : ''}`}
-                >
-                  Offers ({offers.filter(o => o.status !== 'withdrawn').length})
-                </button>
-              )}
-              {task.status === 'completed' && task.assignedTaskerId && (
-                <button
-                  onClick={() => setActiveTab('review')}
-                  className={`segmented-control-btn ${activeTab === 'review' ? 'active' : ''}`}
-                >
-                  Review
-                </button>
-              )}
-            </div>
+            <SegmentedControl
+              options={[
+                { value: 'details', label: 'Details' },
+                ...(task.status !== 'cancelled' ? [{
+                  value: 'offers',
+                  label: `Offers (${offers.filter(o => o.status !== 'withdrawn').length})`
+                }] : []),
+                ...(task.status === 'completed' && task.assignedTaskerId ? [{
+                  value: 'review',
+                  label: 'Review'
+                }] : [])
+              ]}
+              value={activeTab}
+              onChange={(val) => setActiveTab(val as 'details' | 'offers' | 'review')}
+              style={{ marginBottom: 'var(--space-4)' }}
+            />
 
             {/* Tab content 1: Details */}
             {activeTab === 'details' && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,19 +10,41 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }: ModalProps) {
-  if (!isOpen) return null;
+  const [shouldRender, setShouldRender] = useState(isOpen);
+  const [isClosing, setIsClosing] = useState(false);
+  const prevIsOpen = useRef(isOpen);
+
+  useEffect(() => {
+    if (isOpen && !prevIsOpen.current) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (!isOpen && prevIsOpen.current) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+      }, 150); // Matches --modal-close-dur (150ms)
+      return () => clearTimeout(timer);
+    }
+    prevIsOpen.current = isOpen;
+  }, [isOpen]);
+
+  if (!shouldRender) return null;
 
   const maxWidth = size === 'sm' ? '360px' : size === 'lg' ? '640px' : '480px';
 
   return (
     <div
-      className="modal-backdrop"
+      className={`modal-backdrop ${isClosing ? 'is-closing' : ''}`}
+      style={{
+        animation: isClosing ? 'fadeIn 150ms ease reverse forwards' : 'fadeIn 150ms ease forwards'
+      }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div className="modal" style={{ maxWidth }}>
+      <div className={`modal t-modal ${isOpen && !isClosing ? 'is-open' : ''} ${isClosing ? 'is-closing' : ''}`} style={{ maxWidth }}>
         <div className="modal-header">
           <h2 id="modal-title" className="text-headline-sm">{title}</h2>
           <button
@@ -43,6 +65,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }:
     </div>
   );
 }
+
 
 interface ConfirmModalProps {
   isOpen: boolean;

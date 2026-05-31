@@ -1,3 +1,5 @@
+import { ShimmerText } from './ShimmerText';
+
 /**
  * PageSkeleton — a branded shimmer skeleton used as Suspense fallback
  * for lazy-loaded pages and the auth loading state.
@@ -248,11 +250,13 @@ export function PageSpinner() {
         animation: 'fadeIn 300ms ease',
       }}>
         <div className="spinner" style={{ width: 36, height: 36 }} />
-        <span style={{
-          fontSize: 'var(--text-body-sm)',
-          color: 'var(--color-on-surface-variant)',
-          fontWeight: 500,
-        }}>Loading...</span>
+        <ShimmerText
+          text="Loading..."
+          style={{
+            fontSize: 'var(--text-body-sm)',
+            fontWeight: 500,
+          }}
+        />
       </div>
     </div>
   );

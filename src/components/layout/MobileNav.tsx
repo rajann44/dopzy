@@ -97,12 +97,10 @@ export function MobileNav() {
                 if (key) prefetchRoute(key);
               }}
             >
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative', display: 'inline-flex' }}>
                 <Icon size={20} />
-                {showBadge && (
-                  <span style={{
-                    position: 'absolute',
-                    top: -4, right: -4,
+                <span className="t-badge" data-open={showBadge ? "true" : "false"} style={{ top: '-4px', right: '-4px' }}>
+                  <span className="t-badge-dot" style={{
                     width: 14, height: 14,
                     background: 'var(--color-status-error)',
                     borderRadius: '50%',
@@ -115,7 +113,7 @@ export function MobileNav() {
                   }}>
                     {badgeCount > 9 ? '9+' : badgeCount}
                   </span>
-                )}
+                </span>
               </div>
               <span style={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</span>
             </NavLink>
@@ -143,17 +141,15 @@ export function MobileNav() {
             position: 'relative',
           }}
         >
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', display: 'inline-flex' }}>
             <MoreHorizontal size={20} />
-            {unreadNotifications > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: -4, right: -4,
+            <span className="t-badge" data-open={unreadNotifications > 0 ? "true" : "false"} style={{ top: '-4px', right: '-4px' }}>
+              <span className="t-badge-dot" style={{
                 width: 8, height: 8,
                 background: 'var(--color-status-error)',
                 borderRadius: '50%',
               }} />
-            )}
+            </span>
           </div>
           <span>{t('nav.more')}</span>
         </button>
@@ -185,21 +181,24 @@ export function MobileNav() {
       )}
 
       {/* Slide-up Bottom Sheet Drawer */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0, left: 0, right: 0,
-        background: 'var(--color-surface-white)',
-        borderTopLeftRadius: '16px',
-        borderTopRightRadius: '16px',
-        zIndex: 1000,
-        padding: '20px 20px 32px 20px',
-        boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
-        transform: isMoreOpen ? 'translateY(0)' : 'translateY(100%)',
-        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-      }}>
+      <div 
+        className="t-panel-slide"
+        data-open={isMoreOpen ? "true" : "false"}
+        style={{
+          position: 'fixed',
+          bottom: 0, left: 0, right: 0,
+          background: 'var(--color-surface-white)',
+          borderTopLeftRadius: '16px',
+          borderTopRightRadius: '16px',
+          zIndex: 1000,
+          padding: '20px 20px 32px 20px',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          ['--panel-translate-y' as any]: '100%',
+        }}
+      >
         {/* Drawer Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -343,8 +342,8 @@ function DrawerLink({ to, label, icon, onClick, badge }: DrawerLinkProps) {
     >
       <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>
       <span style={{ flex: 1 }}>{label}</span>
-      {badge !== undefined && (
-        <span style={{
+      <span className="t-badge" data-open={badge !== undefined ? "true" : "false"} style={{ position: 'relative', top: 'auto', right: 'auto' }}>
+        <span className="t-badge-dot" style={{
           background: 'var(--color-status-error)',
           color: '#ffffff',
           borderRadius: 'var(--radius-full)',
@@ -352,9 +351,9 @@ function DrawerLink({ to, label, icon, onClick, badge }: DrawerLinkProps) {
           fontWeight: 700,
           padding: '1px 6px',
         }}>
-          {badge}
+          {badge || ''}
         </span>
-      )}
+      </span>
     </NavLink>
   );
 }

@@ -12,6 +12,7 @@ import { Input, Textarea, Select } from '../../components/ui/Input';
 import { FloatingStepActions } from '../../components/ui/FloatingStepActions';
 import { TASK_CATEGORIES, AUSTRALIAN_CITIES, CATEGORY_LUCIDE_ICONS } from '../../utils/constants';
 import { Modal } from '../../components/ui/Modal';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { useTranslation } from '../../context/LanguageContext';
 import type { Task, TaskCategory } from '../../types';
@@ -539,22 +540,15 @@ export function NewTaskPage() {
 
                   <div className="form-group">
                     <label className="form-label">{t('new_task.type_of_task')}</label>
-                    <div className="segmented-control" style={{ marginBottom: 'var(--space-2)' }}>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.taskType === 'in_person' ? 'active' : ''}`}
-                        onClick={() => setFormVal('taskType', 'in_person')}
-                      >
-                        {t('new_task.in_person')}
-                      </button>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.taskType === 'remote' ? 'active' : ''}`}
-                        onClick={() => setFormVal('taskType', 'remote')}
-                      >
-                        {t('new_task.remote')}
-                      </button>
-                    </div>
+                    <SegmentedControl
+                      options={[
+                        { value: 'in_person', label: t('new_task.in_person') },
+                        { value: 'remote', label: t('new_task.remote') }
+                      ]}
+                      value={form.taskType}
+                      onChange={(val) => setFormVal('taskType', val)}
+                      style={{ marginBottom: 'var(--space-2)' }}
+                    />
                     <span className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
                       {form.taskType === 'in_person' ? t('new_task.in_person_desc') : t('new_task.remote_desc')}
                     </span>
@@ -931,22 +925,15 @@ export function NewTaskPage() {
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
                   <div className="form-group">
-                    <div className="segmented-control" style={{ marginBottom: 'var(--space-2)' }}>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.scheduleType === 'asap' ? 'active' : ''}`}
-                        onClick={() => setFormVal('scheduleType', 'asap')}
-                      >
-                        {t('new_task.schedule_asap')}
-                      </button>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.scheduleType === 'specific' ? 'active' : ''}`}
-                        onClick={() => setFormVal('scheduleType', 'specific')}
-                      >
-                        {t('new_task.schedule_specific')}
-                      </button>
-                    </div>
+                    <SegmentedControl
+                      options={[
+                        { value: 'asap', label: t('new_task.schedule_asap') },
+                        { value: 'specific', label: t('new_task.schedule_specific') }
+                      ]}
+                      value={form.scheduleType}
+                      onChange={(val) => setFormVal('scheduleType', val)}
+                      style={{ marginBottom: 'var(--space-2)' }}
+                    />
                     <span className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
                       {form.scheduleType === 'asap' ? t('new_task.schedule_asap_desc') : t('new_task.schedule_specific_desc')}
                     </span>
@@ -1016,29 +1003,16 @@ export function NewTaskPage() {
                 </div>
                 <div className="card-body flex flex-col gap-5" style={{ padding: 'var(--space-6)' }}>
                   <div className="form-group">
-                    <div className="segmented-control" style={{ marginBottom: 'var(--space-2)' }}>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.budgetType === 'fixed' ? 'active' : ''}`}
-                        onClick={() => setFormVal('budgetType', 'fixed')}
-                      >
-                        {t('new_task.budget_fixed')}
-                      </button>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.budgetType === 'hourly' ? 'active' : ''}`}
-                        onClick={() => setFormVal('budgetType', 'hourly')}
-                      >
-                        {t('new_task.budget_hourly')}
-                      </button>
-                      <button
-                        type="button"
-                        className={`segmented-control-btn ${form.budgetType === 'open_to_offers' ? 'active' : ''}`}
-                        onClick={() => setFormVal('budgetType', 'open_to_offers')}
-                      >
-                        {t('new_task.budget_offers')}
-                      </button>
-                    </div>
+                    <SegmentedControl
+                      options={[
+                        { value: 'fixed', label: t('new_task.budget_fixed') },
+                        { value: 'hourly', label: t('new_task.budget_hourly') },
+                        { value: 'open_to_offers', label: t('new_task.budget_offers') }
+                      ]}
+                      value={form.budgetType}
+                      onChange={(val) => setFormVal('budgetType', val)}
+                      style={{ marginBottom: 'var(--space-2)' }}
+                    />
                     <span className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
                       {form.budgetType === 'fixed' && t('new_task.budget_fixed_desc')}
                       {form.budgetType === 'hourly' && t('new_task.budget_hourly_desc')}

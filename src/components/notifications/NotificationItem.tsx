@@ -47,11 +47,14 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
       }}
     >
       {/* Unread dot */}
-      {!notification.isRead ? (
-        <div className="unread-dot" style={{ marginTop: 0, backgroundColor: '#007AFF', width: '10px', height: '10px' }} />
-      ) : (
-        <div style={{ width: 10, height: 10 }} />
-      )}
+      <span className="t-badge" data-open={!notification.isRead ? "true" : "false"} style={{ position: 'relative', top: 'auto', right: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 10, height: 10, flexShrink: 0 }}>
+        <span className="t-badge-dot" style={{
+          backgroundColor: '#007AFF',
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+        }} />
+      </span>
 
       {/* Icon */}
       <div style={{

@@ -290,20 +290,29 @@ function SidebarLink({ to, label, icon, badge, onClick }: NavItem & { badge?: nu
         }
       }}
     >
-      <span style={{ opacity: 0.85, flexShrink: 0 }}>{icon}</span>
-      <span style={{ flex: 1 }}>{label}</span>
-      {badge !== undefined && (
-        <span style={{
-          background: 'var(--color-primary-container)',
-          color: 'var(--color-on-primary-container)',
-          borderRadius: 'var(--radius-full)',
-          fontSize: '10px', fontWeight: 700,
-          padding: '1px 7px',
-          minWidth: '20px', textAlign: 'center',
-        }}>
-          {badge}
+      <span style={{ opacity: 0.85, flexShrink: 0, position: 'relative', display: 'inline-flex' }}>
+        {icon}
+        <span className="t-badge" data-open={badge !== undefined ? "true" : "false"} style={{ top: '-4px', right: '-6px' }}>
+          <span className="t-badge-dot" style={{
+            background: 'var(--color-primary-container)',
+            color: 'var(--color-secondary)',
+            borderRadius: 'var(--radius-full)',
+            fontSize: '9px',
+            fontWeight: 700,
+            padding: '0 4px',
+            minWidth: '14px',
+            height: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: 1,
+            boxShadow: '0 0 0 1.5px var(--sidebar-bg)',
+          }}>
+            {badge || ''}
+          </span>
         </span>
-      )}
+      </span>
+      <span style={{ flex: 1 }}>{label}</span>
     </NavLink>
   );
 }
