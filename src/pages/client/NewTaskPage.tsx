@@ -17,6 +17,8 @@ import { useTranslation } from '../../context/LanguageContext';
 import type { Task, TaskCategory } from '../../types';
 import posthog from '../../utils/posthogClient';
 
+import { scheduleTaskReminder } from '../../utils/qstashClient';
+
 const PRESET_IMAGES = [
   { label: 'Cleaning', url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600' },
   { label: 'Moving', url: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=600' },
@@ -185,6 +187,31 @@ export function NewTaskPage() {
     };
 
     dispatch(createTaskAction(newTask));
+
+    // Schedule a reminder via QStash
+    try {
+      // For ASAP tasks, schedule in 10 seconds for demo/test purposes.
+      // Otherwise, schedule for the set date/time if in the future, or default to 30 seconds.
+      let delaySeconds = 10;
+      if (form.scheduleType !== 'asap' && form.date) {
+        const taskDateTime = new Date(`${form.date}T${form.time || '12:00'}`);
+        const now = new Date();
+        const diffMs = taskDateTime.getTime() - now.getTime();
+        if (diffMs > 0) {
+          delaySeconds = Math.floor(diffMs / 1000);
+        }
+      }
+
+      scheduleTaskReminder({
+        userId: currentUser!.id,
+        taskId: newTask.id,
+        taskTitle: newTask.title,
+        delaySeconds,
+      });
+    } catch (e) {
+      console.error('Failed to schedule task reminder via QStash:', e);
+    }
+
     posthog.capture('task_posted', {
       task_id: newTask.id,
       category: newTask.category,
