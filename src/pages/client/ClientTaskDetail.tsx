@@ -360,6 +360,20 @@ export function ClientTaskDetail() {
               ) : (
                 <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
               )}
+              <span className="badge" style={{ 
+                fontSize: '10px', 
+                fontWeight: 600, 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '4px',
+                background: 'rgba(98, 0, 238, 0.08)', 
+                color: 'var(--color-primary)', 
+                border: '1px solid rgba(98, 0, 238, 0.2)',
+                padding: '2px 8px',
+                borderRadius: '100px'
+              }}>
+                ✨ Posted by You
+              </span>
             </div>
             <h1 className="text-headline-md truncate" style={{ margin: 0, fontWeight: 700 }}>{task.title}</h1>
           </div>
@@ -391,6 +405,40 @@ export function ClientTaskDetail() {
       </div>
 
       <div className="page-inner">
+        {/* Author Notice Banner */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(98, 0, 238, 0.05) 0%, rgba(98, 0, 238, 0.01) 100%)',
+          border: '1px solid rgba(98, 0, 238, 0.12)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-4) var(--space-5)',
+          marginBottom: 'var(--space-5)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-3)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'rgba(98, 0, 238, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--color-primary)',
+            fontSize: '16px',
+            flexShrink: 0
+          }}>
+            👤
+          </div>
+          <div>
+            <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--color-secondary)' }}>You posted this task</h4>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+              As the author, you have full control over this listing. Use the tabs below to manage offers, edit details, or answer questions.
+            </p>
+          </div>
+        </div>
+
         <div className="bento-grid">
           {/* Main Column */}
           <div className="bento-col-8 flex flex-col gap-4">
