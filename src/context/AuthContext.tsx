@@ -164,6 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
+        setIsEmailVerified(!!data.user.email_confirmed_at);
         const profile = await fetchUserProfile(data.user.id);
         if (profile) {
           setCurrentUser(profile);

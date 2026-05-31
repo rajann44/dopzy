@@ -43,6 +43,29 @@ export function LoginPage() {
       setIsLoading(false);
     }
   };
+  
+  const handleResendVerification = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: window.location.origin + '/browse',
+        },
+      });
+      if (error) {
+        throw new Error(error.message);
+      }
+      showToast('Verification email resent! Please check your inbox.', 'success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to resend verification email';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -368,8 +391,31 @@ export function LoginPage() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-body-sm)',
                   fontWeight: 500,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
                 }}>
-                  {error}
+                  <div>{error}</div>
+                  {error.toLowerCase().includes('email not confirmed') && (
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={isLoading}
+                      style={{
+                        alignSelf: 'flex-start',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-secondary)',
+                        textDecoration: 'underline',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        padding: 0,
+                        fontSize: '12px'
+                      }}
+                    >
+                      Resend verification email
+                    </button>
+                  )}
                 </div>
               )}
 
