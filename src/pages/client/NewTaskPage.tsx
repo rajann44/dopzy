@@ -10,6 +10,7 @@ import { useAppContext, createTaskAction } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { Input, Textarea, Select } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { FloatingStepActions } from '../../components/ui/FloatingStepActions';
 import { TASK_CATEGORIES, AUSTRALIAN_CITIES, CATEGORY_LUCIDE_ICONS } from '../../utils/constants';
 import { Modal } from '../../components/ui/Modal';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -236,8 +237,7 @@ export function NewTaskPage() {
     setStep((prev) => (prev - 1) as any);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitTask = async () => {
     if (!validateStep(3)) return;
     setIsLoading(true);
 
@@ -344,6 +344,11 @@ export function NewTaskPage() {
     navigate(`/tasks/${newTask.id}`);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitTask();
+  };
+
   const handleAutofillDemo = () => {
     const randomIdx = Math.floor(Math.random() * DEMO_TASKS.length);
     const template = DEMO_TASKS[randomIdx];
@@ -372,6 +377,30 @@ export function NewTaskPage() {
     return 'pending';
   };
 
+  const leftActionLabel = step === 1 ? t('new_task.cancel') : t('new_task.back');
+  const rightActionLabel =
+    step === 1 || step === 2
+      ? t('new_task.next_step')
+      : step === 3
+        ? t('new_task.review_details')
+        : t('new_task.post_now');
+
+  const handleLeftAction = () => {
+    if (step === 1) {
+      navigate(-1);
+      return;
+    }
+    handleBack();
+  };
+
+  const handleRightAction = () => {
+    if (step === 4) {
+      void submitTask();
+      return;
+    }
+    handleNext();
+  };
+
   return (
     <div>
       {/* Header */}
@@ -398,7 +427,7 @@ export function NewTaskPage() {
         </button>
       </div>
 
-      <div className="page-inner">
+      <div className="page-inner new-task-page-inner">
         
         {/* Stepper Progress bar */}
         <div style={{
@@ -887,23 +916,6 @@ export function NewTaskPage() {
               </div>
             </Modal>
 
-            {/* Stepper Navigation bar at bottom */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              background: 'var(--color-surface-white)',
-              padding: 'var(--space-4) var(--space-6)',
-              border: '1px solid var(--color-outline-variant)',
-              borderRadius: 'var(--radius-lg)',
-              marginTop: 'var(--space-2)'
-            }}>
-              <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
-                {t('new_task.cancel')}
-              </Button>
-              <Button type="button" variant="primary" onClick={handleNext}>
-                {t('new_task.next_step')}
-              </Button>
-            </div>
           </div>
         )}
 
@@ -997,23 +1009,6 @@ export function NewTaskPage() {
               </div>
             </div>
 
-            {/* Stepper Navigation bar at bottom */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              background: 'var(--color-surface-white)',
-              padding: 'var(--space-4) var(--space-6)',
-              border: '1px solid var(--color-outline-variant)',
-              borderRadius: 'var(--radius-lg)',
-              marginTop: 'var(--space-2)'
-            }}>
-              <Button type="button" variant="outlined" onClick={handleBack}>
-                {t('new_task.back')}
-              </Button>
-              <Button type="button" variant="primary" onClick={handleNext}>
-                {t('new_task.next_step')}
-              </Button>
-            </div>
           </div>
         )}
 
@@ -1114,29 +1109,12 @@ export function NewTaskPage() {
               </div>
             </div>
 
-            {/* Stepper Navigation bar at bottom */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              background: 'var(--color-surface-white)',
-              padding: 'var(--space-4) var(--space-6)',
-              border: '1px solid var(--color-outline-variant)',
-              borderRadius: 'var(--radius-lg)',
-              marginTop: 'var(--space-2)'
-            }}>
-              <Button type="button" variant="outlined" onClick={handleBack}>
-                {t('new_task.back')}
-              </Button>
-              <Button type="button" variant="primary" onClick={handleNext}>
-                {t('new_task.review_details')}
-              </Button>
-            </div>
           </div>
         )}
 
         {/* STEP 4: CONFIRMATION SCREEN */}
         {step === 4 && (
-          <form onSubmit={handleSubmit}>
+          <form id="new-task-confirm-form" onSubmit={handleSubmit}>
             <div className="card">
               <div className="card-header">
                 <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1245,19 +1223,23 @@ export function NewTaskPage() {
                 </div>
 
               </div>
-              <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-4) var(--space-6)' }}>
-                <Button type="button" variant="outlined" onClick={handleBack} disabled={isLoading}>
-                  {t('new_task.back')}
-                </Button>
-                <Button type="submit" variant="primary" size="lg" isLoading={isLoading} style={{ minWidth: '150px' }}>
-                  {t('new_task.post_now')}
-                </Button>
-              </div>
             </div>
           </form>
         )}
 
       </div>
+
+      <FloatingStepActions
+        leftLabel={leftActionLabel}
+        rightLabel={rightActionLabel}
+        onLeftClick={handleLeftAction}
+        onRightClick={handleRightAction}
+        leftVariant={step === 1 ? 'ghost' : 'outlined'}
+        rightVariant="primary"
+        leftDisabled={isLoading}
+        rightDisabled={isLoading}
+        rightLoading={step === 4 ? isLoading : false}
+      />
     </div>
   );
 }
