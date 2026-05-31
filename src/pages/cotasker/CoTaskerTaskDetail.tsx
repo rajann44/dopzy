@@ -451,50 +451,62 @@ export function CoTaskerTaskDetail() {
                   />
                 </div>
               </div>
-            ) : canOffer ? (
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Make an Offer</h2>
-                </div>
-                <div className="card-body">
-                  {showOfferForm ? (
-                    <OfferForm
-                      taskId={task.id}
-                      coTaskerId={currentUser!.id}
-                      onSubmit={handleSubmitOffer}
-                      onCancel={() => setShowOfferForm(false)}
-                      isLoading={isLoading}
-                    />
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
-                      <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
-                        Interested in providing this service? Send your offer details to the client or clarify details first.
-                      </p>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-                        <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
-                          <DollarSign size={16} /> Submit Offer
-                        </button>
-                        {acceptedChatRequest || conversation ? (
-                          <Link to="/messages">
-                            <button className="btn btn-outlined" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                              <MessageSquare size={16} /> Go to Chat
+            ) : currentUser?.role === 'cotasker' ? (
+              canOffer ? (
+                <div className="card">
+                  <div className="card-header">
+                    <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Make an Offer</h2>
+                  </div>
+                  <div className="card-body">
+                    {showOfferForm ? (
+                      <OfferForm
+                        taskId={task.id}
+                        coTaskerId={currentUser!.id}
+                        onSubmit={handleSubmitOffer}
+                        onCancel={() => setShowOfferForm(false)}
+                        isLoading={isLoading}
+                      />
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
+                        <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
+                          Interested in providing this service? Send your offer details to the client or clarify details first.
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                          <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
+                            <DollarSign size={16} /> Submit Offer
+                          </button>
+                          {acceptedChatRequest || conversation ? (
+                            <Link to="/messages">
+                              <button className="btn btn-outlined" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                <MessageSquare size={16} /> Go to Chat
+                              </button>
+                            </Link>
+                          ) : pendingChatRequest ? (
+                            <button className="btn btn-outlined" disabled style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.7 }}>
+                              <MessageSquare size={16} /> Inquiry Pending
                             </button>
-                          </Link>
-                        ) : pendingChatRequest ? (
-                          <button className="btn btn-outlined" disabled style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.7 }}>
-                            <MessageSquare size={16} /> Inquiry Pending
-                          </button>
-                        ) : (
-                          <button className="btn btn-outlined" onClick={() => setShowQuestionModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                            <HelpCircle size={16} /> Ask a Question
-                          </button>
-                        )}
+                          ) : (
+                            <button className="btn btn-outlined" onClick={() => setShowQuestionModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                              <HelpCircle size={16} /> Ask a Question
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                </div>
+              ) : null
+            ) : (
+              <div className="card" style={{ border: '1.5px dashed var(--color-outline-variant)', background: 'var(--color-surface-container-lowest)' }}>
+                <div className="card-body" style={{ textAlign: 'center', padding: 'var(--space-6)' }}>
+                  <HelpCircle size={28} style={{ color: 'var(--color-secondary-mid)', marginBottom: '8px', opacity: 0.8 }} />
+                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '6px' }}>Want to provide this service?</h3>
+                  <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0, maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: '1.4' }}>
+                    You are currently logged in as a Client. To submit offers or ask questions on other clients' tasks, you must register as a Co-Tasker (Service Provider).
+                  </p>
                 </div>
               </div>
-            ) : null}
+            )}
 
             {/* Status update for assigned tasks */}
             {isAssignedToMe && (task.status === 'assigned' || task.status === 'in_progress') && (
