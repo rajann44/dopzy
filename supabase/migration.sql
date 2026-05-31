@@ -275,8 +275,27 @@ create policy "Allow message access to conversation participants" on public.chat
       select 1 from public.conversations 
       where id = conversation_id 
       and participant_ids @> jsonb_build_array(auth.uid()::text)
-    )
   );
+
+-- Conversations policies
+create policy "Allow participants select on conversations" on public.conversations
+  for select using (participant_ids @> jsonb_build_array(auth.uid()::text));
+
+create policy "Allow participants insert on conversations" on public.conversations
+  for insert with check (participant_ids @> jsonb_build_array(auth.uid()::text));
+
+create policy "Allow participants update on conversations" on public.conversations
+  for update using (participant_ids @> jsonb_build_array(auth.uid()::text));
+
+-- Chat requests policies
+create policy "Allow participants select on chat_requests" on public.chat_requests
+  for select using (auth.uid() = sender_id or auth.uid() = receiver_id);
+
+create policy "Allow sender insert on chat_requests" on public.chat_requests
+  for insert with check (auth.uid() = sender_id);
+
+create policy "Allow receiver update on chat_requests" on public.chat_requests
+  for update using (auth.uid() = receiver_id);
 
 -- ─── 6. SCHEMA PRIVILEGES GRANTS ─────────────────────────────────────────────
 -- Grant schema usage and basic permissions to API roles (anon and authenticated)
