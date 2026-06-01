@@ -3,6 +3,10 @@ import posthog from 'posthog-js';
 // Defer PostHog initialization until after first paint to keep it off the critical path.
 // Uses requestIdleCallback where available, falls back to setTimeout.
 const initPostHog = () => {
+  // Skip PostHog initialization in development mode
+  if (import.meta.env.DEV) {
+    return;
+  }
   const key = import.meta.env.VITE_POSTHOG_KEY as string;
   const host = import.meta.env.VITE_POSTHOG_HOST as string;
   if (key && host) {

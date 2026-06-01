@@ -323,26 +323,28 @@ export function ProfilePage() {
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             {isEditing ? (
               <>
-                <button 
-                  onClick={handleCancel} 
-                  className="btn btn-outline desktop-only" 
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                >
-                  <X size={15} /> Cancel
-                </button>
+                <span className="desktop-only" style={{ display: 'inline-flex' }}>
+                  <button 
+                    onClick={handleCancel} 
+                    className="btn btn-outline btn-sm" 
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <X size={14} /> Cancel
+                  </button>
+                </span>
                 <button 
                   onClick={handleSave} 
-                  className="btn btn-primary" 
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                  className="btn btn-primary btn-sm" 
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                  <Save size={15} className="desktop-only" /> 
+                  <Save size={14} className="desktop-only" /> 
                   <span className="desktop-only">Save Changes</span>
                   <span className="mobile-only" style={{ fontWeight: 600 }}>Save</span>
                 </button>
               </>
             ) : (
-              <button onClick={() => setIsEditing(true)} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Edit size={16} /> Edit Profile
+              <button onClick={() => setIsEditing(true)} className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Edit size={14} /> Edit Profile
               </button>
             )}
           </div>

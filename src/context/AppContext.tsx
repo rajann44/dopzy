@@ -913,12 +913,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Fire public data fetches in parallel
-    Promise.all([fetchTasks(), fetchUsers()]);
-
     // Listen to Supabase auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
+        Promise.all([fetchTasks(), fetchUsers()]);
         fetchUserScopedData(session.user.id);
       } else {
         // Reset user-scoped lists when logged out
@@ -935,6 +933,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Run initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
+        Promise.all([fetchTasks(), fetchUsers()]);
         fetchUserScopedData(session.user.id);
       }
     });
