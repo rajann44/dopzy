@@ -185,9 +185,39 @@ export function ModerationPanel() {
       <div className="page-inner">
         <SegmentedControl
           options={[
-            { value: 'pending', label: t('moderation.tab_pending_count', { count: pendingUsers.length + pendingTasks.length }) },
-            { value: 'users', label: `${t('moderation.tab_users')} (${state.users.length})` },
-            { value: 'tasks', label: `${t('moderation.tab_tasks')} (${state.tasks.length})` },
+            { 
+              value: 'pending', 
+              label: (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <span>{t('moderation.tab_pending')}</span>
+                  <span className="tab-badge" style={{ background: 'var(--color-primary-container)', color: 'var(--color-secondary)' }}>
+                    {pendingUsers.length + pendingTasks.length}
+                  </span>
+                </div>
+              )
+            },
+            { 
+              value: 'users', 
+              label: (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <span>{t('moderation.tab_users_compact')}</span>
+                  <span className="tab-badge">
+                    {state.users.length}
+                  </span>
+                </div>
+              )
+            },
+            { 
+              value: 'tasks', 
+              label: (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <span>{t('moderation.tab_tasks_compact')}</span>
+                  <span className="tab-badge">
+                    {state.tasks.length}
+                  </span>
+                </div>
+              )
+            },
           ]}
           value={activeTab}
           onChange={(val) => setActiveTab(val as 'pending' | 'users' | 'tasks')}
@@ -346,49 +376,55 @@ export function ModerationPanel() {
                 const isTasker = user.role === 'tasker';
                 const isUserAdmin = user.role === 'admin';
                 return (
-                  <div key={user.id} className="transaction-row-item" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', cursor: 'default' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontWeight: 700, color: user.isDisabled ? 'var(--color-on-surface-variant)' : 'var(--color-secondary)' }}>
-                        {user.name} {user.isDisabled && <span style={{ color: 'var(--color-status-error)', fontSize: '11px', fontWeight: 600 }}>({t('moderation.badge_disabled')})</span>}
+                  <div key={user.id} className="moderation-user-row" style={{ cursor: 'default' }}>
+                    <div className="moderation-col-info">
+                      <span className="moderation-username">
+                        {user.name} {user.isDisabled && <span className="disabled-badge">({t('moderation.badge_disabled')})</span>}
                       </span>
-                      <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                      <span className="moderation-email">
                         {user.email}
                       </span>
+                      <div className="moderation-mobile-badges">
+                        <span className={`badge badge-role-${user.role}`} style={{ textTransform: 'uppercase', fontSize: '9px' }}>
+                          {user.role}
+                        </span>
+                        <span className={`badge badge-${user.taskerStatus || 'none'}`} style={{ textTransform: 'uppercase', fontSize: '9px' }}>
+                          {user.taskerStatus || 'none'}
+                        </span>
+                      </div>
                     </div>
 
-                    <div>
-                      <span style={{ textTransform: 'capitalize', fontSize: 'var(--text-body-sm)' }}>
-                        {user.role}
-                      </span>
+                    <div className="moderation-col-role">
+                      <span className="label-prefix">{t('moderation.th_role')}:</span>
+                      <span className="role-text">{user.role}</span>
                     </div>
 
-                    <div>
+                    <div className="moderation-col-status">
+                      <span className="label-prefix">{t('moderation.th_tasker_status')}:</span>
                       <span className={`badge badge-${user.taskerStatus || 'none'}`} style={{ textTransform: 'uppercase', fontSize: '10px' }}>
                         {user.taskerStatus || 'none'}
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', paddingRight: '16px' }}>
+                    <div className="moderation-col-actions">
                       {!isUserAdmin && (
                         <>
                           <button
                             onClick={() => handleToggleTasker(user.id, isTasker)}
                             className="btn btn-outlined btn-xs"
-                            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', padding: '4px 8px' }}
                           >
                             {isTasker ? t('moderation.btn_revoke_tasker') : t('moderation.btn_promote_tasker')}
                           </button>
                           <button
                             onClick={() => handleToggleDisableUser(user.id, !!user.isDisabled)}
                             className={`btn btn-xs ${user.isDisabled ? 'btn-primary' : 'btn-danger'}`}
-                            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', padding: '4px 8px' }}
                           >
                             {user.isDisabled ? t('moderation.btn_enable_account') : t('moderation.btn_disable_account')}
                           </button>
                         </>
                       )}
                       {isUserAdmin && (
-                        <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>{t('moderation.sys_admin')}</span>
+                        <span className="admin-flag">{t('moderation.sys_admin')}</span>
                       )}
                     </div>
                   </div>
@@ -433,58 +469,68 @@ export function ModerationPanel() {
               </div>
               
               {filteredTasks.map((task) => (
-                <div key={task.id} className="transaction-row-item" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1.2fr', cursor: 'default' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
+                <div key={task.id} className="moderation-task-row" style={{ cursor: 'default' }}>
+                  <div className="moderation-col-info">
+                    <span className="moderation-username" style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>{task.title}</span>
+                    <span className="moderation-email" style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
                       📍 {task.location} · 💶 {task.budgetType === 'open_to_offers' ? 'Open Bids' : formatCurrency(task.budget || 0)}
                     </span>
+                    <div className="moderation-mobile-badges">
+                      <span className="badge badge-role-client" style={{ textTransform: 'uppercase', fontSize: '9px' }}>{task.category}</span>
+                      <span className="badge badge-secondary" style={{ textTransform: 'uppercase', fontSize: '9px' }}>{task.status}</span>
+                      <span className={`badge badge-${task.moderationStatus || 'approved'}`} style={{ textTransform: 'uppercase', fontSize: '9px' }}>
+                        {task.moderationStatus || 'approved'}
+                      </span>
+                    </div>
                   </div>
 
-                  <div>
-                    <span style={{ fontSize: 'var(--text-body-sm)' }}>{task.category}</span>
+                  <div className="moderation-col-role">
+                    <span className="label-prefix">{t('dashboard.th_category')}:</span>
+                    <span className="role-text" style={{ fontSize: 'var(--text-body-sm)' }}>{task.category}</span>
                   </div>
 
-                  <div>
+                  <div className="moderation-col-status">
+                    <span className="label-prefix">{t('moderation.th_flow_status')}:</span>
                     <span className="badge badge-secondary" style={{ textTransform: 'uppercase', fontSize: '10px' }}>
                       {task.status}
                     </span>
                   </div>
 
-                  <div>
+                  <div className="moderation-col-status">
+                    <span className="label-prefix">{t('moderation.th_moderation')}:</span>
                     <span className={`badge badge-${task.moderationStatus || 'approved'}`} style={{ textTransform: 'uppercase', fontSize: '10px' }}>
                       {task.moderationStatus || 'approved'}
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', paddingRight: '16px' }}>
+                  <div className="moderation-col-actions">
                     {task.moderationStatus === 'pending' && (
                       <>
                         <button
                           onClick={() => handleApproveTask(task.id)}
                           className="btn btn-primary btn-xs"
-                          style={{ padding: '4px 6px' }}
                           title="Approve Listing"
                         >
                           <Check size={12} />
+                          <span className="mobile-only-inline" style={{ marginLeft: '4px' }}>{t('moderation.btn_approve')}</span>
                         </button>
                         <button
                           onClick={() => handleRejectTask(task.id)}
                           className="btn btn-outlined btn-xs"
-                          style={{ color: 'var(--color-status-error)', borderColor: 'var(--color-status-error)', padding: '4px 6px' }}
                           title="Reject Listing"
                         >
                           <X size={12} />
+                          <span className="mobile-only-inline" style={{ marginLeft: '4px' }}>{t('moderation.btn_reject')}</span>
                         </button>
                       </>
                     )}
                     <button
                       onClick={() => handleDeleteTask(task.id)}
                       className="btn btn-danger btn-xs"
-                      style={{ padding: '4px 6px' }}
                       title="Delete Listing Permanently"
                     >
                       <Trash2 size={12} />
+                      <span className="mobile-only-inline" style={{ marginLeft: '4px' }}>{t('moderation.btn_delete') || 'Delete'}</span>
                     </button>
                   </div>
                 </div>
