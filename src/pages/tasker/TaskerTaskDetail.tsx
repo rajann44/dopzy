@@ -24,12 +24,14 @@ import { formatDate, formatCurrency } from '../../utils/formatters';
 import { CATEGORY_ICONS } from '../../utils/constants';
 import type { Offer, User as UserType } from '../../types';
 import { supabase } from '../../utils/supabaseClient';
+import { useTranslation } from '../../context/LanguageContext';
 
 export function TaskerTaskDetail() {
   const { id } = useParams<{ id: string }>();
   const { currentUser } = useAuth();
   const { state, dispatch } = useAppContext();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const task = state.tasks.find((t) => t.id === id);
@@ -64,8 +66,8 @@ export function TaskerTaskDetail() {
     return (
       <div className="empty-state">
         <div className="empty-state-icon">🔍</div>
-        <h3>Task not found</h3>
-        <Link to="/browse"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Back to Browse</button></Link>
+        <h3>{t('task_detail.task_not_found')}</h3>
+        <Link to="/browse"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>{t('task_detail.back_to_tasks')}</button></Link>
       </div>
     );
   }
@@ -356,7 +358,7 @@ export function TaskerTaskDetail() {
           <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back" style={{ flexShrink: 0 }}>
             <ArrowLeft size={20} />
           </button>
-          <h1 className="mobile-only-header-title">Task Details</h1>
+          <h1 className="mobile-only-header-title">{t('task_detail.title')}</h1>
           <div className="desktop-only-header-content" style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
               <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -364,11 +366,11 @@ export function TaskerTaskDetail() {
               </span>
               <StatusBadge status={task.status} />
               {task.taskType === 'remote' ? (
-                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 {t('task_detail.remote')}</span>
               ) : (
-                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 {t('task_detail.in_person')}</span>
               )}
-              {isAssignedToMe && <span className="badge badge-gold">Your Job</span>}
+              {isAssignedToMe && <span className="badge badge-gold">{t('task_detail.your_job')}</span>}
             </div>
             <h1 className="text-headline-md truncate" style={{ margin: 0, fontWeight: 700 }}>{task.title}</h1>
           </div>
@@ -384,11 +386,11 @@ export function TaskerTaskDetail() {
             </span>
             <StatusBadge status={task.status} />
             {task.taskType === 'remote' ? (
-              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 {t('task_detail.remote')}</span>
             ) : (
-              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 {t('task_detail.in_person')}</span>
             )}
-            {isAssignedToMe && <span className="badge badge-gold">Your Job</span>}
+            {isAssignedToMe && <span className="badge badge-gold">{t('task_detail.your_job')}</span>}
           </div>
           
           <h1 className="text-headline-md" style={{ margin: '8px 0 0 0', fontWeight: 700, color: 'var(--color-secondary)', fontSize: '20px', lineHeight: 1.3 }}>
@@ -401,7 +403,7 @@ export function TaskerTaskDetail() {
             {/* Description */}
             <div className="card">
               <div className="card-header">
-                <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Task Details</h2>
+                <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>{t('task_detail.title')}</h2>
               </div>
               <div className="card-body">
                 <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)', margin: 0 }}>
@@ -410,7 +412,7 @@ export function TaskerTaskDetail() {
 
                 {task.mustHaves && task.mustHaves.length > 0 && (
                   <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>Must-Haves & Requirements</div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>{t('task_detail.must_haves')}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       {task.mustHaves.map((m, i) => (
                         <div key={i} style={{
@@ -436,7 +438,7 @@ export function TaskerTaskDetail() {
 
                 {task.images && task.images.length > 0 && (
                   <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Reference Images</div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>{t('task_detail.ref_images')}</div>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                       {task.images.map((img, i) => (
                         <div key={i} style={{ borderRadius: 'var(--radius)', overflow: 'hidden', width: '180px', height: '120px', border: '1px solid var(--color-outline-variant)' }}>
@@ -449,18 +451,18 @@ export function TaskerTaskDetail() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
                   <div>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>{t('task_detail.location')}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
                       <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
                       <span>{task.location} · {task.address}</span>
                     </div>
                   </div>
                   <div>
-                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Schedule</div>
+                    <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>{t('task_detail.schedule')}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
                       <Calendar size={16} style={{ color: 'var(--color-secondary-mid)' }} />
                       <span>
-                        {formatDate(task.date)} {task.time && `at ${task.time}`}
+                        {formatDate(task.date)}{task.time && ` ${t('task_detail.at_time', { time: task.time })}`}
                       </span>
                     </div>
                   </div>
@@ -471,7 +473,7 @@ export function TaskerTaskDetail() {
             {/* My Offer / Offer Form */}
             {myOffer ? (
               <div style={{ marginBottom: 'var(--space-6)' }}>
-                <div className="section-label" style={{ marginBottom: '12px' }}>Your Active Offer</div>
+                <div className="section-label" style={{ marginBottom: '12px' }}>{t('task_detail.your_active_offer')}</div>
                 <div className="transaction-rows-container">
                   <OfferCard
                     offer={myOffer}
@@ -486,7 +488,7 @@ export function TaskerTaskDetail() {
               canOffer ? (
                 <div className="card">
                   <div className="card-header">
-                    <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Make an Offer</h2>
+                    <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>{t('task_detail.make_an_offer')}</h2>
                   </div>
                   <div className="card-body">
                     {showOfferForm ? (
@@ -500,25 +502,25 @@ export function TaskerTaskDetail() {
                     ) : (
                       <div style={{ textAlign: 'center', padding: 'var(--space-4)' }}>
                         <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
-                          Interested in providing this service? Send your offer details to the client or clarify details first.
+                          {t('task_detail.interested_offer_desc')}
                         </p>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
                           <button className="btn btn-primary" onClick={() => setShowOfferForm(true)}>
-                            <DollarSign size={16} /> Submit Offer
+                            <DollarSign size={16} /> {t('task_detail.btn_submit_offer')}
                           </button>
                           {acceptedChatRequest || conversation ? (
                             <Link to="/messages">
                               <button className="btn btn-outlined" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                                <MessageSquare size={16} /> Go to Chat
+                                <MessageSquare size={16} /> {t('task_detail.btn_go_to_chat')}
                               </button>
                             </Link>
                           ) : pendingChatRequest ? (
                             <button className="btn btn-outlined" disabled style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.7 }}>
-                              <MessageSquare size={16} /> Inquiry Pending
+                              <MessageSquare size={16} /> {t('task_detail.btn_inquiry_pending')}
                             </button>
                           ) : (
                             <button className="btn btn-outlined" onClick={() => setShowQuestionModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                              <HelpCircle size={16} /> Ask a Question
+                              <HelpCircle size={16} /> {t('task_detail.btn_ask_question')}
                             </button>
                           )}
                         </div>
@@ -531,13 +533,13 @@ export function TaskerTaskDetail() {
               <div className="card" style={{ border: '1.5px dashed var(--color-outline-variant)', background: 'var(--color-surface-container-lowest)' }}>
                 <div className="card-body" style={{ textAlign: 'center', padding: 'var(--space-6)' }}>
                   <HelpCircle size={28} style={{ color: 'var(--color-secondary-mid)', marginBottom: '8px', opacity: 0.8 }} />
-                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '6px' }}>Want to provide this service?</h3>
+                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '6px' }}>{t('task_detail.want_to_provide_title')}</h3>
                   <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0, maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: '1.4' }}>
-                    You are currently logged in as a Client. To submit offers or ask questions, please upgrade to a Co-Tasker profile.
+                    {t('task_detail.want_to_provide_desc')}
                   </p>
                   <div style={{ marginTop: '16px' }}>
                     <Link to="/my-tasks?tab=tasker" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-                      Apply to Become a Co-Tasker
+                      {t('tasks.apply_title')}
                     </Link>
                   </div>
                 </div>
@@ -548,17 +550,17 @@ export function TaskerTaskDetail() {
             {isAssignedToMe && (task.status === 'assigned' || task.status === 'in_progress') && (
               <div className="card">
                 <div className="card-header">
-                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Update Job Status</h2>
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>{t('task_detail.title_update_status')}</h2>
                 </div>
                 <div className="card-body" style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
                   {task.status === 'assigned' && (
                     <button className="btn btn-secondary" onClick={() => setUpdateStatusConfirm('in_progress')}>
-                      Mark as In Progress
+                      {t('task_detail.btn_mark_in_progress')}
                     </button>
                   )}
                   {task.status === 'in_progress' && (
                     <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0 }}>
-                      Waiting for the client to confirm completion and release payment from escrow.
+                      {t('task_detail.wait_completion_desc')}
                     </p>
                   )}
                 </div>
@@ -584,26 +586,26 @@ export function TaskerTaskDetail() {
                 }}>
                   <Wallet size={18} />
                 </div>
-                <span className="text-label" style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contract Spec</span>
+                <span className="text-label" style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('task_detail.contract_spec')}</span>
               </div>
               <div>
-                <div className="section-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Client Budget</div>
+                <div className="section-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('task_detail.client_budget')}</div>
                 {task.budgetType === 'fixed' && task.budget ? (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
                     {formatCurrency(task.budget)}
                   </div>
                 ) : task.budgetType === 'hourly' && task.budget ? (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
-                    {formatCurrency(task.budget)}<span style={{ fontSize: '18px', fontWeight: 500, color: 'var(--color-on-surface-variant)' }}>/hr</span>
+                    {formatCurrency(task.budget)}<span style={{ fontSize: '18px', fontWeight: 500, color: 'var(--color-on-surface-variant)' }}>/{t('task_detail.hours')}</span>
                   </div>
                 ) : (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '28px', fontWeight: 700, color: 'var(--color-on-surface-variant)', letterSpacing: '-0.02em', lineHeight: 1.0 }}>
-                    Open to offers
+                    {t('new_task.open_for_offers')}
                   </div>
                 )}
               </div>
               <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontWeight: 500 }}>
-                {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
+                {task.budgetType === 'fixed' ? t('new_task.contract_fixed') : task.budgetType === 'hourly' ? t('new_task.contract_hourly') : t('new_task.contract_open')}
               </div>
             </div>
 
@@ -613,12 +615,12 @@ export function TaskerTaskDetail() {
               <div className="card-header">
                 <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Users size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                  Competition
+                  {t('task_detail.competition')}
                 </h3>
               </div>
               <div className="card-body" style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--text-body-sm)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--color-on-surface-variant)' }}>Offers submitted</span>
+                  <span style={{ color: 'var(--color-on-surface-variant)' }}>{t('task_detail.offers_submitted')}</span>
                   <span style={{ fontWeight: 700 }}>{task.offersCount}</span>
                 </div>
               </div>
@@ -630,7 +632,7 @@ export function TaskerTaskDetail() {
                 <div className="card-header">
                   <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Posted by
+                    {t('task_detail.posted_by')}
                   </h3>
                 </div>
                 <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
@@ -638,7 +640,7 @@ export function TaskerTaskDetail() {
                   <div>
                     <div style={{ fontWeight: 700, color: 'var(--color-on-surface)' }}>{clientUser.name}</div>
                     <Link to={`/profile/${clientUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600, display: 'inline-block', marginTop: '2px' }}>
-                      View Profile →
+                      {t('task_detail.view_profile')}
                     </Link>
                   </div>
                 </div>
@@ -653,9 +655,9 @@ export function TaskerTaskDetail() {
         isOpen={withdrawConfirm}
         onClose={() => setWithdrawConfirm(false)}
         onConfirm={handleWithdraw}
-        title="Withdraw your offer?"
-        message="This will retract your offer from this task listing. The client will no longer see your offer, but you can submit a new one if you change your mind."
-        confirmLabel="Withdraw Offer"
+        title={t('task_detail.confirm_withdraw_title')}
+        message={t('task_detail.confirm_withdraw_msg')}
+        confirmLabel={t('task_detail.confirm_withdraw_btn')}
         confirmVariant="danger"
         isLoading={isLoading}
       />
@@ -663,19 +665,19 @@ export function TaskerTaskDetail() {
         isOpen={!!updateStatusConfirm}
         onClose={() => setUpdateStatusConfirm(null)}
         onConfirm={handleUpdateStatus}
-        title="Update job progress?"
-        message={`This will transition the job status to "${updateStatusConfirm}". The client will be updated on your progress.`}
-        confirmLabel="Confirm Update"
+        title={t('task_detail.confirm_update_progress_title')}
+        message={t('task_detail.confirm_update_progress_msg', { status: updateStatusConfirm || '' })}
+        confirmLabel={t('task_detail.confirm_update_progress_btn')}
         isLoading={isLoading}
       />
       <Modal
         isOpen={showQuestionModal}
         onClose={() => setShowQuestionModal(false)}
-        title="Clarify Task Details"
+        title={t('task_detail.modal_question_title')}
         footer={
           <>
             <button className="btn btn-ghost" onClick={() => setShowQuestionModal(false)} disabled={isSubmittingQuestion}>
-              Cancel
+              {t('new_task.cancel')}
             </button>
             <button
               className="btn btn-primary"
@@ -683,21 +685,21 @@ export function TaskerTaskDetail() {
               disabled={isSubmittingQuestion || !questionText.trim() || questionText.trim().length < 15}
             >
               {isSubmittingQuestion && <span className="spinner" style={{ width: '16px', height: '16px' }} />}
-              Send Question
+              {t('task_detail.modal_question_submit')}
             </button>
           </>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: 0 }}>
-            Send a private inquiry to <strong>{clientUser?.name || 'the client'}</strong> regarding this task. They can accept your request to open a private conversation in Messages.
+            {t('task_detail.modal_question_desc', { name: clientUser?.name || t('task_detail.client_default_name') })}
           </p>
           <div className="form-group" style={{ marginTop: 'var(--space-2)' }}>
-            <label className="form-label required">Your Question</label>
+            <label className="form-label required">{t('task_detail.modal_question_label')}</label>
             <textarea
               className="form-input"
               rows={4}
-              placeholder="e.g. Is there parking available? Do I need to bring specialized cleaning equipment?"
+              placeholder={t('task_detail.modal_question_placeholder')}
               value={questionText}
               onChange={(e) => setQuestionText(e.target.value)}
               style={{ resize: 'none', fontSize: 'var(--text-body-sm)', padding: '10px var(--space-3)' }}
@@ -705,8 +707,8 @@ export function TaskerTaskDetail() {
             />
             <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
               {questionText.trim().length < 15 
-                ? `${15 - questionText.trim().length} more characters minimum`
-                : 'Meets length requirements'
+                ? t('task_detail.modal_question_min_chars', { count: 15 - questionText.trim().length })
+                : t('task_detail.modal_question_meets_req')
               }
             </span>
           </div>

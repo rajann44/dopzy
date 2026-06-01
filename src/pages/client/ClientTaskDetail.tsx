@@ -5,6 +5,7 @@ import posthog from '../../utils/posthogClient';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext, acceptOfferAction, updateTaskStatusAction, addReviewAction, addNotificationAction, createConversationAction, sendChatMessageAction } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
+import { useTranslation } from '../../context/LanguageContext';
 import { StatusBadge } from '../../components/ui/Badge';
 import { OfferCard } from '../../components/offers/OfferCard';
 import { ConfirmModal, Modal } from '../../components/ui/Modal';
@@ -22,6 +23,7 @@ export function ClientTaskDetail() {
   const { currentUser } = useAuth();
   const { state, dispatch } = useAppContext();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const task = state.tasks.find((t) => t.id === id);
@@ -61,14 +63,14 @@ export function ClientTaskDetail() {
     return (
       <div className="empty-state">
         <div className="empty-state-icon">🔍</div>
-        <h3>Task not found</h3>
-        <Link to="/my-tasks"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Back to Tasks</button></Link>
+        <h3>{t('task_detail.task_not_found')}</h3>
+        <Link to="/my-tasks"><button className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>{t('task_detail.back_to_tasks')}</button></Link>
       </div>
     );
   }
 
   if (task.clientId !== currentUser?.id && currentUser?.role !== 'admin') {
-    return <div className="empty-state"><h3>Access denied</h3></div>;
+    return <div className="empty-state"><h3>{t('task_detail.access_denied')}</h3></div>;
   }
 
   const handleMessageTasker = (taskerId: string) => {
@@ -177,7 +179,7 @@ export function ClientTaskDetail() {
         offer_price: acceptConfirm.price,
       });
 
-      showToast('Offer accepted! The task has been assigned.', 'success');
+      showToast(t('task_detail.toast_assigned'), 'success');
       setAcceptConfirm(null);
     } catch (err: any) {
       console.error(err);
@@ -202,7 +204,7 @@ export function ClientTaskDetail() {
         category: task.category,
         status_at_cancel: task.status,
       });
-      showToast('Task has been cancelled.', 'info');
+      showToast(t('task_detail.toast_cancelled'), 'info');
       setCancelConfirm(false);
       navigate('/my-tasks');
     } catch (err: any) {
@@ -234,7 +236,7 @@ export function ClientTaskDetail() {
         category: task.category,
         accepted_offer_price: acceptedOffer?.price,
       });
-      showToast('Task marked as complete!', 'success');
+      showToast(t('task_detail.toast_completed'), 'success');
       setCompleteConfirm(false);
       setShowReviewModal(true);
     } catch (err: any) {
@@ -247,7 +249,7 @@ export function ClientTaskDetail() {
 
   const handleSubmitReview = async () => {
     if (!reviewComment.trim() || reviewComment.length < 10) {
-      showToast('Please write at least 10 characters for your review.', 'warning');
+      showToast(t('task_detail.toast_review_min'), 'warning');
       return;
     }
     setIsActionLoading(true);
@@ -288,7 +290,7 @@ export function ClientTaskDetail() {
         category: task.category,
         rating: reviewRating,
       });
-      showToast('Review submitted! Thank you.', 'success');
+      showToast(t('task_detail.toast_review_success'), 'success');
       setShowReviewModal(false);
     } catch (err: any) {
       console.error(err);
@@ -300,7 +302,7 @@ export function ClientTaskDetail() {
 
   const handleSaveEdit = async () => {
     if (!editTitle.trim() || !editDescription.trim()) {
-      showToast('Please fill out all required fields.', 'warning');
+      showToast(t('task_detail.toast_edit_required'), 'warning');
       return;
     }
     setIsActionLoading(true);
@@ -328,7 +330,7 @@ export function ClientTaskDetail() {
           moderationStatus: 'pending'
         }
       });
-      showToast('Task updated successfully! It has been submitted for moderation review.', 'success');
+      showToast(t('task_detail.toast_edit_success'), 'success');
       setShowEditModal(false);
     } catch (err: any) {
       console.error(err);
@@ -350,7 +352,7 @@ export function ClientTaskDetail() {
           <button onClick={() => navigate(-1)} className="btn btn-ghost btn-icon btn-back" style={{ flexShrink: 0 }}>
             <ArrowLeft size={20} />
           </button>
-          <h1 className="mobile-only-header-title">Task Details</h1>
+          <h1 className="mobile-only-header-title">{t('task_detail.title')}</h1>
           <div className="desktop-only-header-content" style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '4px', flexWrap: 'wrap' }}>
               <span className="section-label" style={{ margin: 0, fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -358,9 +360,9 @@ export function ClientTaskDetail() {
               </span>
               <StatusBadge status={task.status} />
               {task.taskType === 'remote' ? (
-                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 {t('task_detail.remote')}</span>
               ) : (
-                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+                <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 {t('task_detail.in_person')}</span>
               )}
               <span className="badge" style={{ 
                 fontSize: '10px', 
@@ -374,7 +376,7 @@ export function ClientTaskDetail() {
                 padding: '2px 8px',
                 borderRadius: '100px'
               }}>
-                ✨ Posted by You
+                ✨ {t('task_detail.posted_by_you')}
               </span>
             </div>
             <h1 className="text-headline-md truncate" style={{ margin: 0, fontWeight: 700 }}>{task.title}</h1>
@@ -391,16 +393,16 @@ export function ClientTaskDetail() {
                 setEditDate(task.date);
                 setShowEditModal(true);
               }} style={{ borderColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
-                Edit Task
+                {t('task_detail.btn_edit')}
               </button>
               <button className="btn btn-danger btn-sm" onClick={() => setCancelConfirm(true)}>
-                <X size={14} /> Cancel Task
+                <X size={14} /> {t('task_detail.btn_cancel')}
               </button>
             </>
           )}
           {canComplete && (
             <button className="btn btn-primary btn-sm" onClick={() => setCompleteConfirm(true)}>
-              <CheckCircle size={14} /> Mark Complete
+              <CheckCircle size={14} /> {t('task_detail.btn_complete')}
             </button>
           )}
         </div>
@@ -415,9 +417,9 @@ export function ClientTaskDetail() {
             </span>
             <StatusBadge status={task.status} />
             {task.taskType === 'remote' ? (
-              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 Remote</span>
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💻 {t('task_detail.remote')}</span>
             ) : (
-              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 In Person</span>
+              <span className="badge badge-secondary" style={{ fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📍 {t('task_detail.in_person')}</span>
             )}
             <span className="badge" style={{ 
               fontSize: '10px', 
@@ -431,7 +433,7 @@ export function ClientTaskDetail() {
               padding: '2px 8px',
               borderRadius: '100px'
             }}>
-              ✨ Posted by You
+              ✨ {t('task_detail.posted_by_you')}
             </span>
           </div>
           
@@ -449,16 +451,16 @@ export function ClientTaskDetail() {
                   setEditDate(task.date);
                   setShowEditModal(true);
                 }} style={{ flex: 1, borderColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
-                  Edit Task
+                  {t('task_detail.btn_edit')}
                 </button>
                 <button className="btn btn-danger btn-sm" onClick={() => setCancelConfirm(true)} style={{ flex: 1 }}>
-                  <X size={14} /> Cancel
+                  <X size={14} /> {t('new_task.cancel')}
                 </button>
               </>
             )}
             {canComplete && (
               <button className="btn btn-primary btn-sm" onClick={() => setCompleteConfirm(true)} style={{ flex: 1 }}>
-                <CheckCircle size={14} /> Mark Complete
+                <CheckCircle size={14} /> {t('task_detail.btn_complete')}
               </button>
             )}
           </div>
@@ -490,9 +492,9 @@ export function ClientTaskDetail() {
             👤
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--color-secondary)' }}>You posted this task</h4>
+            <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--color-secondary)' }}>{t('task_detail.posted_by_you')}</h4>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
-              As the author, you have full control over this listing. Use the tabs below to manage offers, edit details, or answer questions.
+              {t('task_detail.posted_by_you_desc')}
             </p>
           </div>
         </div>
@@ -502,14 +504,14 @@ export function ClientTaskDetail() {
           <div className="bento-col-8 flex flex-col gap-4">
             <SegmentedControl
               options={[
-                { value: 'details', label: 'Details' },
+                { value: 'details', label: t('task_detail.tab_details') },
                 ...(task.status !== 'cancelled' ? [{
                   value: 'offers',
-                  label: `Offers (${offers.filter(o => o.status !== 'withdrawn').length})`
+                  label: t('task_detail.tab_offers', { count: offers.filter(o => o.status !== 'withdrawn').length })
                 }] : []),
                 ...(task.status === 'completed' && task.assignedTaskerId ? [{
                   value: 'review',
-                  label: 'Review'
+                  label: t('task_detail.tab_review')
                 }] : [])
               ]}
               value={activeTab}
@@ -521,7 +523,7 @@ export function ClientTaskDetail() {
             {activeTab === 'details' && (
               <div className="card">
                 <div className="card-header">
-                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Task Details</h2>
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>{t('task_detail.title')}</h2>
                 </div>
                 <div className="card-body">
                   <p style={{ whiteSpace: 'pre-wrap', lineHeight: 'var(--lh-body-lg)', color: 'var(--color-on-surface-variant)', margin: 0 }}>
@@ -530,7 +532,7 @@ export function ClientTaskDetail() {
 
                   {task.mustHaves && task.mustHaves.length > 0 && (
                     <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>Must-Haves & Requirements</div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '12px' }}>{t('task_detail.must_haves')}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                         {task.mustHaves.map((m, i) => (
                           <div key={i} style={{
@@ -556,7 +558,7 @@ export function ClientTaskDetail() {
 
                   {task.images && task.images.length > 0 && (
                     <div style={{ marginTop: 'var(--space-5)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
-                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Reference Images</div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '8px' }}>{t('task_detail.ref_images')}</div>
                       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         {task.images.map((img, i) => (
                           <div key={i} style={{ borderRadius: 'var(--radius)', overflow: 'hidden', width: '180px', height: '120px', border: '1px solid var(--color-outline-variant)' }}>
@@ -569,14 +571,14 @@ export function ClientTaskDetail() {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginTop: 'var(--space-6)', borderTop: '1px solid var(--color-surface-container-highest)', paddingTop: 'var(--space-4)' }}>
                     <div>
-                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Location</div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>{t('task_detail.location')}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
                         <MapPin size={16} style={{ color: 'var(--color-secondary-mid)' }} />
                         <span>{task.location} · {task.address}</span>
                       </div>
                     </div>
                     <div>
-                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>Schedule</div>
+                      <div className="section-label" style={{ fontSize: '11px', marginBottom: '4px' }}>{t('task_detail.schedule')}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-body-sm)' }}>
                         <Calendar size={16} style={{ color: 'var(--color-secondary-mid)' }} />
                         <span>
@@ -594,7 +596,7 @@ export function ClientTaskDetail() {
               <div className="card">
                 <div className="card-header" style={{ borderBottom: '1px solid var(--color-outline-variant)', padding: 'var(--space-4) var(--space-5)' }}>
                   <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    Offers Received ({offers.filter(o => o.status !== 'withdrawn').length})
+                    {t('task_detail.offers_received', { count: offers.filter(o => o.status !== 'withdrawn').length })}
                   </h2>
                 </div>
                 <div className="card-body" style={{ padding: offers.length > 0 ? 0 : 'var(--space-6)' }}>
@@ -602,25 +604,25 @@ export function ClientTaskDetail() {
                     <div className="transaction-rows-container" style={{ border: 'none', borderRadius: 0 }}>
                       {offers.map((offer) => (
                         <OfferCard
-                          key={offer.id}
-                          offer={offer}
-                          onAccept={task.status === 'receiving_offers' ? (id) => {
-                            const o = offers.find(x => x.id === id);
-                            if (o) setAcceptConfirm(o);
-                          } : undefined}
-                          onMessage={handleMessageTasker}
-                          onViewProfile={setSelectedTaskerId}
-                          viewerRole="client"
-                          showActions={task.status === 'receiving_offers'}
+                           key={offer.id}
+                           offer={offer}
+                           onAccept={task.status === 'receiving_offers' ? (id) => {
+                             const o = offers.find(x => x.id === id);
+                             if (o) setAcceptConfirm(o);
+                           } : undefined}
+                           onMessage={handleMessageTasker}
+                           onViewProfile={setSelectedTaskerId}
+                           viewerRole="client"
+                           showActions={task.status === 'receiving_offers'}
                         />
                       ))}
                     </div>
                   ) : (
                     <div className="empty-state" style={{ padding: 'var(--space-8) 0' }}>
                       <div className="empty-state-icon" style={{ fontSize: '32px', marginBottom: '12px' }}>👥</div>
-                      <h3 className="text-headline-sm" style={{ marginBottom: '4px', fontSize: '15px', fontWeight: 700 }}>No offers received yet</h3>
+                      <h3 className="text-headline-sm" style={{ marginBottom: '4px', fontSize: '15px', fontWeight: 700 }}>{t('task_detail.no_offers')}</h3>
                       <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '13px', margin: 0 }}>
-                        Providers will start submitting bids shortly. We will notify you when a new offer is made.
+                        {t('task_detail.no_offers_desc')}
                       </p>
                     </div>
                   )}
@@ -632,7 +634,7 @@ export function ClientTaskDetail() {
             {activeTab === 'review' && task.status === 'completed' && task.assignedTaskerId && (
               <div className="card">
                 <div className="card-header">
-                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>Your Review</h2>
+                  <h2 className="text-headline-sm" style={{ fontSize: '16px', fontWeight: 700 }}>{t('task_detail.your_review')}</h2>
                 </div>
                 <div className="card-body">
                   {existingReview ? (
@@ -649,10 +651,10 @@ export function ClientTaskDetail() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                       <p style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
-                        How was your experience with the service provider? Let others know!
+                        {t('task_detail.leave_review_desc')}
                       </p>
                       <button className="btn btn-primary" onClick={() => setShowReviewModal(true)} style={{ width: 'fit-content', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                        <Star size={16} /> Leave a Review
+                        <Star size={16} /> {t('task_detail.btn_leave_review')}
                       </button>
                     </div>
                   )}
@@ -679,10 +681,10 @@ export function ClientTaskDetail() {
                 }}>
                   <Wallet size={18} />
                 </div>
-                <span className="text-label" style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contract Spec</span>
+                <span className="text-label" style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('task_detail.contract_spec')}</span>
               </div>
               <div>
-                <div className="section-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Task Budget</div>
+                <div className="section-label" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-on-surface-variant)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('dashboard.th_budget')}</div>
                 {task.budgetType === 'fixed' && task.budget ? (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '38px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.03em', lineHeight: 1.0 }}>
                     {formatCurrency(task.budget)}
@@ -693,12 +695,12 @@ export function ClientTaskDetail() {
                   </div>
                 ) : (
                   <div style={{ fontFamily: 'var(--font-headline)', fontSize: '28px', fontWeight: 700, color: 'var(--color-on-surface-variant)', letterSpacing: '-0.02em', lineHeight: 1.0 }}>
-                    Open to offers
+                    {t('new_task.open_for_offers')}
                   </div>
                 )}
               </div>
               <div style={{ borderTop: '1px solid var(--color-outline-variant)', paddingTop: '12px', marginTop: '12px', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', fontWeight: 500 }}>
-                {task.budgetType === 'fixed' ? 'Fixed price contract' : task.budgetType === 'hourly' ? 'Hourly rates contract' : 'Open bidding'}
+                {task.budgetType === 'fixed' ? t('new_task.contract_fixed') : task.budgetType === 'hourly' ? t('new_task.contract_hourly') : t('new_task.contract_open')}
               </div>
             </div>
 
@@ -709,27 +711,27 @@ export function ClientTaskDetail() {
                 <div className="card-header">
                   <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Wallet size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Payment Details
+                    {t('task_detail.payment_details')}
                   </h3>
                 </div>
                 <div className="card-body" style={{ padding: 'var(--space-4)' }}>
                   {state.walletTransactions.filter(w => w.taskId === task.id).map(tx => (
                     <div key={tx.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--text-body-sm)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Funded Amount</span>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>{t('task_detail.funded_amount')}</span>
                         <span style={{ fontWeight: 700 }}>{formatCurrency(tx.amount)}</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Contract Status</span>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>{t('task_detail.contract_status')}</span>
                         <span className={`badge badge-${tx.status}`}>
-                          {tx.status === 'reserved' ? 'In Escrow' : tx.status === 'released' ? 'Released' : 'Refunded'}
+                          {tx.status === 'reserved' ? t('dashboard.label_escrow_hold') : tx.status === 'released' ? t('dashboard.tx_released') : t('dashboard.tx_refunded')}
                         </span>
                       </div>
                     </div>
                   ))}
                   {state.walletTransactions.filter(w => w.taskId === task.id).length === 0 && (
                     <div style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', textAlign: 'center' }}>
-                      No transactions recorded.
+                      {t('dashboard.empty_payments')}
                     </div>
                   )}
                 </div>
@@ -742,7 +744,7 @@ export function ClientTaskDetail() {
                 <div className="card-header">
                   <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Assigned Tasker
+                    {t('task_detail.assigned_tasker')}
                   </h3>
                 </div>
                 <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-4)' }}>
@@ -751,19 +753,19 @@ export function ClientTaskDetail() {
                     <div>
                       <div style={{ fontWeight: 700, color: 'var(--color-on-surface)' }}>{assignedUser.name}</div>
                       <Link to={`/profile/${assignedUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600, display: 'inline-block', marginTop: '2px' }}>
-                        View Profile →
+                        {t('task_detail.view_profile')}
                       </Link>
                     </div>
                   </div>
                   {acceptedOffer && (
                     <div style={{ padding: 'var(--space-3)', background: 'var(--color-surface-container-low)', borderRadius: 'var(--radius)', fontSize: 'var(--text-body-sm)', border: '1px solid var(--color-outline-variant)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Agreed budget:</span>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>{t('task_detail.agreed_budget')}</span>
                         <strong>{formatCurrency(acceptedOffer.price)}</strong>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--color-on-surface-variant)' }}>Estimated effort:</span>
-                        <strong>~{acceptedOffer.estimatedHours} hours</strong>
+                        <span style={{ color: 'var(--color-on-surface-variant)' }}>{t('task_detail.estimated_effort')}</span>
+                        <strong>~{acceptedOffer.estimatedHours} {t('task_detail.hours')}</strong>
                       </div>
                     </div>
                   )}
@@ -777,17 +779,17 @@ export function ClientTaskDetail() {
                 <div className="card-header">
                   <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <User size={16} style={{ color: 'var(--color-secondary-mid)' }} />
-                    Posted by You
+                    {t('task_detail.posted_by_you')}
                   </h3>
                 </div>
                 <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
                   <Avatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size="md" />
                   <div>
                     <div style={{ fontWeight: 700, color: 'var(--color-on-surface)' }}>
-                      {currentUser.name} <span style={{ color: 'var(--color-primary)', fontWeight: 500, fontSize: '11px' }}>(You)</span>
+                      {currentUser.name} <span style={{ color: 'var(--color-primary)', fontWeight: 500, fontSize: '11px' }}>({t('messages.you')})</span>
                     </div>
                     <Link to={`/profile/${currentUser.id}`} style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600, display: 'inline-block', marginTop: '2px' }}>
-                      View Profile →
+                      {t('task_detail.view_profile')}
                     </Link>
                   </div>
                 </div>
@@ -797,23 +799,25 @@ export function ClientTaskDetail() {
         </div>
       </div>
 
+
+
       {/* Confirm Modals */}
       <ConfirmModal
         isOpen={!!acceptConfirm}
         onClose={() => setAcceptConfirm(null)}
         onConfirm={handleAcceptOffer}
-        title="Accept this offer?"
-        message={`You are about to accept the offer of ${acceptConfirm?.price ? formatCurrency(acceptConfirm.price) : ''}. All other offers will be auto-declined and the project funds will be placed in secure escrow.`}
-        confirmLabel="Accept Offer"
+        title={t('task_detail.confirm_accept_title')}
+        message={t('task_detail.confirm_accept_msg', { price: acceptConfirm?.price ? formatCurrency(acceptConfirm.price) : '' })}
+        confirmLabel={t('task_detail.confirm_accept_btn')}
         isLoading={isActionLoading}
       />
       <ConfirmModal
         isOpen={cancelConfirm}
         onClose={() => setCancelConfirm(false)}
         onConfirm={handleCancelTask}
-        title="Cancel task listing?"
-        message="This will cancel your task posting, delete the listing from the marketplace, and close all pending offers. This action cannot be undone."
-        confirmLabel="Cancel Listing"
+        title={t('task_detail.confirm_cancel_title')}
+        message={t('task_detail.confirm_cancel_msg')}
+        confirmLabel={t('task_detail.confirm_cancel_btn')}
         confirmVariant="danger"
         isLoading={isActionLoading}
       />
@@ -821,9 +825,9 @@ export function ClientTaskDetail() {
         isOpen={completeConfirm}
         onClose={() => setCompleteConfirm(false)}
         onConfirm={handleMarkComplete}
-        title="Mark task as completed?"
-        message="Please verify that the work has been completed to your satisfaction. Confirming completion will release the escrow funds directly to the provider."
-        confirmLabel="Confirm Completion"
+        title={t('task_detail.confirm_complete_title')}
+        message={t('task_detail.confirm_complete_msg')}
+        confirmLabel={t('task_detail.confirm_complete_btn')}
         isLoading={isActionLoading}
       />
 
@@ -831,20 +835,20 @@ export function ClientTaskDetail() {
       <Modal
         isOpen={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        title="Review Service Provider"
+        title={t('task_detail.modal_review_title')}
         footer={
           <>
-            <button className="btn btn-ghost" onClick={() => setShowReviewModal(false)}>Skip</button>
+            <button className="btn btn-ghost" onClick={() => setShowReviewModal(false)}>{t('task_detail.modal_review_skip')}</button>
             <button className="btn btn-primary" onClick={handleSubmitReview} disabled={isActionLoading}>
               {isActionLoading && <span className="spinner" style={{ width: 16, height: 16 }} />}
-              Submit Review
+              {t('task_detail.modal_review_submit')}
             </button>
           </>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div>
-            <div style={{ fontSize: 'var(--text-body-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>How was your experience?</div>
+            <div style={{ fontSize: 'var(--text-body-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>{t('task_detail.modal_review_experience')}</div>
             <div style={{ display: 'flex', gap: 'var(--space-1)' }}>
               {[1, 2, 3, 4, 5].map((s) => (
                 <button
@@ -858,12 +862,12 @@ export function ClientTaskDetail() {
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label required">Written Feedback</label>
+            <label className="form-label required">{t('task_detail.modal_review_feedback')}</label>
             <textarea
               className="form-textarea"
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
-              placeholder="Tell others what it was like working with this provider. Minimum 10 characters."
+              placeholder={t('task_detail.modal_review_placeholder')}
               rows={4}
               required
             />
@@ -881,26 +885,26 @@ export function ClientTaskDetail() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Task Details"
+        title={t('task_detail.modal_edit_title')}
         footer={
           <>
-            <button className="btn btn-ghost" onClick={() => setShowEditModal(false)}>Cancel</button>
+            <button className="btn btn-ghost" onClick={() => setShowEditModal(false)}>{t('new_task.cancel')}</button>
             <button className="btn btn-primary" onClick={handleSaveEdit} disabled={isActionLoading}>
               {isActionLoading && <span className="spinner" style={{ width: 16, height: 16 }} />}
-              Save Changes
+              {t('task_detail.modal_edit_save')}
             </button>
           </>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div className="form-group">
-            <label className="form-label required">Task Title</label>
+            <label className="form-label required">{t('new_task.task_title')}</label>
             <input
               type="text"
               className="form-input"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              placeholder="e.g. Clean my 2-bedroom apartment"
+              placeholder={t('task_detail.modal_edit_placeholder_title')}
               required
               style={{
                 width: '100%',
@@ -916,12 +920,12 @@ export function ClientTaskDetail() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label required">Description</label>
+            <label className="form-label required">{t('new_task.description')}</label>
             <textarea
               className="form-textarea"
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Provide a detailed description of the task..."
+              placeholder={t('task_detail.modal_edit_placeholder_desc')}
               rows={5}
               required
               style={{
@@ -938,7 +942,7 @@ export function ClientTaskDetail() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Task Date</label>
+            <label className="form-label">{t('task_detail.modal_edit_label_date')}</label>
             <input
               type="date"
               className="form-input"
@@ -959,7 +963,7 @@ export function ClientTaskDetail() {
           </div>
           {task.budgetType !== 'open_to_offers' && (
             <div className="form-group">
-              <label className="form-label required">Budget (€)</label>
+              <label className="form-label required">{t('task_detail.modal_edit_label_budget')}</label>
               <input
                 type="number"
                 className="form-input"

@@ -9,7 +9,7 @@ const translationDictionaries: Record<Language, any> = { en, de };
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, replacements?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -37,7 +37,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('app_language_change', handleLangChange);
   }, [language]);
 
-  const t = (path: string): string => {
+  const t = (path: string, replacements?: Record<string, string | number>): string => {
     const dictionary = translationDictionaries[language] || en;
     const parts = path.split('.');
     let current = dictionary;
@@ -47,7 +47,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
       current = current[part];
     }
-    return typeof current === 'string' ? current : path;
+    let text = typeof current === 'string' ? current : path;
+    if (replacements) {
+      Object.entries(replacements).forEach(([key, val]) => {
+        text = text.replace(new RegExp(`{${key}}`, 'g'), String(val));
+      });
+    }
+    return text;
   };
 
   return (

@@ -33,28 +33,28 @@ export function SettingsPage() {
   const handlePasswordChange = (e: React.FormEvent) => {
     e.preventDefault();
     if (!passwords.current || !passwords.new || !passwords.confirm) {
-      showToast('Please fill out all password fields', 'error');
+      showToast(t('settings.toast_fill_all_pass'), 'error');
       return;
     }
     if (passwords.new !== passwords.confirm) {
-      showToast('New password and confirmation do not match', 'error');
+      showToast(t('settings.toast_pass_mismatch'), 'error');
       return;
     }
     if (passwords.new.length < 6) {
-      showToast('Password must be at least 6 characters long', 'error');
+      showToast(t('settings.toast_pass_min'), 'error');
       return;
     }
 
-    showToast('Password updated successfully', 'success');
+    showToast(t('settings.toast_pass_success'), 'success');
     setPasswords({ current: '', new: '', confirm: '' });
   };
 
   const handleSavePreferences = (preferenceName: string) => {
-    showToast(`${preferenceName} preferences updated`, 'success');
+    showToast(t('settings.toast_pref_updated', { name: preferenceName }), 'success');
   };
 
   const handleDeleteAccount = () => {
-    showToast('Account deletion request submitted. Support will contact you shortly.', 'success');
+    showToast(t('settings.toast_delete_success'), 'success');
     setShowDeleteModal(false);
   };
 
@@ -110,7 +110,7 @@ export function SettingsPage() {
           <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <div>
               <label style={{ display: 'block', fontSize: 'var(--text-body-sm)', fontWeight: 600, color: 'var(--color-secondary)', marginBottom: '6px' }}>
-                Current Password
+                {t('settings.current_password')}
               </label>
               <input
                 type="password"
@@ -125,7 +125,7 @@ export function SettingsPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-4)', maxWidth: '400px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: 'var(--text-body-sm)', fontWeight: 600, color: 'var(--color-secondary)', marginBottom: '6px' }}>
-                  New Password
+                  {t('settings.new_password')}
                 </label>
                 <input
                   type="password"
@@ -138,7 +138,7 @@ export function SettingsPage() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 'var(--text-body-sm)', fontWeight: 600, color: 'var(--color-secondary)', marginBottom: '6px' }}>
-                  Confirm Password
+                  {t('settings.confirm_password')}
                 </label>
                 <input
                   type="password"
@@ -152,7 +152,7 @@ export function SettingsPage() {
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ width: 'fit-content', marginTop: 'var(--space-2)' }}>
-              Update Password
+              {t('settings.update_password_btn')}
             </button>
           </form>
         </div>
@@ -161,11 +161,11 @@ export function SettingsPage() {
         <div className="card" style={{ padding: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: 'var(--space-4)' }}>
             <Bell size={22} style={{ color: 'var(--color-secondary)' }} />
-            <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>Notification Channels</h3>
+            <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>{t('settings.notifications_title')}</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="settings-row">
-              <span className="settings-row-label">Receive updates and task status changes via email</span>
+              <span className="settings-row-label">{t('settings.email_notif_label')}</span>
               <label className="ios-switch">
                 <input
                   type="checkbox"
@@ -179,7 +179,7 @@ export function SettingsPage() {
               </label>
             </div>
             <div className="settings-row">
-              <span className="settings-row-label">Enable real-time browser push notifications</span>
+              <span className="settings-row-label">{t('settings.push_notif_label')}</span>
               <label className="ios-switch">
                 <input
                   type="checkbox"
@@ -199,11 +199,11 @@ export function SettingsPage() {
         <div className="card" style={{ padding: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: 'var(--space-4)' }}>
             <Eye size={22} style={{ color: 'var(--color-secondary)' }} />
-            <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>Profile Visibility & Privacy</h3>
+            <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>{t('settings.privacy_title')}</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="settings-row">
-              <span className="settings-row-label">Allow public search engines and non-registered users to view my task marketplace feedback</span>
+              <span className="settings-row-label">{t('settings.privacy_label')}</span>
               <label className="ios-switch">
                 <input
                   type="checkbox"
@@ -226,7 +226,7 @@ export function SettingsPage() {
             <h3 className="text-headline-sm" style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--color-error)' }}>{t('settings.danger_title')}</h3>
           </div>
           <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', marginBottom: 'var(--space-4)' }}>
-            Once you delete your account, all escrow transactions, posted jobs, and history ledger records will be permanently archived or deleted. This action is irreversible.
+            {t('settings.delete_desc')}
           </p>
           <button
             onClick={() => setShowDeleteModal(true)}
@@ -252,9 +252,9 @@ export function SettingsPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteAccount}
-        title="Confirm Account Deletion"
-        message={`Are you absolutely sure you want to delete your profile ${currentUser?.name}? All pending offers, balance states, and message streams will be deleted forever.`}
-        confirmLabel="Delete Irreversibly"
+        title={t('settings.confirm_delete_title')}
+        message={t('settings.confirm_delete_msg', { name: currentUser?.name || '' })}
+        confirmLabel={t('settings.confirm_delete_btn')}
         confirmVariant="danger"
       />
     </div>

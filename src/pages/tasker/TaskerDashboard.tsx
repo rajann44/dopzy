@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star, TrendingUp, CheckCircle, Clock, DollarSign, ArrowRight, Bell, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppContext } from '../../context/AppContext';
+import { useTranslation } from '../../context/LanguageContext';
 import { profileService } from '../../services/profileService';
 import { StatusBadge } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
@@ -12,6 +13,7 @@ import type { TaskerProfile } from '../../types';
 export function TaskerDashboard() {
   const { currentUser } = useAuth();
   const { state } = useAppContext();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<TaskerProfile | null>(null);
 
   useEffect(() => {
@@ -43,18 +45,18 @@ export function TaskerDashboard() {
       <div className="page-topbar">
         <div>
           <h1 className="text-headline-md" style={{ margin: 0, fontWeight: 700 }}>
-            Welcome back, {currentUser?.name.split(' ')[0]} 👋
+            {t('dashboard.welcome_back')}, {currentUser?.name.split(' ')[0]} 👋
           </h1>
           {profile && (
             <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Star size={14} fill="var(--color-primary-container)" color="var(--color-primary)" />
-              <span style={{ fontWeight: 600 }}>{profile.rating} Rating</span> · {profile.reviewCount} Reviews · {profile.responseTime} response
+              <span style={{ fontWeight: 600 }}>{t('dashboard.rating_span', { rating: profile.rating })}</span> · {t('dashboard.reviews_count', { count: profile.reviewCount })} · {t('dashboard.response_time', { time: profile.responseTime })}
             </p>
           )}
         </div>
         <Link to="/tasker/tasks">
           <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            Browse Tasks
+            {t('dashboard.browse_tasks_btn')}
             <ArrowRight size={16} />
           </button>
         </Link>
@@ -68,28 +70,28 @@ export function TaskerDashboard() {
               <TrendingUp size={18} style={{ color: 'var(--color-status-warning)' }} />
             </div>
             <div className="stat-value">{pendingOffers.length}</div>
-            <div className="stat-label">Pending Offers</div>
+            <div className="stat-label">{t('dashboard.pending_offers')}</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon-wrap" style={{ background: 'rgba(69, 39, 160, 0.08)' }}>
               <Clock size={18} style={{ color: '#4527A0' }} />
             </div>
             <div className="stat-value">{activeTasks.length}</div>
-            <div className="stat-label">Active Jobs</div>
+            <div className="stat-label">{t('dashboard.active_jobs')}</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon-wrap" style={{ background: 'var(--color-status-success-bg)' }}>
               <CheckCircle size={18} style={{ color: 'var(--color-status-success)' }} />
             </div>
             <div className="stat-value">{completedTasks.length}</div>
-            <div className="stat-label">Completed</div>
+            <div className="stat-label">{t('dashboard.completed')}</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon-wrap" style={{ background: 'rgba(255, 215, 0, 0.15)' }}>
               <DollarSign size={18} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div className="stat-value">{formatCurrency(totalEarned || (profile?.totalEarnings ?? 0))}</div>
-            <div className="stat-label">Total Earned</div>
+            <div className="stat-label">{t('dashboard.total_earned')}</div>
           </div>
         </div>
 
@@ -111,15 +113,15 @@ export function TaskerDashboard() {
             }}>
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '20px', color: '#fff', marginBottom: '4px' }}>
-                  {openTasksCount} tasks available near you
+                  {t('dashboard.open_market_banner', { count: openTasksCount })}
                 </div>
                 <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-body-sm)' }}>
-                  New tasks posted today. Be the first to send an offer!
+                  {t('dashboard.open_market_banner_desc')}
                 </div>
               </div>
               <Link to="/tasker/tasks" style={{ flexShrink: 0, zIndex: 1 }}>
                 <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  Browse All <ArrowRight size={14} />
+                  {t('dashboard.view_all')} <ArrowRight size={14} />
                 </button>
               </Link>
               <div style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,215,0,0.08)' }} />
@@ -128,7 +130,7 @@ export function TaskerDashboard() {
             {/* Active Jobs */}
             {activeTasks.length > 0 && (
               <div>
-                <div className="section-label">Active Jobs</div>
+                <div className="section-label">{t('dashboard.active_jobs')}</div>
                 <div className="flex flex-col gap-3">
                   {activeTasks.map((task) => (
                     <Link key={task.id} to={`/tasker/tasks/${task.id}`} style={{ textDecoration: 'none' }}>
@@ -151,7 +153,7 @@ export function TaskerDashboard() {
             {/* Recent reviews */}
             {myReviews.length > 0 && (
               <div>
-                <div className="section-label">Recent Reviews</div>
+                <div className="section-label">{t('dashboard.recent_reviews')}</div>
                 <div className="flex flex-col gap-3">
                   {myReviews.map((review) => (
                     <div key={review.id} className="card">
@@ -187,24 +189,24 @@ export function TaskerDashboard() {
                     <div style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', marginTop: '2px' }}>{profile.location}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    {profile.isVerified && <span className="badge badge-verified">✓ Verified</span>}
-                    {profile.isTopRated && <span className="badge badge-top-rated">★ Top Rated</span>}
-                    {profile.isFastResponder && <span className="badge badge-fast">⚡ Fast</span>}
+                    {profile.isVerified && <span className="badge badge-verified">{t('dashboard.badge_verified')}</span>}
+                    {profile.isTopRated && <span className="badge badge-top-rated">{t('dashboard.badge_top_rated')}</span>}
+                    {profile.isFastResponder && <span className="badge badge-fast">{t('dashboard.badge_fast')}</span>}
                   </div>
                   <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-surface-container-highest)', marginTop: 'var(--space-2)' }}>
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '20px', color: 'var(--color-on-surface)' }}>{profile.rating}</div>
-                      <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>Rating</div>
+                      <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{t('dashboard.label_rating')}</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '20px', color: 'var(--color-on-surface)' }}>{profile.completedJobs}</div>
-                      <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>Jobs Done</div>
+                      <div style={{ fontSize: 'var(--text-label-md)', color: 'var(--color-on-surface-variant)' }}>{t('dashboard.jobs_done')}</div>
                     </div>
                   </div>
                   <Link to={`/profile/${currentUser.id}`} style={{ width: '100%', marginTop: 'var(--space-2)' }}>
                     <button className="btn btn-outlined w-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
                       <User size={16} />
-                      View Public Profile
+                      {t('dashboard.view_public_profile')}
                     </button>
                   </Link>
                 </div>
@@ -216,9 +218,9 @@ export function TaskerDashboard() {
               <div className="card-header">
                 <h3 className="text-headline-sm" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <Bell size={16} />
-                  Activity
+                  {t('dashboard.title_recent_activity')}
                 </h3>
-                <Link to="/notifications" style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600 }}>All</Link>
+                <Link to="/notifications" style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-secondary)', fontWeight: 600 }}>{t('dashboard.view_all')}</Link>
               </div>
               <div>
                 {recentActivity.length > 0 ? (
@@ -237,7 +239,7 @@ export function TaskerDashboard() {
                   ))
                 ) : (
                   <div className="empty-state" style={{ padding: 'var(--space-6)' }}>
-                    <p>No recent activity</p>
+                    <p>{t('dashboard.no_recent_activity')}</p>
                   </div>
                 )}
               </div>

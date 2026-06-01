@@ -30,14 +30,14 @@ export function LoginPage() {
     setIsLoading(true);
     try {
       if (isSignUp) {
-        await signUp(email, password, name || 'New Member');
-        showToast('Account created successfully! Welcome to Dopzy.', 'success');
+        await signUp(email, password, name || t('messages.user'));
+        showToast(t('login.toast_account_created'), 'success');
       } else {
         await login(email, password);
-        showToast('Welcome back!', 'success');
+        showToast(t('login.toast_welcome_back'), 'success');
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Authentication failed';
+      const msg = err instanceof Error ? err.message : t('login.err_auth_failed');
       setError(msg);
     } finally {
       setIsLoading(false);
@@ -58,9 +58,9 @@ export function LoginPage() {
       if (error) {
         throw new Error(error.message);
       }
-      showToast('Verification email resent! Please check your inbox.', 'success');
+      showToast(t('login.toast_email_resent'), 'success');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to resend verification email';
+      const msg = err instanceof Error ? err.message : t('login.err_resend_failed');
       setError(msg);
     } finally {
       setIsLoading(false);
@@ -78,10 +78,10 @@ export function LoginPage() {
       if (error) {
         throw new Error(error.message);
       }
-      showToast('Password reset link sent! Check your inbox.', 'success');
+      showToast(t('login.toast_reset_sent'), 'success');
       setIsForgotPassword(false);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to send reset link';
+      const msg = err instanceof Error ? err.message : t('login.err_reset_failed');
       setError(msg);
     } finally {
       setIsLoading(false);
@@ -115,24 +115,24 @@ export function LoginPage() {
           </svg>
           <div>
             <div style={{ fontFamily: 'var(--font-headline)', fontWeight: 700, fontSize: '20px', color: '#fff' }}>Dopzy</div>
-            <div style={{ fontSize: 'var(--text-label-md)', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>One Tap, Task Done</div>
+            <div style={{ fontSize: 'var(--text-label-md)', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('login.brand_tagline')}</div>
           </div>
         </div>
 
         {/* Hero text */}
         <div className="login-reveal login-reveal-2" style={{ zIndex: 1 }}>
           <h1 style={{ fontFamily: 'var(--font-headline)', fontSize: '42px', fontWeight: 800, color: '#fff', lineHeight: 1.15, marginBottom: 'var(--space-4)', letterSpacing: '-0.02em' }}>
-            Your Tasks,<br />
-            <span className="login-gold-accent" style={{ color: 'var(--color-primary-container)' }}>Done.</span>
+            {t('login.brand_hero_line1')}<br />
+            <span className="login-gold-accent" style={{ color: 'var(--color-primary-container)' }}>{t('login.brand_hero_line2')}</span>
           </h1>
           <p style={{ fontSize: 'var(--text-body-lg)', color: 'rgba(255,255,255,0.75)', lineHeight: 'var(--lh-body-lg)', maxWidth: '380px' }}>
-            Connect with vetted, trusted service providers in your area. From moving to cleaning — every task, matched perfectly.
+            {t('login.brand_desc')}
           </p>
         </div>
 
         {/* Stats */}
         <div className="login-reveal login-reveal-3" style={{ display: 'flex', gap: 'var(--space-8)', zIndex: 1 }}>
-          {[['2,400+', 'Tasks Completed'], ['98%', 'Satisfaction Rate'], ['500+', 'Verified Providers']].map(([val, label]) => (
+          {[['2,400+', t('login.brand_stat_tasks')], ['98%', t('login.brand_stat_satisfaction')], ['500+', t('login.brand_stat_providers')]].map(([val, label]) => (
             <div key={label}>
               <div style={{ fontFamily: 'var(--font-headline)', fontSize: '28px', fontWeight: 700, color: 'var(--color-primary-container)' }}>{val}</div>
               <div style={{ fontSize: 'var(--text-label-md)', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
@@ -217,12 +217,12 @@ export function LoginPage() {
         <div key={`${isForgotPassword ? 'forgot' : isSignUp ? 'signup' : 'signin'}-${language}`} className="login-form-shell" style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           <div style={{ marginBottom: 'var(--space-8)' }}>
             <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: 'var(--text-headline-lg)', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: 'var(--space-2)' }}>
-              {isForgotPassword ? 'Reset Password' : (isSignUp ? 'Create an Account' : t('login.login_btn'))}
+              {isForgotPassword ? t('login.reset_password') : (isSignUp ? t('login.create_account') : t('login.login_btn'))}
             </h2>
             <p style={{ fontSize: 'var(--text-body-md)', color: 'var(--color-on-surface-variant)' }}>
               {isForgotPassword 
-                ? 'Enter your email address and we will send you a link to reset your password.'
-                : (isSignUp ? 'Sign up to post tasks or offer your services on Dopzy.' : 'Sign in to access your dashboard and manage tasks.')
+                ? t('login.reset_desc')
+                : (isSignUp ? t('login.signup_desc') : t('login.signin_desc'))
               }
             </p>
           </div>
@@ -276,11 +276,11 @@ export function LoginPage() {
                 {isLoading ? (
                   <>
                     <span className="spinner" style={{ width: '18px', height: '18px', borderColor: 'rgba(0,48,59,0.3)', borderTopColor: '#00303b' }} />
-                    Sending Link...
+                    {t('login.sending_link')}
                   </>
                 ) : (
                   <>
-                    <span>Send Reset Link</span>
+                    <span>{t('login.send_reset_link')}</span>
                     <ArrowRight size={18} strokeWidth={2.5} />
                   </>
                 )}
@@ -295,7 +295,7 @@ export function LoginPage() {
                 }}
                 style={{ width: '100%' }}
               >
-                Back to Sign In
+                {t('login.back_to_signin')}
               </button>
             </form>
           ) : (
@@ -303,7 +303,7 @@ export function LoginPage() {
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {isSignUp && (
                 <div className="form-group">
-                  <label htmlFor="name" className="form-label">Full Name</label>
+                  <label htmlFor="name" className="form-label">{t('login.full_name')}</label>
                   <input
                     id="name"
                     type="text"
@@ -350,7 +350,7 @@ export function LoginPage() {
                         padding: 0,
                       }}
                     >
-                      Forgot password?
+                      {t('login.forgot_password')}
                     </button>
                   )}
                 </div>
@@ -413,7 +413,7 @@ export function LoginPage() {
                         fontSize: '12px'
                       }}
                     >
-                      Resend verification email
+                      {t('login.resend_verification')}
                     </button>
                   )}
                 </div>
@@ -439,11 +439,11 @@ export function LoginPage() {
                 {isLoading ? (
                   <>
                     <span className="spinner" style={{ width: '18px', height: '18px', borderColor: 'rgba(0,48,59,0.3)', borderTopColor: '#00303b' }} />
-                    {isSignUp ? 'Registering...' : (language === 'de' ? 'Anmeldung...' : 'Signing in...')}
+                    {isSignUp ? t('login.registering') : t('login.signing_in')}
                   </>
                 ) : (
                   <>
-                    <span>{isSignUp ? 'Create Account' : t('login.login_btn')}</span>
+                    <span>{isSignUp ? t('login.btn_create_account') : t('login.login_btn')}</span>
                     <ArrowRight size={18} strokeWidth={2.5} />
                   </>
                 )}
@@ -453,7 +453,7 @@ export function LoginPage() {
 
           {!isForgotPassword && (
             <p style={{ marginTop: 'var(--space-6)', fontSize: 'var(--text-body-sm)', color: 'var(--color-on-surface-variant)', textAlign: 'center' }}>
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              {isSignUp ? t('login.already_have_account') : t('login.dont_have_account')}{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -470,7 +470,7 @@ export function LoginPage() {
                   padding: 0,
                 }}
               >
-                {isSignUp ? 'Sign In' : 'Sign Up'}
+                {isSignUp ? t('login.btn_signin') : t('login.btn_signup')}
               </button>
             </p>
           )}

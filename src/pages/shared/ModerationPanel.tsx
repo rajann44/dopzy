@@ -52,7 +52,7 @@ export function ModerationPanel() {
         .eq('id', userId);
       if (error) throw error;
       dispatch(approveTaskerAction(userId));
-      showToast('Tasker application approved successfully!', 'success');
+      showToast(t('moderation.toast_approved_user'), 'success');
     } catch (err: any) {
       console.error('Failed to approve user:', err);
       showToast(err.message || 'Failed to approve user in database.', 'error');
@@ -67,7 +67,7 @@ export function ModerationPanel() {
         .eq('id', userId);
       if (error) throw error;
       dispatch(rejectTaskerAction(userId));
-      showToast('Tasker application declined.', 'info');
+      showToast(t('moderation.toast_rejected_user'), 'info');
     } catch (err: any) {
       console.error('Failed to reject user:', err);
       showToast(err.message || 'Failed to reject user in database.', 'error');
@@ -82,7 +82,7 @@ export function ModerationPanel() {
         .eq('id', taskId);
       if (error) throw error;
       dispatch(approveTaskAction(taskId));
-      showToast('Task approved and listed in the marketplace!', 'success');
+      showToast(t('moderation.toast_approved_task'), 'success');
     } catch (err: any) {
       console.error('Failed to approve task:', err);
       showToast(err.message || 'Failed to approve task in database.', 'error');
@@ -97,7 +97,7 @@ export function ModerationPanel() {
         .eq('id', taskId);
       if (error) throw error;
       dispatch(rejectTaskAction(taskId));
-      showToast('Task rejected from the marketplace.', 'info');
+      showToast(t('moderation.toast_rejected_task'), 'info');
     } catch (err: any) {
       console.error('Failed to reject task:', err);
       showToast(err.message || 'Failed to reject task in database.', 'error');
@@ -114,10 +114,10 @@ export function ModerationPanel() {
       
       if (currentDisabled) {
         dispatch(enableUserAction(userId));
-        showToast('User account has been enabled.', 'success');
+        showToast(t('moderation.toast_enabled_user'), 'success');
       } else {
         dispatch(disableUserAction(userId));
-        showToast('User account has been disabled and logged out.', 'warning');
+        showToast(t('moderation.toast_disabled_user'), 'warning');
       }
     } catch (err: any) {
       console.error('Failed to toggle user status:', err);
@@ -138,8 +138,8 @@ export function ModerationPanel() {
       dispatch(toggleUserTaskerAction(userId, !isTasker));
       showToast(
         isTasker 
-          ? 'Tasker status revoked. User is now a regular client.' 
-          : 'User promoted to approved Tasker status.', 
+          ? t('moderation.toast_revoked_tasker')
+          : t('moderation.toast_promoted_tasker'), 
         'success'
       );
     } catch (err: any) {
@@ -149,7 +149,7 @@ export function ModerationPanel() {
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    if (window.confirm('Are you sure you want to permanently delete this task listing?')) {
+    if (window.confirm(t('moderation.confirm_delete_task'))) {
       try {
         const { error } = await supabase
           .from('tasks')
@@ -158,7 +158,7 @@ export function ModerationPanel() {
         if (error) throw error;
 
         dispatch(deleteTaskAction(taskId));
-        showToast('Task listing deleted permanently.', 'error');
+        showToast(t('moderation.toast_deleted_task'), 'error');
       } catch (err: any) {
         console.error('Failed to delete task:', err);
         showToast(err.message || 'Failed to delete task from database.', 'error');
@@ -176,7 +176,7 @@ export function ModerationPanel() {
               {t('moderation.title') || 'Moderation & Admin Panel'}
             </h1>
             <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--text-body-sm)', margin: '4px 0 0 0' }}>
-              Moderate accounts, toggle roles, and approve task listings
+              {t('moderation.subtitle')}
             </p>
           </div>
         </div>
@@ -185,9 +185,9 @@ export function ModerationPanel() {
       <div className="page-inner">
         <SegmentedControl
           options={[
-            { value: 'pending', label: `Pending (${pendingUsers.length + pendingTasks.length})` },
-            { value: 'users', label: `Users (${state.users.length})` },
-            { value: 'tasks', label: `Tasks (${state.tasks.length})` },
+            { value: 'pending', label: t('moderation.tab_pending_count', { count: pendingUsers.length + pendingTasks.length }) },
+            { value: 'users', label: `${t('moderation.tab_users')} (${state.users.length})` },
+            { value: 'tasks', label: `${t('moderation.tab_tasks')} (${state.tasks.length})` },
           ]}
           value={activeTab}
           onChange={(val) => setActiveTab(val as 'pending' | 'users' | 'tasks')}
@@ -200,7 +200,7 @@ export function ModerationPanel() {
             {/* Tasker applications */}
             <div>
               <div className="section-label" style={{ marginBottom: 'var(--space-3)' }}>
-                Pending Tasker Applications ({pendingUsers.length})
+                {t('moderation.pending_tasker_apps', { count: pendingUsers.length })}
               </div>
               {pendingUsers.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -221,14 +221,14 @@ export function ModerationPanel() {
                             className="btn btn-outlined btn-sm"
                             style={{ color: 'var(--color-status-error)', borderColor: 'var(--color-status-error)', display: 'flex', alignItems: 'center', gap: '4px' }}
                           >
-                            <X size={14} /> Reject
+                            <X size={14} /> {t('moderation.btn_reject')}
                           </button>
                           <button
                             onClick={() => handleApproveUser(user.id)}
                             className="btn btn-primary btn-sm"
                             style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                           >
-                            <Check size={14} /> Approve
+                            <Check size={14} /> {t('moderation.btn_approve')}
                           </button>
                         </div>
                       </div>
@@ -239,7 +239,7 @@ export function ModerationPanel() {
                 <div className="card">
                   <div className="empty-state" style={{ padding: 'var(--space-6)' }}>
                     <UserCheck size={28} style={{ opacity: 0.4, marginBottom: '6px' }} />
-                    <p style={{ margin: 0, fontSize: '13px' }}>No pending applications</p>
+                    <p style={{ margin: 0, fontSize: '13px' }}>{t('moderation.no_pending_apps')}</p>
                   </div>
                 </div>
               )}
@@ -248,7 +248,7 @@ export function ModerationPanel() {
             {/* Task moderation */}
             <div>
               <div className="section-label" style={{ marginBottom: 'var(--space-3)' }}>
-                Tasks Pending Moderation ({pendingTasks.length})
+                {t('moderation.tasks_pending_review', { count: pendingTasks.length })}
               </div>
               {pendingTasks.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -272,14 +272,14 @@ export function ModerationPanel() {
                             className="btn btn-outlined btn-sm"
                             style={{ color: 'var(--color-status-error)', borderColor: 'var(--color-status-error)', display: 'flex', alignItems: 'center', gap: '4px' }}
                           >
-                            <X size={14} /> Reject
+                            <X size={14} /> {t('moderation.btn_reject')}
                           </button>
                           <button
                             onClick={() => handleApproveTask(task.id)}
                             className="btn btn-primary btn-sm"
                             style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                           >
-                            <Check size={14} /> Approve
+                            <Check size={14} /> {t('moderation.btn_approve')}
                           </button>
                         </div>
                       </div>
@@ -301,7 +301,7 @@ export function ModerationPanel() {
                 <div className="card">
                   <div className="empty-state" style={{ padding: 'var(--space-6)' }}>
                     <FileText size={28} style={{ opacity: 0.4, marginBottom: '6px' }} />
-                    <p style={{ margin: 0, fontSize: '13px' }}>No tasks pending review</p>
+                    <p style={{ margin: 0, fontSize: '13px' }}>{t('moderation.no_pending_tasks')}</p>
                   </div>
                 </div>
               )}
@@ -317,7 +317,7 @@ export function ModerationPanel() {
               <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-on-surface-variant)' }} />
               <input
                 type="text"
-                placeholder="Search users by name, email, or role..."
+                placeholder={t('moderation.search_users_placeholder')}
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 style={{
@@ -336,10 +336,10 @@ export function ModerationPanel() {
 
             <div className="transaction-rows-container">
               <div className="transaction-row-header" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr' }}>
-                <span>User Info</span>
-                <span>Role</span>
-                <span>Tasker Status</span>
-                <span style={{ textAlign: 'right', paddingRight: '16px' }}>Actions</span>
+                <span>{t('moderation.th_user_info')}</span>
+                <span>{t('moderation.th_role')}</span>
+                <span>{t('moderation.th_tasker_status')}</span>
+                <span style={{ textAlign: 'right', paddingRight: '16px' }}>{t('moderation.th_actions')}</span>
               </div>
               
               {filteredUsers.map((user) => {
@@ -349,7 +349,7 @@ export function ModerationPanel() {
                   <div key={user.id} className="transaction-row-item" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', cursor: 'default' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 700, color: user.isDisabled ? 'var(--color-on-surface-variant)' : 'var(--color-secondary)' }}>
-                        {user.name} {user.isDisabled && <span style={{ color: 'var(--color-status-error)', fontSize: '11px', fontWeight: 600 }}>(DISABLED)</span>}
+                        {user.name} {user.isDisabled && <span style={{ color: 'var(--color-status-error)', fontSize: '11px', fontWeight: 600 }}>({t('moderation.badge_disabled')})</span>}
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>
                         {user.email}
@@ -376,19 +376,19 @@ export function ModerationPanel() {
                             className="btn btn-outlined btn-xs"
                             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', padding: '4px 8px' }}
                           >
-                            {isTasker ? 'Revoke Tasker' : 'Promote Tasker'}
+                            {isTasker ? t('moderation.btn_revoke_tasker') : t('moderation.btn_promote_tasker')}
                           </button>
                           <button
                             onClick={() => handleToggleDisableUser(user.id, !!user.isDisabled)}
                             className={`btn btn-xs ${user.isDisabled ? 'btn-primary' : 'btn-danger'}`}
                             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', padding: '4px 8px' }}
                           >
-                            {user.isDisabled ? 'Enable Account' : 'Disable Account'}
+                            {user.isDisabled ? t('moderation.btn_enable_account') : t('moderation.btn_disable_account')}
                           </button>
                         </>
                       )}
                       {isUserAdmin && (
-                        <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>System Administrator</span>
+                        <span style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>{t('moderation.sys_admin')}</span>
                       )}
                     </div>
                   </div>
@@ -406,7 +406,7 @@ export function ModerationPanel() {
               <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-on-surface-variant)' }} />
               <input
                 type="text"
-                placeholder="Search tasks by title, category, or description..."
+                placeholder={t('moderation.search_tasks_placeholder')}
                 value={taskSearch}
                 onChange={(e) => setTaskSearch(e.target.value)}
                 style={{
@@ -425,11 +425,11 @@ export function ModerationPanel() {
 
             <div className="transaction-rows-container">
               <div className="transaction-row-header" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1.2fr' }}>
-                <span>Task Listing</span>
-                <span>Category</span>
-                <span>Flow Status</span>
-                <span>Moderation</span>
-                <span style={{ textAlign: 'right', paddingRight: '16px' }}>Actions</span>
+                <span>{t('moderation.th_task_listing')}</span>
+                <span>{t('dashboard.th_category')}</span>
+                <span>{t('moderation.th_flow_status')}</span>
+                <span>{t('moderation.th_moderation')}</span>
+                <span style={{ textAlign: 'right', paddingRight: '16px' }}>{t('moderation.th_actions')}</span>
               </div>
               
               {filteredTasks.map((task) => (
